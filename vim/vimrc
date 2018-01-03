@@ -1,0 +1,483 @@
+"------------------------------------------------------------
+" Vundle
+"
+" Plugin manager for vim
+
+" set nocompatible    " be iMproved, required
+" filetype off        " required
+
+" set the runtime path to include Vundle and initialize
+" set rtp+=~/.vim/bundle/Vundle.vim
+" call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+" Plugin 'gmarik/Vundle.vim'
+
+" The following are examples of different formats supported.
+" Keep Plugin commands between vundle#begin/end.
+" plugin on GitHub repo
+" Plugin 'tpope/vim-fugitive'
+" plugin from http://vim-scripts.org/vim/scripts.html
+" Plugin 'L9'
+" Git plugin not hosted on GitHub
+" Plugin 'git://git.wincent.com/command-t.git'
+" git repos on your local machine (i.e. when working on your own plugin)
+" Plugin 'file:///home/gmarik/path/to/plugin'
+" The sparkup vim script is in a subdirectory of this repo called vim.
+" Pass the path to set the runtimepath properly.
+" Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+" Avoid a name conflict with L9
+" Plugin 'user/L9', {'name': 'newL9'}
+
+" All of your Plugins must be added before the following line
+" call vundle#end()            " required
+" filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList          - list configured plugins
+" :PluginInstall(!)    - install (update) plugins
+" :PluginSearch(!) foo - search (or refresh cache first) for foo
+" :PluginClean(!)      - confirm (or auto-approve) removal of unused plugins
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+
+
+"------------------------------------------------------------
+" Vim-Plug
+"
+" Plugin manager for vim
+
+" Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
+call plug#begin('~/.vim/plugins')
+
+" Make sure you use single quotes
+
+" Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
+" Plug 'junegunn/vim-easy-align'
+
+" Any valid git URL is allowed
+" Plug 'https://github.com/junegunn/vim-github-dashboard.git'
+
+" Multiple Plug commands can be written in a single line using | separators
+" Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+
+" On-demand loading
+" Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+" Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
+
+" Using a non-master branch
+" Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
+
+" Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
+" Plug 'fatih/vim-go', { 'tag': '*' }
+
+" Plugin options
+" Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
+
+" Plugin outside ~/.vim/plugged with post-update hook
+" Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+
+" Unmanaged plugin (manually installed and updated)
+" Plug '~/my-prototype-plugin'
+
+" Initialize plugin system
+" call plug#end()
+
+
+"------------------------------------------------------------
+" Plugins
+
+" Solarized colortheme
+Plug 'altercation/vim-colors-solarized'
+let g:solarized_termcolors = 16
+let g:solarized_termtrans = 1
+
+" A plugin which traces the highlighting linkages
+" ie. just what highlighting groups associated with the word under the cursor
+" Plug 'kergoth/vim-hilinks', {'on': 'HLTm'}
+
+" View vim startup time
+" Plug 'tweekmonster/startuptime.vim', {'on': 'StartUpTime'}
+
+" Auto complete with support for most programming languages
+Plug 'Valloric/YouCompleteMe', {'do': './install.py --all'}
+Plug 'rdnetto/YCM-Generator', {'branch': 'stable', 'on': 'YcmGenerateConfig'}
+let g:ycm_autoclose_preview_window_after_completion = 1
+let g:ycm_show_diagnostics_ui = 0
+let g:ycm_confirm_extra_conf = 0
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
+
+"map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+" Make vim aware of virtualenv
+Plug 'jmcantrell/vim-virtualenv'
+
+" Highlights syntax errors in editor for many different languages
+Plug 'scrooloose/syntastic'
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 2
+"let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_w = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_enable_balloons = 1
+let g:syntastic_aggregate_errors = 1
+
+" Enable checkers for syntastic
+let g:syntastic_python_checkers = ['flake8']
+
+let g:syntastic_java_checkers = ['javac']
+
+let g:syntastic_c_checkers = ['gcc', 'cppcheck', 'oclint']
+" let g:syntastic_c_compiler_options = '-std=c99 -Wall -ansi -pedantic -D_BSD_SOURCE'
+let g:syntastic_c_auto_refresh_includes = 1
+
+let g:syntastic_puppet_checkers = ['puppetlint']
+
+let g:syntastic_tex_checkers = ['chktex']
+
+let g:syntastic_rst_checkers = ['rstcheck']
+let g:syntastic_markdown_checkers = ['mdl']
+let g:syntastic_yaml_checkers = ['yamllint']
+let g:sysntastic_json_checkers = ['jsonlint']
+
+Plug 'syngan/vim-vimlint', {'for': 'vim'}
+Plug 'ynkdir/vim-vimlparser', {'for': 'vim'}
+
+" Flake 8 checking in python for PEP8 compatibility
+Plug 'nvie/vim-flake8', {'for': 'python'}
+"autocmd FileType python map <leader>c :call Flake8()<CR>
+"autocmd BufWritePost *.py call Flake8()
+
+" Vim plugin that displays tags in a window, ordered by scope
+" Plug 'majutsushi/tagbar'
+
+" Highlights trailing whitespace in red. Fix it with :FixWhitespace
+Plug 'bronson/vim-trailing-whitespace'
+
+" Snippet engine. Works with YouCompleteMe
+Plug 'SirVer/ultisnips'
+
+" Snippets are separated from the engine. Add this if you want them:
+Plug 'honza/vim-snippets'
+
+" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger = "<c-j>"
+let g:UltiSnipsJumpForwardTrigger = "<c-k>"
+let g:UltiSnipsJumpBackwardTrigger = "<c-l>"
+
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
+
+" Indenting for python
+Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
+
+" vim support for puppet
+Plug 'rodjek/vim-puppet', {'for': 'puppet'}
+
+" aligns text, used by vim-puppet
+Plug 'godlygeek/tabular', {'for': 'puppet'}
+
+" Allows selecting blocks of text easier
+"Plug 'terryma/vim-expand-region'
+"vmap v <Plug>(expand_region_expand)
+"vmap <C-v> <Plug>(expand_region_shrink)
+
+" File browsing in vim
+Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
+Plug 'jistr/vim-nerdtree-tabs', {'on': 'NERDTreeToggle'}
+
+" Ignore files in NERDTree
+let g:NERDTreeIgnore=['\.pyc$', '\~$']
+
+" comment multiple lines at once
+Plug 'scrooloose/nerdcommenter'
+let g:NERDCustomDelimiters = { 'go': { 'left': '#','right': '' } }
+
+" Different status line in
+Plug 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
+
+" Git support in vim
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+" Powerful search
+" Plug 'ctrlpvim/ctrlp.vim'
+
+" Markdown support
+Plug 'plasticboy/vim-markdown', {'for': 'markdown'}
+let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_math = 1
+let g:vim_markdown_frontmatter = 1
+let g:vim_markdown_json_frontmatter = 1
+
+" RST support
+Plug 'Rykka/riv.vim'
+Plug 'Rykka/InstantRst', {'for': 'rst'}
+
+" Prolog Support
+Plug 'adimit/prolog.vim', {'for': 'prolog'}
+
+" PowerShell support
+Plug 'PProvost/vim-ps1', {'for': 'ps1'}
+
+" use gvim color schemes in terminal (vim)
+" Plug 'vim-scripts/colorsupport.vim'
+
+" vim java autocomplete
+" Plug 'vim-scripts/javacomplete'
+
+" Display indent levels
+" Plug 'Yggdroot/indentLine'
+
+" A bunch of color schemes written for vim
+" Plug 'flazz/vim-colorschemes'
+
+
+" Initialize plugin system
+call plug#end()
+
+
+"------------------------------------------------------------
+" Color Schemes
+"
+" These optioins control the different colors displayed in vim
+
+" Enable syntax highlighting
+syntax on
+
+" Set vim default color scheme to use colors better with ddark background.
+" Can also be "light" if a light background is used
+set background=dark
+
+" set the color pallet to 256. Some terminals may only support 88.
+" Gnome-terminal supports 256 colors
+set t_Co=256
+
+" set the colorscheme vim uses
+colorscheme solarized
+
+
+"------------------------------------------------------------
+" Features
+"
+" These options and commands enable some very useful features in Vim, that
+" no user should have to live without.
+
+" Set 'nocompatible' to ward off unexpected things that your distro might
+" have made, as well as sanely reset options when re-sourcing .vimrc
+set nocompatible
+
+" Attempt to determine the type of a file based on its name and possibly its
+" contents. Use this to allow intelligent auto-indenting for each filetype,
+" and for plugins that are filetype specific.
+filetype indent plugin on
+
+" return to same spot in file when previously closed
+if has("autocmd")
+    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
+
+"------------------------------------------------------------
+" Must have options
+"
+" These are highly recommended options.
+
+" Vim with default settings does not allow easy switching between multiple files
+" in the same editor window. Users can use multiple split windows or multiple
+" tab pages to edit multiple files, but it is still best to enable an option to
+" allow easier switching between files.
+"
+" One such option is the 'hidden' option, which allows you to re-use the same
+" window and switch from an unsaved buffer without saving it first. Also allows
+" you to keep an undo history for multiple files when re-using the same window
+" in this way. Note that using persistent undo also lets you undo in multiple
+" files even in the same window, but is less efficient and is actually designed
+" for keeping undo history after closing Vim entirely. Vim will complain if you
+" try to quit without saving, and swap files will keep you safe if your computer
+" crashes.
+set hidden
+
+" Note that not everyone likes working this way (with the hidden option).
+" Alternatives include using tabs or split windows instead of re-using the same
+" window as mentioned above, and/or either of the following options:
+" set confirm
+" set autowriteall
+
+" Better command-line completion
+set wildmenu
+
+" Show partial commands in the last line of the screen
+set showcmd
+
+" Highlight searches (use <C-L> to temporarily turn off highlighting; see the
+" mapping of <C-L> below)
+set hlsearch
+
+" Modelines have historically been a source of security vulnerabilities. As
+" such, it may be a good idea to disable them and use the securemodelines
+" script, <http://www.vim.org/scripts/script.php?script_id=1876>.
+" set nomodeline
+
+" Turn spell checking on if the current file is a .tex document
+" autocmd BufNewFile,BufRead *.tex set spell spelllang=en_us
+
+
+"------------------------------------------------------------
+" Usability options
+"
+" These are options that users frequently set in their .vimrc. Some of them
+" change Vim's behaviour in ways which deviate from the true Vi way, but
+" which are considered to add usability. Which, if any, of these options to
+" use is very much a personal preference, but they are harmless.
+
+" Use case insensitive search, except when using capital letters
+set ignorecase
+set smartcase
+
+" Show matching brackets.
+set showmatch
+
+" Incremental search
+set incsearch
+
+" Automatically save before commands like :next and :make
+set autowrite
+
+" Allow backspacing over autoindent, line breaks and start of insert action
+set backspace=indent,eol,start
+
+" When opening a new line and no filetype-specific indenting is enabled, keep
+" the same indent as the line you're currently on. Useful for READMEs, etc.
+set autoindent
+
+" Stop certain movements from always going to the first character of a line.
+" While this behaviour deviates from that of Vi, it does what most users
+" coming from other editors would expect.
+set nostartofline
+
+" Display the cursor position on the last line of the screen or in the status
+" line of a window
+set ruler
+
+" Always display the status line, even if only one window is displayed
+set laststatus=2
+
+" Instead of failing a command because of unsaved changes, instead raise a
+" dialogue asking if you wish to save changed files.
+set confirm
+
+" Use visual bell instead of beeping when doing something wrong
+set visualbell
+
+" And reset the terminal code for the visual bell. If visualbell is set, and
+" this line is also included, vim will neither flash nor beep. If visualbell
+" is unset, this does nothing.
+set t_vb=
+
+" Enable use of the mouse for all modes
+" set mouse=a
+
+" Set the command window height to 2 lines, to avoid many cases of having to
+" "press <Enter> to continue"
+set cmdheight=2
+
+" Display line numbers on the left
+set number
+
+" Quickly time out on keycodes, but never time out on mappings
+set notimeout ttimeout ttimeoutlen=200
+
+" Use <F11> to toggle between 'paste' and 'nopaste'
+set pastetoggle=<F11>
+
+" Use UTF-8 encoding
+set encoding=utf-8
+
+" Use the system clipboard
+set clipboard=unnamed
+
+
+"------------------------------------------------------------
+" Indentation options
+"
+" Indentation settings according to personal preference.
+
+" Indentation settings for using 4 spaces instead of tabs.
+set tabstop=8
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+set shiftround
+
+" Indentation settings for using hard tabs for indent. Display tabs as
+" two characters wide.
+"set shiftwidth=4
+"set tabstop=4
+
+
+"------------------------------------------------------------
+" Mappings
+"
+" Useful mappings
+
+" Set leader to space
+let g:mapleader = "\<Space>"
+
+" Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
+" which is the default
+map Y y$
+
+" Map <C-L> (redraw screen) to also turn off search highlighting until the
+" next search
+nnoremap <C-R> :nohl<CR><C-L>
+
+" easier navigation between splits
+nnoremap <Leader>j <C-W><C-J>
+nnoremap <Leader>k <C-W><C-K>
+nnoremap <Leader>l <C-W><C-L>
+nnoremap <Leader>h <C-W><C-H>
+
+" Save a file with <Leader>w (<Space>w)
+nnoremap <Leader>w :w<CR>
+nnoremap <Leader>q :wq<CR>
+nnoremap <Leader>e :q!<CR>
+
+" Use leader to open a file
+nnoremap <Leader>o :CtrlP<CR>
+
+" Copy and paste shortcuts
+vmap <Leader>y "+y
+vmap <Leader>d "+d
+nmap <Leader>p "+p
+nmap <Leader>P "+P
+vmap <Leader>p "+p
+vmap <Leader>P "+P
+
+" Enter visual mode easy
+nmap <Leader><Leader> V
+
+"------------------------------------------------------------
+" FileTypes
+"
+" Set different settings for different filetypes
+" sw=shiftwidth, sts=softtabstop, et=expandtab
+
+autocmd BufReadPost *.rkt,*.rktl,*.scm set filetype=racket
+autocmd BufReadPost *.env set filetype=sh
+autocmd BufReadPost *.tf set filetype=go
+autocmd BufReadPost *.tpl set filetype=sh
+autocmd BufReadPost *.pl set filetype=prolog
+
+autocmd FileType make set noexpandtab " make files need hard tabs, not spaces
+autocmd FileType html setl sw=2 sts=2 et
+
