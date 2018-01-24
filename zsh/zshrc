@@ -6,7 +6,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
+export ZSH=~/.oh-my-zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -137,6 +137,8 @@ addToPath() {
 
 set editing-mode vi
 
+eval `dircolors ~/Repos/dircolors-solarized/dircolors.ansi-dark`
+
 
 ###########
 # Aliases #
@@ -155,4 +157,7 @@ alias vimrc="$EDITOR ~/.vimrc"
 
 alias activate="source .venv/bin/activate"
 
-alias py="python3"
+alias python="python3"
+alias py="python2"
+alias pip="pip3"
+alias pp="pip2"
