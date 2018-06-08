@@ -1,53 +1,4 @@
 "------------------------------------------------------------
-" Vundle
-"
-" Plugin manager for vim
-
-" set nocompatible    " be iMproved, required
-" filetype off        " required
-
-" set the runtime path to include Vundle and initialize
-" set rtp+=~/.vim/bundle/Vundle.vim
-" call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required
-" Plugin 'gmarik/Vundle.vim'
-
-" The following are examples of different formats supported.
-" Keep Plugin commands between vundle#begin/end.
-" plugin on GitHub repo
-" Plugin 'tpope/vim-fugitive'
-" plugin from http://vim-scripts.org/vim/scripts.html
-" Plugin 'L9'
-" Git plugin not hosted on GitHub
-" Plugin 'git://git.wincent.com/command-t.git'
-" git repos on your local machine (i.e. when working on your own plugin)
-" Plugin 'file:///home/gmarik/path/to/plugin'
-" The sparkup vim script is in a subdirectory of this repo called vim.
-" Pass the path to set the runtimepath properly.
-" Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-" Avoid a name conflict with L9
-" Plugin 'user/L9', {'name': 'newL9'}
-
-" All of your Plugins must be added before the following line
-" call vundle#end()            " required
-" filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList          - list configured plugins
-" :PluginInstall(!)    - install (update) plugins
-" :PluginSearch(!) foo - search (or refresh cache first) for foo
-" :PluginClean(!)      - confirm (or auto-approve) removal of unused plugins
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
-
-
-"------------------------------------------------------------
 " Vim-Plug
 "
 " Plugin manager for vim
@@ -105,7 +56,7 @@ let g:solarized_termtrans = 1
 " Plug 'tweekmonster/startuptime.vim', {'on': 'StartUpTime'}
 
 " Auto complete with support for most programming languages
-Plug 'Valloric/YouCompleteMe', {'do': './install.py --all'}
+Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer'}
 Plug 'rdnetto/YCM-Generator', {'branch': 'stable', 'on': 'YcmGenerateConfig'}
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_show_diagnostics_ui = 0
@@ -223,7 +174,7 @@ let g:vim_markdown_frontmatter = 1
 let g:vim_markdown_json_frontmatter = 1
 
 " RST support
-Plug 'Rykka/riv.vim'
+Plug 'Rykka/riv.vim', {'for': 'rst'}
 Plug 'Rykka/InstantRst', {'for': 'rst'}
 
 " Prolog Support
@@ -458,13 +409,13 @@ nnoremap <Leader>e :q!<CR>
 " Use leader to open a file
 nnoremap <Leader>o :CtrlP<CR>
 
-" Copy and paste shortcuts
-vmap <Leader>y "+y
-vmap <Leader>d "+d
-nmap <Leader>p "+p
-nmap <Leader>P "+P
-vmap <Leader>p "+p
-vmap <Leader>P "+P
+" Copy and paste shortcuts to use system clipboard
+map y "+y
+map d "+d
+map p "+p
+map P "+P
+map p "+p
+map P "+P
 
 " Enter visual mode easy
 nmap <Leader><Leader> V
