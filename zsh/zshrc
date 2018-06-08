@@ -50,13 +50,13 @@ ZSH_THEME="myagnoster"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+ZSH_CUSTOM=~/.dotfiles/zsh/zsh_custom
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git, zsh-dircolors-solarized)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -89,75 +89,3 @@ export SSH_KEY_PATH="~/.ssh/rsa_id"
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-
-#############
-# Functions #
-#############
-
-# Extracts different types of compressed files in one command
-# Author: Jayson Grace
-extract() {
-    if [ -f $1 ] ; then
-        case $1 in
-            *.tar.bz2)   tar xvjf $1    ;;
-            *.tar.gz)    tar xvzf $1    ;;
-            *.bz2)       bunzip2 $1     ;;
-            *.rar)       unrar x $1     ;;
-            *.gz)        gunzip $1      ;;
-            *.tar)       tar xvf $1     ;;
-            *.tbz2)      tar xvjf $1    ;;
-            *.tgz)       tar xvzf $1    ;;
-            *.zip)       unzip $1       ;;
-            *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1        ;;
-            *)           echo "don't know how to extract '$1'..." ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
-    fi
-}
-
-# Appends a directory to a path if it does not already exist
-# Author: http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
-addToPath() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]] ; then
-        if [ $2 = "before" ] ; then
-            PATH="$1${PATH:+":$PATH"}"
-        else
-            PATH="${PATH:+"$PATH:"}$1"
-        fi
-    fi
-}
-
-
-##################
-# Custom Options #
-##################
-
-set editing-mode vi
-
-eval `dircolors ~/Repos/dircolors-solarized/dircolors.ansi-dark`
-
-
-###########
-# Aliases #
-###########
-
-# GNU ls options
-LS_OPTIONS='-lhF --color=auto'
-alias ls="ls $LS_OPTIONS"
-alias la="ls $LS_OPTIONS -a"
-
-alias c='clear'
-alias e='exit'
-
-alias zshrc="$EDITOR ~/.zshrc"
-alias vimrc="$EDITOR ~/.vimrc"
-
-alias activate="source .venv/bin/activate"
-
-alias python="python3"
-alias py="python2"
-alias pip="pip3"
-alias pp="pip2"
