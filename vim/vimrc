@@ -56,7 +56,7 @@ let g:solarized_termtrans = 1
 " Plug 'tweekmonster/startuptime.vim', {'on': 'StartUpTime'}
 
 " Auto complete with support for most programming languages
-Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer'}
+Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --all'}
 Plug 'rdnetto/YCM-Generator', {'branch': 'stable', 'on': 'YcmGenerateConfig'}
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_show_diagnostics_ui = 0
