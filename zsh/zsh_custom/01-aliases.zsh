@@ -4,8 +4,8 @@
 
 # GNU ls options
 LS_OPTIONS='-lhF --color=auto'
-alias ls="gls $LS_OPTIONS"
-alias la="gls $LS_OPTIONS -a"
+alias ls="ls $LS_OPTIONS"
+alias la="ls $LS_OPTIONS -a"
 
 alias c='clear'
 alias e='exit'

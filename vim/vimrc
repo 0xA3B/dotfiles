@@ -410,12 +410,12 @@ nnoremap <Leader>e :q!<CR>
 nnoremap <Leader>o :CtrlP<CR>
 
 " Copy and paste shortcuts to use system clipboard
-map y "+y
-map d "+d
-map p "+p
-map P "+P
-map p "+p
-map P "+P
+"map y "+y
+"map d "+d
+"map p "+p
+"map P "+P
+"map p "+p
+"map P "+P
 
 " Enter visual mode easy
 nmap <Leader><Leader> V
