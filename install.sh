@@ -1,7 +1,7 @@
 #! /bin/bash
 
 
-git clone git@github.com:alexebaker/dotfiles.git ~/.dotfiles
+git clone https://github.com/alexebaker/dotfiles.git ~/.dotfiles
 
 
 cd ~/
