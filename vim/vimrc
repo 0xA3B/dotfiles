@@ -92,7 +92,7 @@ let g:syntastic_c_auto_refresh_includes = 1
 
 let g:syntastic_puppet_checkers = ['puppetlint']
 
-let g:syntastic_tex_checkers = ['chktex']
+"let g:syntastic_tex_checkers = ['chktex']
 
 let g:syntastic_rst_checkers = ['rstcheck']
 let g:syntastic_markdown_checkers = ['mdl']
@@ -410,12 +410,12 @@ nnoremap <Leader>e :q!<CR>
 nnoremap <Leader>o :CtrlP<CR>
 
 " Copy and paste shortcuts to use system clipboard
-map y "+y
-map d "+d
-map p "+p
-map P "+P
-map p "+p
-map P "+P
+"map y "+y
+"map d "+d
+"map p "+p
+"map P "+P
+"map p "+p
+"map P "+P
 
 " Enter visual mode easy
 nmap <Leader><Leader> V
