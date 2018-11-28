@@ -17,3 +17,6 @@ alias activate="source .venv/bin/activate"
 
 alias python="python3"
 alias pip="pip3"
+
+alias ghci="docker run --rm -it haskell"
+#alias gcc="docker run --rm -v "$PWD":/usr/src -w /usr/src gcc:latest make"

@@ -56,7 +56,7 @@ let g:solarized_termtrans = 1
 " Plug 'tweekmonster/startuptime.vim', {'on': 'StartUpTime'}
 
 " Auto complete with support for most programming languages
-Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer'}
+Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer --js-completer'}
 Plug 'rdnetto/YCM-Generator', {'branch': 'stable', 'on': 'YcmGenerateConfig'}
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_show_diagnostics_ui = 0
@@ -183,6 +183,8 @@ Plug 'adimit/prolog.vim', {'for': 'prolog'}
 " PowerShell support
 Plug 'PProvost/vim-ps1', {'for': 'ps1'}
 
+Plug 'hail2u/vim-css3-syntax'
+
 " use gvim color schemes in terminal (vim)
 " Plug 'vim-scripts/colorsupport.vim'
 
@@ -198,6 +200,12 @@ Plug 'PProvost/vim-ps1', {'for': 'ps1'}
 
 " Initialize plugin system
 call plug#end()
+
+
+" Used to disable deprecation warning when using vim + python3.7
+if has("python3")
+    silent! python3 1
+endif
 
 
 "------------------------------------------------------------
@@ -239,6 +247,11 @@ filetype indent plugin on
 if has("autocmd")
     au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
+
+" Change cursor to vertical line in insert mode: for GNOME Terminal
+let &t_SI = "\<Esc>[6 q"
+let &t_SR = "\<Esc>[4 q"
+let &t_EI = "\<Esc>[2 q"
 
 
 "------------------------------------------------------------
@@ -410,12 +423,12 @@ nnoremap <Leader>e :q!<CR>
 nnoremap <Leader>o :CtrlP<CR>
 
 " Copy and paste shortcuts to use system clipboard
-map y "+y
-map d "+d
-map p "+p
-map P "+P
-map p "+p
-map P "+P
+"map y "+y
+"map d "+d
+"map p "+p
+"map P "+P
+"map p "+p
+"map P "+P
 
 " Enter visual mode easy
 nmap <Leader><Leader> V
@@ -433,5 +446,8 @@ autocmd BufReadPost *.tpl set filetype=sh
 autocmd BufReadPost *.pl set filetype=prolog
 
 autocmd FileType make set noexpandtab " make files need hard tabs, not spaces
-autocmd FileType html setl sw=2 sts=2 et
+autocmd FileType html setl sw=4 sts=4 et
+autocmd FileType yaml setl sw=4 sts=4 et
+
+autocmd FileType css set omnifunc=csscomplete#CompleteCSS
 
