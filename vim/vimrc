@@ -86,13 +86,13 @@ let g:syntastic_python_checkers = ['flake8']
 
 let g:syntastic_java_checkers = ['javac']
 
-let g:syntastic_c_checkers = ['gcc', 'cppcheck', 'oclint']
+let g:syntastic_c_checkers = ['gcc']
 " let g:syntastic_c_compiler_options = '-std=c99 -Wall -ansi -pedantic -D_BSD_SOURCE'
 let g:syntastic_c_auto_refresh_includes = 1
 
 let g:syntastic_puppet_checkers = ['puppetlint']
 
-let g:syntastic_tex_checkers = ['chktex']
+"let g:syntastic_tex_checkers = ['chktex']
 
 let g:syntastic_rst_checkers = ['rstcheck']
 let g:syntastic_markdown_checkers = ['mdl']
@@ -184,6 +184,9 @@ Plug 'adimit/prolog.vim', {'for': 'prolog'}
 Plug 'PProvost/vim-ps1', {'for': 'ps1'}
 
 Plug 'hail2u/vim-css3-syntax'
+
+" Haskell support
+Plug 'neovimhaskell/haskell-vim', {'for': 'haskell'}
 
 " use gvim color schemes in terminal (vim)
 " Plug 'vim-scripts/colorsupport.vim'
@@ -444,10 +447,10 @@ autocmd BufReadPost *.env set filetype=sh
 autocmd BufReadPost *.tf set filetype=go
 autocmd BufReadPost *.tpl set filetype=sh
 autocmd BufReadPost *.pl set filetype=prolog
+autocmd BufReadPost *.hl set filetype=haskell
+autocmd BufReadPost Dockerfile* set filetype=dockerfile
 
 autocmd FileType make set noexpandtab " make files need hard tabs, not spaces
 autocmd FileType html setl sw=4 sts=4 et
 autocmd FileType yaml setl sw=4 sts=4 et
-
 autocmd FileType css set omnifunc=csscomplete#CompleteCSS
-
