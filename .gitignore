@@ -1,7 +1,3 @@
-*snl.zsh
-
-plugins/
-
 # General
 .DS_Store
 .AppleDouble
@@ -92,3 +88,9 @@ tags
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+
+*snl.zsh
+plugins/
+themes/
+
+
