@@ -6,6 +6,7 @@
 # Add brew directories to path
 addToPath /usr/local/sbin before
 addToPath /usr/local/bin before
+addToPath /usr/local/opt/tcl-tk/bin before
 
 set editing-mode vi
 

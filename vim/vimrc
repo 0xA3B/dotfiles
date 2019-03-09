@@ -447,6 +447,7 @@ autocmd BufReadPost *.tf set filetype=go
 autocmd BufReadPost *.tpl set filetype=sh
 autocmd BufReadPost *.pl set filetype=prolog
 autocmd BufReadPost *.hl set filetype=haskell
+autocmd BufReadPost Dockerfile* set filetype=dockerfile
 
 autocmd FileType make set noexpandtab " make files need hard tabs, not spaces
 autocmd FileType html setl sw=4 sts=4 et
