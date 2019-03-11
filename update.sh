@@ -1,19 +1,27 @@
 #!/usr/bin/env zsh
 
+
 cd ~/.oh-my-zsh
 git pull origin master
 
-cd $ZSH_CUSTOM/plugins/zsh-dircolors-solarized
+cd ~/.zsh_custom/plugins/zsh-dircolors-solarized
 git pull origin master
 
-cd $ZSH_CUSTOM/themes/powerlevel9k
+cd ~/.zsh_custom/themes/powerlevel9k
 git pull origin master
 
 brew update
 brew upgrade
+brew cleanup
 
 pip install -U pip setuptools wheel virtualenv rstcheck
 
-gem update mdl puppet-lint
+if [[ ! -z "$http_proxy" ]] ; then
+    sudo gem update --http-proxy $http_proxy mdl puppet-lint
+else
+    sudo gem update mdl puppet-lint
+fi
 
-vim -c "PlugUpgrade" -c "PlugUpdate" -c "q\!" -c "q\!"
+vim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
+
+exit 0

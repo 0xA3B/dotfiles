@@ -16,8 +16,13 @@ ln -s ~/.dotfiles/zsh/zsh_custom .zsh_custom
 
 brew tap oclint/formulae
 brew install flake8 cppcheck oclint yamllint jsonlint
-gem install mdl puppet-lint
 pip install rstcheck
+
+if [[ ! -z "$http_proxy" ]] ; then
+    sudo gem install --http-proxy $http_proxy mdl puppet-lint
+else
+    sudo gem install mdl puppet-lint
+fi
 
 cd ~/.fonts
 ./install.sh
