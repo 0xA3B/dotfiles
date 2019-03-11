@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env zsh
 
 
 git clone https://github.com/alexebaker/dotfiles.git ~/.dotfiles

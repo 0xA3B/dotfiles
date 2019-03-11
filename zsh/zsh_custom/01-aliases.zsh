@@ -2,13 +2,22 @@
 # Aliases #
 ###########
 
-# GNU ls options
-LS_OPTIONS='-lhF --color=auto'
-alias ls="ls $LS_OPTIONS"
-alias la="ls $LS_OPTIONS -a"
+# check if we are on osx, use gls if so
+{
+    if (sw_vers | grep "Mac OS X") then
+        LS="gls"
+    else
+        LS="ls"
+    fi
+} > /dev/null
 
-alias c='clear'
-alias e='exit'
+
+LS_OPTIONS="-lhF --color=auto"
+alias ls="$LS $LS_OPTIONS"
+alias la="$LS $LS_OPTIONS -a"
+
+alias c="clear"
+alias e="exit"
 
 alias zshrc="$EDITOR ~/.zshrc"
 alias vimrc="$EDITOR ~/.vimrc"
@@ -18,8 +27,7 @@ alias activate="source .venv/bin/activate"
 alias python="python3"
 alias pip="pip3"
 
-alias ghci="docker run --rm -it haskell"
-#alias gcc="docker run --rm -v "$PWD":/usr/src -w /usr/src gcc:latest make"
+alias vim-update='vim -c "PlugUpgrade" -c "PlugUpdate" -c "q\!" -c "q\!"'
 
 ### Vulnerable Containers ###
 alias bricks="docker run --rm -d -p 8081:80 --name=bricks citizenstig/owaspbricks"
