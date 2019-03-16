@@ -61,11 +61,9 @@ ZSH_CUSTOM=~/.zsh_custom
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-{
-    if (sw_vers | grep "Mac OS X") then
-        alias dircolors="gdircolors"
-    fi
-} > /dev/null
+if [[ ! -f /etc/os-release ]] ; then
+    alias dircolors="gdircolors"
+fi
 plugins=(git, zsh-dircolors-solarized)
 
 source $ZSH/oh-my-zsh.sh
