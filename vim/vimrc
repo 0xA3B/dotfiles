@@ -219,7 +219,7 @@ endif
 " Enable syntax highlighting
 syntax on
 
-" Set vim default color scheme to use colors better with ddark background.
+" Set vim default color scheme to use colors better with dark background.
 " Can also be "light" if a light background is used
 set background=dark
 
