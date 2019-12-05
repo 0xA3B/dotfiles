@@ -56,7 +56,7 @@ let g:solarized_termtrans = 1
 " Plug 'tweekmonster/startuptime.vim', {'on': 'StartUpTime'}
 
 " Auto complete with support for most programming languages
-Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer'}
+Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer --js-completer'}
 Plug 'rdnetto/YCM-Generator', {'branch': 'stable', 'on': 'YcmGenerateConfig'}
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_show_diagnostics_ui = 0
@@ -86,13 +86,13 @@ let g:syntastic_python_checkers = ['flake8']
 
 let g:syntastic_java_checkers = ['javac']
 
-let g:syntastic_c_checkers = ['gcc', 'cppcheck', 'oclint']
+let g:syntastic_c_checkers = ['gcc']
 " let g:syntastic_c_compiler_options = '-std=c99 -Wall -ansi -pedantic -D_BSD_SOURCE'
 let g:syntastic_c_auto_refresh_includes = 1
 
 let g:syntastic_puppet_checkers = ['puppetlint']
 
-let g:syntastic_tex_checkers = ['chktex']
+"let g:syntastic_tex_checkers = ['chktex']
 
 let g:syntastic_rst_checkers = ['rstcheck']
 let g:syntastic_markdown_checkers = ['mdl']
@@ -183,6 +183,11 @@ Plug 'adimit/prolog.vim', {'for': 'prolog'}
 " PowerShell support
 Plug 'PProvost/vim-ps1', {'for': 'ps1'}
 
+Plug 'hail2u/vim-css3-syntax'
+
+" Haskell support
+Plug 'neovimhaskell/haskell-vim', {'for': 'haskell'}
+
 " use gvim color schemes in terminal (vim)
 " Plug 'vim-scripts/colorsupport.vim'
 
@@ -200,6 +205,12 @@ Plug 'PProvost/vim-ps1', {'for': 'ps1'}
 call plug#end()
 
 
+" Used to disable deprecation warning when using vim + python3.7
+if has("python3")
+    silent! python3 1
+endif
+
+
 "------------------------------------------------------------
 " Color Schemes
 "
@@ -208,7 +219,7 @@ call plug#end()
 " Enable syntax highlighting
 syntax on
 
-" Set vim default color scheme to use colors better with ddark background.
+" Set vim default color scheme to use colors better with dark background.
 " Can also be "light" if a light background is used
 set background=dark
 
@@ -239,6 +250,11 @@ filetype indent plugin on
 if has("autocmd")
     au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
+
+" Change cursor to vertical line in insert mode: for GNOME Terminal
+let &t_SI = "\<Esc>[6 q"
+let &t_SR = "\<Esc>[4 q"
+let &t_EI = "\<Esc>[2 q"
 
 
 "------------------------------------------------------------
@@ -410,12 +426,12 @@ nnoremap <Leader>e :q!<CR>
 nnoremap <Leader>o :CtrlP<CR>
 
 " Copy and paste shortcuts to use system clipboard
-map y "+y
-map d "+d
-map p "+p
-map P "+P
-map p "+p
-map P "+P
+"map y "+y
+"map d "+d
+"map p "+p
+"map P "+P
+"map p "+p
+"map P "+P
 
 " Enter visual mode easy
 nmap <Leader><Leader> V
@@ -431,7 +447,10 @@ autocmd BufReadPost *.env set filetype=sh
 autocmd BufReadPost *.tf set filetype=go
 autocmd BufReadPost *.tpl set filetype=sh
 autocmd BufReadPost *.pl set filetype=prolog
+autocmd BufReadPost *.hl set filetype=haskell
+autocmd BufReadPost Dockerfile* set filetype=dockerfile
 
 autocmd FileType make set noexpandtab " make files need hard tabs, not spaces
-autocmd FileType html setl sw=2 sts=2 et
-
+autocmd FileType html setl sw=4 sts=4 et
+autocmd FileType yaml setl sw=4 sts=4 et
+autocmd FileType css set omnifunc=csscomplete#CompleteCSS
