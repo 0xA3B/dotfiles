@@ -25,10 +25,12 @@ brew cleanup
 pip install -U pip setuptools wheel virtualenv rstcheck
 
 if [[ ! -z "$http_proxy" ]] ; then
-    sudo gem update --http-proxy $http_proxy mdl puppet-lint
+    gem update --http-proxy $http_proxy mdl puppet-lint
 else
-    sudo gem update mdl puppet-lint
+    gem update mdl puppet-lint
 fi
+
+npm install -g npm
 
 vim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
 
