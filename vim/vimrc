@@ -48,6 +48,13 @@ Plug 'altercation/vim-colors-solarized'
 let g:solarized_termcolors = 16
 let g:solarized_termtrans = 1
 
+" Different status line in
+Plug 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
+
+" Git support in vim
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
 " A plugin which traces the highlighting linkages
 " ie. just what highlighting groups associated with the word under the cursor
 " Plug 'kergoth/vim-hilinks', {'on': 'HLTm'}
@@ -87,12 +94,8 @@ let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_java_checkers = ['javac']
 
 let g:syntastic_c_checkers = ['gcc']
-" let g:syntastic_c_compiler_options = '-std=c99 -Wall -ansi -pedantic -D_BSD_SOURCE'
+let g:syntastic_c_compiler_options = '-std=c99 -Wall -ansi -pedantic -D_BSD_SOURCE'
 let g:syntastic_c_auto_refresh_includes = 1
-
-let g:syntastic_puppet_checkers = ['puppetlint']
-
-"let g:syntastic_tex_checkers = ['chktex']
 
 let g:syntastic_rst_checkers = ['rstcheck']
 let g:syntastic_markdown_checkers = ['mdl']
@@ -134,10 +137,10 @@ Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
 Plug 'mattn/emmet-vim', {'for': 'html'}
 
 " vim support for puppet
-Plug 'rodjek/vim-puppet', {'for': 'puppet'}
+" Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 
 " aligns text, used by vim-puppet
-Plug 'godlygeek/tabular', {'for': 'puppet'}
+" Plug 'godlygeek/tabular', {'for': 'puppet'}
 
 " Allows selecting blocks of text easier
 "Plug 'terryma/vim-expand-region'
@@ -154,13 +157,6 @@ let g:NERDTreeIgnore=['\.pyc$', '\~$']
 " comment multiple lines at once
 Plug 'scrooloose/nerdcommenter'
 let g:NERDCustomDelimiters = { 'go': { 'left': '#','right': '' } }
-
-" Different status line in
-Plug 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
-
-" Git support in vim
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
 
 " Powerful search
 " Plug 'ctrlpvim/ctrlp.vim'
@@ -451,6 +447,6 @@ autocmd BufReadPost *.hl set filetype=haskell
 autocmd BufReadPost Dockerfile* set filetype=dockerfile
 
 autocmd FileType make set noexpandtab " make files need hard tabs, not spaces
-autocmd FileType html setl sw=4 sts=4 et
-autocmd FileType yaml setl sw=4 sts=4 et
+autocmd FileType html setl sw=2 sts=2 et
+autocmd FileType yaml setl sw=2 sts=2 et
 autocmd FileType css set omnifunc=csscomplete#CompleteCSS
