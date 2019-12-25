@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 
-git clone https://github.com/alexebaker/dotfiles.git ~/.dotfiles
+git clone https://github.com/alexebaker/dotfiles.git $HOME/.dotfiles
 git clone --recursive https://github.com/joel-porquet/zsh-dircolors-solarized.git $ZSH_CUSTOM/plugins/zsh-dircolors-solarized
 git clone https://github.com/bhilburn/powerlevel9k.git $ZSH_CUSTOM/themes/powerlevel9k
-git clone --depth=1 https://github.com/powerline/fonts.git ~/.fonts
+git clone --depth=1 https://github.com/powerline/fonts.git $HOME/.fonts
 
 cd ~/
 rm .vimrc

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 
 cd ~/.oh-my-zsh
@@ -10,7 +10,7 @@ git pull origin master
 cd ~/.zsh_custom/themes/powerlevel9k
 git pull origin master
 
-if [[ -f /etc/os-release ]] ; then
+if [[ $OSTYPE == "linux-gnu" ]] ; then
     sudo apt-get update
     sudo apt-get -f install
     sudo apt-get -y dist-upgrade
@@ -25,9 +25,9 @@ brew cleanup
 pip install -U pip setuptools wheel virtualenv rstcheck
 
 if [[ ! -z "$http_proxy" ]] ; then
-    gem update --http-proxy $http_proxy mdl puppet-lint
+    gem update --http-proxy $http_proxy mdl
 else
-    gem update mdl puppet-lint
+    gem update mdl
 fi
 
 npm install -g npm
