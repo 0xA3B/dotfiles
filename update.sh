@@ -22,15 +22,13 @@ brew update
 brew upgrade
 brew cleanup
 
-pip install -U pip setuptools wheel virtualenv rstcheck
+pip3 install -U pip setuptools wheel virtualenv rstcheck flake8 dlint
 
 if [[ ! -z "$http_proxy" ]] ; then
     gem update --http-proxy $http_proxy mdl
 else
     gem update mdl
 fi
-
-npm install -g npm
 
 vim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
 
