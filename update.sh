@@ -1,16 +1,20 @@
 #!/bin/bash
 
 
-cd ~/.oh-my-zsh
-git pull origin master
+pushd "$ZSH"
+git pull
+popd
 
-cd ~/.zsh_custom/plugins/zsh-dircolors-solarized
-git pull origin master
+pushd "$ZSH_CUSTOM/plugins/zsh-dircolors-solarized"
+git pull
+popd
 
-cd ~/.zsh_custom/themes/powerlevel9k
-git pull origin master
+pushd "$ZSH_CUSTOM/themes/powerlevel9k"
+git pull
+popd
 
-if [[ $OSTYPE == "linux-gnu" ]] ; then
+if [[ $OSTYPE =~ "linux" ]]
+then
     sudo apt-get update
     sudo apt-get -f install
     sudo apt-get -y dist-upgrade
@@ -22,9 +26,10 @@ brew update
 brew upgrade
 brew cleanup
 
-pip3 install -U pip setuptools wheel virtualenv rstcheck flake8 dlint
+pip3 install -U pip setuptools wheel virtualenv rstcheck dlint
 
-if [[ ! -z "$http_proxy" ]] ; then
+if [[ ! -z "$http_proxy" ]]
+then
     gem update --http-proxy $http_proxy mdl
 else
     gem update mdl
