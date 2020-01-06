@@ -4,9 +4,9 @@
 
 
 # check if we are on osx or linux, use gls if on osx
-if [[ $OSTYPE == "linux-gnu" ]] ; then
+if [[ $OSTYPE =~ "linux" ]] ; then
     LS="ls"
-elif [[ $OSTYPE == "darwin" ]] ; then
+elif [[ $OSTYPE =~ "darwin" ]] ; then
     LS="gls"
 fi
 

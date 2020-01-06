@@ -4,18 +4,17 @@
 
 
 export GEM_HOME="$HOME/.gems"
+addToPath "$GEM_HOME/bin" before
 
-if [[ $OSTYPE == "linux-gnu" ]] ; then
+if [[ $OSTYPE =~ "linux" ]] ; then
     if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]] ; then
         eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
     fi
 
-    addToPath "$GEM_HOME/bin" before
-elif [[ $OSTYPE == "darwin" ]] ; then
-    # Add brew directories to path
-    addToPath "/usr/local/sbin" before
-    addToPath "/usr/local/bin" before
-    addToPath "/usr/local/opt/tcl-tk/bin" before
+elif [[ $OSTYPE =~ "darwin" ]] ; then
+    if [[ -f "/usr/local/bin/brew" ]] ; then
+        eval $(/usr/local/bin/brew shellenv)
+    fi
 fi
 
 set editing-mode vi
