@@ -10,11 +10,12 @@ if [[ $OSTYPE =~ "linux" ]] ; then
     if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]] ; then
         eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
     fi
-
 elif [[ $OSTYPE =~ "darwin" ]] ; then
     if [[ -f "/usr/local/bin/brew" ]] ; then
         eval $(/usr/local/bin/brew shellenv)
     fi
+
+    addToPath "/usr/local/opt/ruby/bin" before
 fi
 
 set editing-mode vi
