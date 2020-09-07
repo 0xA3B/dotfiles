@@ -89,8 +89,7 @@ pyvenv.cfg
 .venv
 pip-selfcheck.json
 
-*snl.zsh
 plugins/
 themes/
 
-
+*.bak

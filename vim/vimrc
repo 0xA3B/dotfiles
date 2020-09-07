@@ -45,41 +45,42 @@ call plug#begin('~/.vim/plugins')
 
 " Solarized colortheme
 Plug 'altercation/vim-colors-solarized'
-let g:solarized_termcolors = 16
-let g:solarized_termtrans = 1
+"let g:solarized_termcolors = 16
+"let g:solarized_termtrans = 1
 
-" Different status line in
-Plug 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
+" Powerline status bar
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+let g:airline_theme='solarized_flood'
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#formatter = 'default'
 
-" Git support in vim
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
+" Fuzzy file finder
+Plug 'ctrlpvim/ctrlp.vim'
 
-" A plugin which traces the highlighting linkages
-" ie. just what highlighting groups associated with the word under the cursor
-" Plug 'kergoth/vim-hilinks', {'on': 'HLTm'}
+" Tagbar support
+Plug 'majutsushi/tagbar'
+nmap <F8> :TagbarToggle<CR>
 
-" View vim startup time
-" Plug 'tweekmonster/startuptime.vim', {'on': 'StartUpTime'}
+" Tmux support
+Plug 'edkolev/tmuxline.vim'
+let g:tmuxline_powerline_separators = 1
 
-" Auto complete with support for most programming languages
-Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer --js-completer'}
-Plug 'rdnetto/YCM-Generator', {'branch': 'stable', 'on': 'YcmGenerateConfig'}
-let g:ycm_autoclose_preview_window_after_completion = 1
-let g:ycm_show_diagnostics_ui = 0
-let g:ycm_confirm_extra_conf = 0
-let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
-
-"map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
-
-" Make vim aware of virtualenv
+" Virtualenv support
 Plug 'jmcantrell/vim-virtualenv'
 
-" Highlights syntax errors in editor for many different languages
-Plug 'scrooloose/syntastic'
-"set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
-"set statusline+=%*
+" Git support
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+"Plug 'mhinz/vim-signify'
+"set updatetime=100
+
+" Syntax hilighting
+Plug 'vim-syntastic/syntastic'
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 2
 let g:syntastic_check_on_open = 0
@@ -90,6 +91,8 @@ let g:syntastic_aggregate_errors = 1
 
 " Enable checkers for syntastic
 let g:syntastic_python_checkers = ['flake8']
+
+let g:syntastic_go_checkers = ['go']
 
 let g:syntastic_java_checkers = ['javac']
 
@@ -102,104 +105,18 @@ let g:syntastic_markdown_checkers = ['mdl']
 let g:syntastic_yaml_checkers = ['yamllint']
 let g:sysntastic_json_checkers = ['jsonlint']
 
-Plug 'syngan/vim-vimlint', {'for': 'vim'}
-Plug 'ynkdir/vim-vimlparser', {'for': 'vim'}
+" Rust support
+Plug 'rust-lang/rust.vim'
 
-" Flake 8 checking in python for PEP8 compatibility
-Plug 'nvie/vim-flake8', {'for': 'python'}
-"autocmd FileType python map <leader>c :call Flake8()<CR>
-"autocmd BufWritePost *.py call Flake8()
-
-" Vim plugin that displays tags in a window, ordered by scope
-" Plug 'majutsushi/tagbar'
+" Snippet engine. Works with YouCompleteMe
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 
 " Highlights trailing whitespace in red. Fix it with :FixWhitespace
 Plug 'bronson/vim-trailing-whitespace'
 
-" Snippet engine. Works with YouCompleteMe
-Plug 'SirVer/ultisnips'
-
-" Snippets are separated from the engine. Add this if you want them:
-Plug 'honza/vim-snippets'
-
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger = "<c-j>"
-let g:UltiSnipsJumpForwardTrigger = "<c-k>"
-let g:UltiSnipsJumpBackwardTrigger = "<c-l>"
-
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
-
-" Indenting for python
-Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
-
-" HTML support
-Plug 'mattn/emmet-vim', {'for': 'html'}
-
-" vim support for puppet
-" Plug 'rodjek/vim-puppet', {'for': 'puppet'}
-
-" aligns text, used by vim-puppet
-" Plug 'godlygeek/tabular', {'for': 'puppet'}
-
-" Allows selecting blocks of text easier
-"Plug 'terryma/vim-expand-region'
-"vmap v <Plug>(expand_region_expand)
-"vmap <C-v> <Plug>(expand_region_shrink)
-
-" File browsing in vim
-Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
-Plug 'jistr/vim-nerdtree-tabs', {'on': 'NERDTreeToggle'}
-
-" Ignore files in NERDTree
-let g:NERDTreeIgnore=['\.pyc$', '\~$']
-
-" comment multiple lines at once
-Plug 'scrooloose/nerdcommenter'
-let g:NERDCustomDelimiters = { 'go': { 'left': '#','right': '' } }
-
-" Powerful search
-" Plug 'ctrlpvim/ctrlp.vim'
-
-" Markdown support
-Plug 'plasticboy/vim-markdown', {'for': 'markdown'}
-let g:vim_markdown_folding_disabled = 1
-let g:vim_markdown_toc_autofit = 1
-let g:vim_markdown_math = 1
-let g:vim_markdown_frontmatter = 1
-let g:vim_markdown_json_frontmatter = 1
-
-" RST support
-Plug 'Rykka/riv.vim', {'for': 'rst'}
-Plug 'Rykka/InstantRst', {'for': 'rst'}
-
-" Prolog Support
-Plug 'adimit/prolog.vim', {'for': 'prolog'}
-
-" PowerShell support
-Plug 'PProvost/vim-ps1', {'for': 'ps1'}
-
-Plug 'hail2u/vim-css3-syntax'
-
-" Haskell support
-Plug 'neovimhaskell/haskell-vim', {'for': 'haskell'}
-
-" use gvim color schemes in terminal (vim)
-" Plug 'vim-scripts/colorsupport.vim'
-
-" vim java autocomplete
-" Plug 'vim-scripts/javacomplete'
-
-" Display indent levels
-" Plug 'Yggdroot/indentLine'
-
-" A bunch of color schemes written for vim
-" Plug 'flazz/vim-colorschemes'
-
-
 " Initialize plugin system
 call plug#end()
-
 
 " Used to disable deprecation warning when using vim + python3.7
 if has("python3")
@@ -370,7 +287,7 @@ set pastetoggle=<F11>
 set encoding=utf-8
 
 " Use the system clipboard
-set clipboard=unnamed
+set clipboard=unnamedplus
 
 
 "------------------------------------------------------------
@@ -438,13 +355,11 @@ nmap <Leader><Leader> V
 " Set different settings for different filetypes
 " sw=shiftwidth, sts=softtabstop, et=expandtab
 
-autocmd BufReadPost *.rkt,*.rktl,*.scm set filetype=racket
 autocmd BufReadPost *.env set filetype=sh
 autocmd BufReadPost *.tf set filetype=go
 autocmd BufReadPost *.tpl set filetype=sh
-autocmd BufReadPost *.pl set filetype=prolog
-autocmd BufReadPost *.hl set filetype=haskell
 autocmd BufReadPost Dockerfile* set filetype=dockerfile
+autocmd BufReadPost Vagrantfile* set filetype=ruby
 
 autocmd FileType make set noexpandtab " make files need hard tabs, not spaces
 autocmd FileType html setl sw=2 sts=2 et
