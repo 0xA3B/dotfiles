@@ -56,6 +56,18 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'default'
 
+" File browsing in vim
+Plug 'preservim/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'preservim/nerdcommenter'
+map <C-o> :NERDTreeToggle<CR>
+let g:NERDSpaceDelims = 1
+let g:NERDCompactSexyComs = 1
+let g:NERDDefaultAlign = 'left'
+let g:NERDCommentEmptyLines = 1
+let g:NERDTrimTrailingWhitespace = 1
+let g:NERDToggleCheckAllLines = 1
+
 " Fuzzy file finder
 Plug 'ctrlpvim/ctrlp.vim'
 
@@ -68,22 +80,24 @@ Plug 'edkolev/tmuxline.vim'
 let g:tmuxline_powerline_separators = 1
 
 " Virtualenv support
-Plug 'jmcantrell/vim-virtualenv'
+Plug 'jmcantrell/vim-virtualenv', {'for': 'python'}
 
 " Git support
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
-"Plug 'mhinz/vim-signify'
-"set updatetime=100
 
-" Syntax hilighting
+" Auto complete with support for most programming languages
+Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer --js-completer'}
+let g:ycm_autoclose_preview_window_after_completion = 1
+
+" Syntax checking
 Plug 'vim-syntastic/syntastic'
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 2
-let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_w = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_enable_balloons = 1
@@ -100,17 +114,24 @@ let g:syntastic_c_checkers = ['gcc']
 let g:syntastic_c_compiler_options = '-std=c99 -Wall -ansi -pedantic -D_BSD_SOURCE'
 let g:syntastic_c_auto_refresh_includes = 1
 
-let g:syntastic_rst_checkers = ['rstcheck']
-let g:syntastic_markdown_checkers = ['mdl']
 let g:syntastic_yaml_checkers = ['yamllint']
+
 let g:sysntastic_json_checkers = ['jsonlint']
 
-" Rust support
-Plug 'rust-lang/rust.vim'
+let g:syntastic_markdown_checkers = ['mdl']
+
+let g:syntastic_rst_checkers = ['rstcheck']
 
 " Snippet engine. Works with YouCompleteMe
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
+let g:UltiSnipsExpandTrigger = "<c-tab>"
+let g:UltiSnipsJumpForwardTrigger = "<c-j>"
+let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
+let g:UltiSnipsEditSplit="vertical"
+
+" Rust support
+Plug 'rust-lang/rust.vim', {'for': 'rust'}
 
 " Highlights trailing whitespace in red. Fix it with :FixWhitespace
 Plug 'bronson/vim-trailing-whitespace'

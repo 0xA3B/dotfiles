@@ -118,7 +118,7 @@ LS="ls"
 LS_OPTIONS="-lhF --color=auto"
 alias ls="$LS $LS_OPTIONS"
 alias la="$LS $LS_OPTIONS -a"
-alias lt="$LS $LS_OPTIONS -lart"
+alias lt="$LS $LS_OPTIONS -art"
 
 alias c="clear"
 alias e="exit"
