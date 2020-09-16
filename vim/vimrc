@@ -370,6 +370,8 @@ nnoremap <Leader>o :CtrlP<CR>
 " Enter visual mode easy
 nmap <Leader><Leader> V
 
+tnoremap <ESC> <C-\><C-n><CR>
+
 "------------------------------------------------------------
 " FileTypes
 "
