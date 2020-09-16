@@ -60,7 +60,7 @@ let g:airline#extensions#tabline#formatter = 'default'
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'preservim/nerdcommenter'
-map <C-o> :NERDTreeToggle<CR>
+map <C-n> :NERDTreeToggle<CR>
 let g:NERDSpaceDelims = 1
 let g:NERDCompactSexyComs = 1
 let g:NERDDefaultAlign = 'left'
@@ -80,7 +80,7 @@ Plug 'edkolev/tmuxline.vim'
 let g:tmuxline_powerline_separators = 1
 
 " Virtualenv support
-Plug 'jmcantrell/vim-virtualenv', {'for': 'python'}
+Plug 'jmcantrell/vim-virtualenv'
 
 " Git support
 Plug 'tpope/vim-fugitive'
@@ -92,21 +92,21 @@ let g:ycm_autoclose_preview_window_after_completion = 1
 
 " Syntax checking
 Plug 'vim-syntastic/syntastic'
-"set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
-"set statusline+=%*
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 2
+let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_w = 1
 let g:syntastic_check_on_wq = 0
-let g:syntastic_enable_balloons = 1
+"let g:syntastic_enable_balloons = 1
 let g:syntastic_aggregate_errors = 1
 
 " Enable checkers for syntastic
-let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_python_checkers = ['python', 'flake8']
 
-let g:syntastic_go_checkers = ['go']
+let g:syntastic_go_checkers = ['go', 'gofmt', 'golint']
 
 let g:syntastic_java_checkers = ['javac']
 

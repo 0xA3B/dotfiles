@@ -9,11 +9,11 @@ pushd "$HOME/.dotfiles"
 git pull
 popd
 
-pushd "$ZSH_CUSTOM/plugins/zsh-dircolors-solarized"
+pushd "$ZSH/custom/plugins/zsh-dircolors-solarized"
 git pull
 popd
 
-pushd "$ZSH_CUSTOM/themes/powerlevel9k"
+pushd "$ZSH/custom/themes/powerlevel10k"
 git pull
 popd
 
@@ -29,7 +29,7 @@ brew update
 brew upgrade
 brew cleanup
 
-pip3 install -U pip setuptools wheel virtualenv rstcheck dlint
+pip install -U pip setuptools wheel virtualenv flake8 dlint yamllint rstcheck
 
 if [[ ! -z "$HTTP_PROXY" ]] ; then
     gem update --http-proxy $HTTP_PROXY mdl
