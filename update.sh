@@ -29,13 +29,16 @@ brew update
 brew upgrade
 brew cleanup
 
-pip install -U pip setuptools wheel virtualenv flake8 dlint yamllint rstcheck
+python3 -m pip install -U pip setuptools wheel virtualenv neovim flake8 dlint yamllint rstcheck
+python2 -m pip install -U pip setuptools wheel virtualenv neovim
 
 if [[ ! -z "$HTTP_PROXY" ]] ; then
-    gem update --http-proxy $HTTP_PROXY mdl
+    gem update --http-proxy $HTTP_PROXY mdl neovim
 else
-    gem update mdl
+    gem update mdl neovim
 fi
+
+npm install -g npm neovim
 
 vim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
 
