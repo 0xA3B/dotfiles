@@ -144,6 +144,7 @@ alias vim="$(which nvim)"
 export GEM_HOME="$HOME/.gems"
 export PATH="$PATH:$GEM_HOME/bin"
 export PATH="$(brew --prefix ruby)/bin:$PATH"
+export PATH="$(brew --prefix java)/bin:$PATH"
 
 export EDITOR="nvim"
 export HOMEBREW_NO_ANALYTICS=true
