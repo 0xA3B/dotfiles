@@ -134,6 +134,12 @@ export PATH="$(brew --prefix java)/bin:$PATH"
 export EDITOR="nvim"
 export HOMEBREW_NO_ANALYTICS=true
 
+if [[ $OSTYPE =~ "darwin" ]] ; then
+    export PYTHON_CONFIGURE_OPTS="--enable-framework"
+else
+    export PYTHON_CONFIGURE_OPTS="--enable-shared"
+fi
+
 #############
 ## Aliases ##
 #############
@@ -141,10 +147,8 @@ export HOMEBREW_NO_ANALYTICS=true
 if [[ $OSTYPE =~ "darwin" ]] ; then
     LS="gls"
     alias make="gmake"
-    alias pyenv-install="PYTHON_CONFIGURE_OPTS='--enable-framework' pyenv"
 else
     LS="ls"
-    alias pyenv-install="PYTHON_CONFIGURE_OPTS='--enable-shared' pyenv"
 fi
 
 LS_OPTIONS="-lhF --color=auto"
