@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 
 pushd "$ZSH"
@@ -10,7 +10,8 @@ git pull
 popd
 
 pushd "$ZSH/custom/plugins/zsh-dircolors-solarized"
-git pull
+git pull --force --recurse-submodules
+ln -snf zsh-dircolors-solarized.zsh zsh-dircolors-solarized.plugin.zsh
 popd
 
 pushd "$ZSH/custom/themes/powerlevel10k"
@@ -32,6 +33,8 @@ brew cleanup
 python3 -m pip install -U pip setuptools wheel virtualenv neovim flake8 dlint yamllint rstcheck
 python2 -m pip install -U pip setuptools wheel virtualenv neovim
 
+~/.pyenv/versions/neovim2/bin/python -m pip install -U pip setuptools wheel virtualenv neovim
+
 if [[ ! -z "$HTTP_PROXY" ]] ; then
     gem update --http-proxy $HTTP_PROXY mdl neovim
 else
@@ -40,6 +43,6 @@ fi
 
 npm install -g npm neovim
 
-vim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
+nvim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
 
 exit 0
