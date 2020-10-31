@@ -33,8 +33,6 @@ brew cleanup
 python3 -m pip install -U pip setuptools wheel virtualenv neovim flake8 dlint yamllint rstcheck
 python2 -m pip install -U pip setuptools wheel virtualenv neovim
 
-~/.pyenv/versions/neovim2/bin/python -m pip install -U pip setuptools wheel virtualenv neovim
-
 if [[ ! -z "$HTTP_PROXY" ]] ; then
     gem update --http-proxy $HTTP_PROXY mdl neovim
 else

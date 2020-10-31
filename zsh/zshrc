@@ -122,7 +122,7 @@ source $ZSH/oh-my-zsh.sh
 
 if ( command -v pyenv >/dev/null ) ; then
     eval "$(pyenv init -)"
-    #eval "$(pyenv virtualenv-init -)"
+    eval "$(pyenv virtualenv-init -)"
 fi
 
 export GEM_HOME="$HOME/.gems"
@@ -141,10 +141,10 @@ export HOMEBREW_NO_ANALYTICS=true
 if [[ $OSTYPE =~ "darwin" ]] ; then
     LS="gls"
     alias make="gmake"
-    alias pyenv="PYTHON_CONFIGURE_OPTS='--enable-framework' pyenv"
+    alias pyenv-install="PYTHON_CONFIGURE_OPTS='--enable-framework' pyenv"
 else
     LS="ls"
-    alias pyenv="PYTHON_CONFIGURE_OPTS='--enable-shared' pyenv"
+    alias pyenv-install="PYTHON_CONFIGURE_OPTS='--enable-shared' pyenv"
 fi
 
 LS_OPTIONS="-lhF --color=auto"
