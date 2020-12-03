@@ -1,0 +1,5 @@
+[flake8]
+max-line-length = 120
+max-complexity = 20
+enable-extensions = dlint
+ignore = DUO131,DUO123,DUO107,E741

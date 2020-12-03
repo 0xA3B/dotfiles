@@ -41,6 +41,8 @@ fi
 
 npm install -g npm neovim
 
+
+vim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
 nvim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
 
 exit 0

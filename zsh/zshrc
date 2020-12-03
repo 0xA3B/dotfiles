@@ -18,6 +18,9 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Homebrew
+export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_ANALYTICS=1
+
 if ( command -v brew >/dev/null ) ; then
     eval $(brew shellenv)
 elif [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]] ; then
@@ -59,7 +62,7 @@ fi
 # ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
-COMPLETION_WAITING_DOTS="true"
+# COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -128,11 +131,10 @@ fi
 export GEM_HOME="$HOME/.gems"
 
 export PATH="$PATH:$GEM_HOME/bin"
-export PATH="$(brew --prefix ruby)/bin:$PATH"
-export PATH="$(brew --prefix java)/bin:$PATH"
+export PATH="$HOMEBREW_PREFIX/opt/ruby/bin:$PATH"
+export PATH="$HOMEBREW_PREFIX/opt/openjdk/bin:$PATH"
 
-export EDITOR="nvim"
-export HOMEBREW_NO_ANALYTICS=true
+export EDITOR="vim"
 
 if [[ $OSTYPE =~ "darwin" ]] ; then
     export PYTHON_CONFIGURE_OPTS="--enable-framework"
@@ -159,8 +161,18 @@ alias lt="$LS $LS_OPTIONS -art"
 alias c="clear"
 alias e="exit"
 
-alias vi="$(which vim)"
-alias vim="$(which nvim)"
+#alias vi="$HOMEBREW_PREFIX/bin/vim"
+#alias vim="$HOMEBREW_PREFIX/bin/vim"
+
+alias pip="python -m pip"
+alias virtualenv="python -m virtualenv"
+alias mkvenv="python -m virtualenv .venv"
+
+##########
+## Work ##
+##########
+
+[[ -f $HOME/.workrc ]] && source $HOME/.workrc
 
 ####################
 ## Powerlevel 10k ##

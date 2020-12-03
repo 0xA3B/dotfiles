@@ -144,6 +144,8 @@ if has("python3")
     silent! python3 1
 endif
 
+let g:python_host_skip_check = 1
+
 "if has("nvim")
 "    let g:python_host_prog = "~/.pyenv/versions/neovim2/bin/python"
 "    let g:python3_host_prog = "~/.pyenv/versions/neovim3/bin/python"
@@ -313,7 +315,11 @@ set pastetoggle=<F11>
 set encoding=utf-8
 
 " Use the system clipboard
-set clipboard=unnamedplus
+if has("nvim")
+    set clipboard=unnamedplus
+else
+    set clipboard=unnamed
+endif
 
 
 "------------------------------------------------------------
