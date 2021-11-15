@@ -88,7 +88,7 @@ fi
 if [[ $OSTYPE =~ "darwin" ]] ; then
     alias dircolors="gdircolors"
 fi
-plugins=(zsh-dircolors-solarized brew git python pip jsontools zsh_reload)
+plugins=(zsh-dircolors-solarized brew git python pip jsontools)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -124,8 +124,8 @@ source $ZSH/oh-my-zsh.sh
 ####################
 
 if ( command -v pyenv >/dev/null ) ; then
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
+    eval "$(pyenv init --path)"
+    eval "$(pyenv virtualenv-init - --no-rehash)"
 fi
 
 export GEM_HOME="$HOME/.gems"
@@ -133,6 +133,10 @@ export GEM_HOME="$HOME/.gems"
 export PATH="$PATH:$GEM_HOME/bin"
 export PATH="$HOMEBREW_PREFIX/opt/ruby/bin:$PATH"
 export PATH="$HOMEBREW_PREFIX/opt/openjdk/bin:$PATH"
+
+if ( command -v go >/dev/null ) ; then
+    export PATH="$PATH:$(go env GOPATH)/bin"
+fi
 
 export EDITOR="vim"
 

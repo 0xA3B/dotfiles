@@ -11,7 +11,7 @@ popd
 
 pushd "$ZSH/custom/plugins/zsh-dircolors-solarized"
 git pull --force --recurse-submodules
-ln -snf zsh-dircolors-solarized.zsh zsh-dircolors-solarized.plugin.zsh
+#ln -snf zsh-dircolors-solarized.zsh zsh-dircolors-solarized.plugin.zsh
 popd
 
 pushd "$ZSH/custom/themes/powerlevel10k"
@@ -24,14 +24,14 @@ if [[ $OSTYPE =~ "linux" ]] ; then
     sudo apt-get -y dist-upgrade
     sudo apt-get -y autoremove
     sudo apt-get autoclean
+elif [[ $OSTYPE =~ "darwin" ]] ; then
+    brew update
+    brew upgrade
+    brew cleanup
 fi
 
-brew update
-brew upgrade
-brew cleanup
-
-python3 -m pip install -U pip setuptools wheel virtualenv neovim flake8 dlint yamllint rstcheck
-python2 -m pip install -U pip setuptools wheel virtualenv neovim
+python3 -m pip install --upgrade-strategy eager -U -r $HOME/.dotfiles/python/requirements.txt
+python2 -m pip install --upgrade-strategy eager -U -r $HOME/.dotfiles/python/requirements.txt
 
 if [[ ! -z "$HTTP_PROXY" ]] ; then
     gem update --http-proxy $HTTP_PROXY mdl neovim
@@ -39,7 +39,7 @@ else
     gem update mdl neovim
 fi
 
-npm install -g npm neovim
+#npm install -g npm neovim
 
 
 vim -c "PlugUpgrade" -c "PlugUpdate" -c "q!" -c "q!"
