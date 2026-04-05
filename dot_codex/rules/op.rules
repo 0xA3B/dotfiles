@@ -1,0 +1,8 @@
+# 1password execution policy rules.
+# Unlisted op subcommands will still prompt by default when escalation is requested.
+
+prefix_rule(
+    pattern = ["op", ["run"]],
+    decision = "allow",
+    justification = "Automatically allow `op run` commands without prompting.",
+)

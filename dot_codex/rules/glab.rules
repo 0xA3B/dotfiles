@@ -1,0 +1,59 @@
+# GitLab CLI execution policy rules.
+# Unlisted glab commands will still prompt by default when escalation is requested.
+# Keep `glab api` auto-allows narrow. Endpoint paths are a single argv token, so
+# prefix rules cannot safely express "allow anything under projects/:id/...".
+# Prefer first-class `glab mr` / `glab ci` / `glab repo` commands when possible.
+
+prefix_rule(
+    pattern = ["glab", "version"],
+    decision = "allow",
+    justification = "Allowed version checks.",
+)
+
+prefix_rule(
+    pattern = ["glab", "auth", "status"],
+    decision = "allow",
+    justification = "Allowed auth status checks.",
+)
+
+prefix_rule(
+    pattern = ["glab", "auth", ["login"]],
+    decision = "forbidden",
+    justification = "Blocked glab auth login.",
+)
+
+prefix_rule(
+    pattern = ["glab", "repo", "view"],
+    decision = "allow",
+    justification = "Allowed repo inspection.",
+)
+
+prefix_rule(
+    pattern = ["glab", "mr", ["list", "view", "diff"]],
+    decision = "allow",
+    justification = "Allowed merge request inspection commands.",
+)
+
+prefix_rule(
+    pattern = ["glab", "ci", ["status", "get", "trace", "lint"]],
+    decision = "allow",
+    justification = "Allowed CI inspection commands.",
+)
+
+prefix_rule(
+    pattern = ["glab", "pipeline", ["list", "view", "status"]],
+    decision = "allow",
+    justification = "Allowed pipeline inspection commands.",
+)
+
+prefix_rule(
+    pattern = ["glab", ["issue", "release", "config"]],
+    decision = "forbidden",
+    justification = "Blocked glab issue/release/config commands.",
+)
+
+prefix_rule(
+    pattern = ["glab", "repo", ["create", "delete"]],
+    decision = "forbidden",
+    justification = "Blocked glab repo creation/deletion.",
+)

@@ -1,0 +1,14 @@
+# Git execution policy rules.
+# Unlisted git subcommands will still prompt by default when escalation is requested.
+
+prefix_rule(
+    pattern = ["git", ["add", "commit"]],
+    decision = "allow",
+    justification = "git commands which need to be able to write to .git/ need to execute outside the sandbox.",
+)
+
+prefix_rule(
+    pattern = ["git", "commit", ["--no-verify", "-n"]],
+    decision = "forbidden",
+    justification = "Blocked hook bypass flags for commit quality and attribution checks.",
+)

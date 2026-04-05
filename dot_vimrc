@@ -1,156 +1,9 @@
-"------------------------------------------------------------
-" Vim-Plug
-"
-" Plugin manager for vim
-
-" Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
-call plug#begin('~/.vim/plugins')
-
-" Make sure you use single quotes
-
-" Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
-" Plug 'junegunn/vim-easy-align'
-
-" Any valid git URL is allowed
-" Plug 'https://github.com/junegunn/vim-github-dashboard.git'
-
-" Multiple Plug commands can be written in a single line using | separators
-" Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
-
-" On-demand loading
-" Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-" Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
-
-" Using a non-master branch
-" Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
-
-" Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
-" Plug 'fatih/vim-go', { 'tag': '*' }
-
-" Plugin options
-" Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
-
-" Plugin outside ~/.vim/plugged with post-update hook
-" Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-
-" Unmanaged plugin (manually installed and updated)
-" Plug '~/my-prototype-plugin'
-
-" Initialize plugin system
-" call plug#end()
-
-
-"------------------------------------------------------------
-" Plugins
-
-" Solarized colortheme
-Plug 'altercation/vim-colors-solarized'
-"let g:solarized_termcolors = 16
-"let g:solarized_termtrans = 1
-
-" Powerline status bar
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-let g:airline_theme='solarized_flood'
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#formatter = 'default'
-
-" File browsing in vim
-Plug 'preservim/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'preservim/nerdcommenter'
-map <C-n> :NERDTreeToggle<CR>
-let g:NERDSpaceDelims = 1
-let g:NERDCompactSexyComs = 1
-let g:NERDDefaultAlign = 'left'
-let g:NERDCommentEmptyLines = 1
-let g:NERDTrimTrailingWhitespace = 1
-let g:NERDToggleCheckAllLines = 1
-
-" Fuzzy file finder
-Plug 'ctrlpvim/ctrlp.vim'
-
-" Tagbar support
-Plug 'majutsushi/tagbar'
-nmap <F8> :TagbarToggle<CR>
-
-" Tmux support
-Plug 'edkolev/tmuxline.vim'
-let g:tmuxline_powerline_separators = 1
-
-" Virtualenv support
-Plug 'jmcantrell/vim-virtualenv'
-
-" Git support
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
-
-" Auto complete with support for most programming languages
-Plug 'Valloric/YouCompleteMe', {'do': 'python install.py --clang-completer --go-completer --java-completer --js-completer'}
-let g:ycm_autoclose_preview_window_after_completion = 1
-
-" Syntax checking
-Plug 'vim-syntastic/syntastic'
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_w = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_enable_balloons = 1
-let g:syntastic_aggregate_errors = 1
-
-" Enable checkers for syntastic
-let g:syntastic_python_checkers = ['python', 'flake8']
-
-let g:syntastic_go_checkers = ['go', 'gofmt', 'golint']
-
-let g:syntastic_java_checkers = ['javac']
-
-let g:syntastic_c_checkers = ['gcc']
-let g:syntastic_c_compiler_options = '-std=c99 -Wall -ansi -pedantic -D_BSD_SOURCE'
-let g:syntastic_c_auto_refresh_includes = 1
-
-let g:syntastic_yaml_checkers = ['yamllint']
-
-let g:sysntastic_json_checkers = ['jsonlint']
-
-let g:syntastic_markdown_checkers = ['mdl']
-
-let g:syntastic_rst_checkers = ['rstcheck']
-
-" Snippet engine. Works with YouCompleteMe
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-let g:UltiSnipsExpandTrigger = "<c-tab>"
-let g:UltiSnipsJumpForwardTrigger = "<c-j>"
-let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
-let g:UltiSnipsEditSplit="vertical"
-
-" Rust support
-Plug 'rust-lang/rust.vim', {'for': 'rust'}
-
-" Highlights trailing whitespace in red. Fix it with :FixWhitespace
-Plug 'bronson/vim-trailing-whitespace'
-
-" Initialize plugin system
-call plug#end()
-
 " Used to disable deprecation warning when using vim + python3.7
 if has("python3")
     silent! python3 1
 endif
 
 let g:python_host_skip_check = 1
-
-"if has("nvim")
-"    let g:python_host_prog = "~/.pyenv/versions/neovim2/bin/python"
-"    let g:python3_host_prog = "~/.pyenv/versions/neovim3/bin/python"
-"endif
-
 
 "------------------------------------------------------------
 " Color Schemes
@@ -169,7 +22,7 @@ set background=dark
 set t_Co=256
 
 " set the colorscheme vim uses
-colorscheme solarized
+colorscheme gruvbox
 
 
 "------------------------------------------------------------
@@ -296,7 +149,7 @@ set visualbell
 set t_vb=
 
 " Enable use of the mouse for all modes
-" set mouse=a
+set mouse=a
 
 " Set the command window height to 2 lines, to avoid many cases of having to
 " "press <Enter> to continue"
@@ -315,11 +168,10 @@ set pastetoggle=<F11>
 set encoding=utf-8
 
 " Use the system clipboard
-if has("nvim")
-    set clipboard=unnamedplus
-else
-    set clipboard=unnamed
-endif
+" nvim
+" set clipboard=unnamedplus
+" vim
+set clipboard=unnamed
 
 
 "------------------------------------------------------------
@@ -336,8 +188,8 @@ set shiftround
 
 " Indentation settings for using hard tabs for indent. Display tabs as
 " two characters wide.
-"set shiftwidth=4
-"set tabstop=4
+" set shiftwidth=4
+" set tabstop=4
 
 
 "------------------------------------------------------------
