@@ -1,5 +1,3 @@
-# font-family = "Hack Nerd Font Mono"
-# font-family = "Iosevka Nerd Font Mono"
 font-family = "FiraCode Nerd Font Mono"
 font-size = 14
 font-feature = +calt, +liga, +dlig

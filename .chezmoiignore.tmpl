@@ -1,0 +1,17 @@
+# Repository metadata and docs should not be materialized in $HOME.
+README.md
+AGENTS.md
+.gitignore
+
+# Local-only scratch/state content in this repo is intentionally unmanaged.
+.local
+.local/**
+
+# Fish writes this file itself and it varies across machines.
+.config/fish/fish_variables
+
+{{ if .work_machine -}}
+# Keep the public base uv config in the repo, but do not apply it on work
+# machines where the live user config includes private/internal indexes.
+.config/uv/uv.toml
+{{ end -}}

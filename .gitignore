@@ -322,3 +322,11 @@ tags
 #---Custom Rules------------------------
 
 .local/
+
+# Safety rule to prevent accidentally committing files that should not be tracked
+dot_config/fish/fish_variables
+dot_config/fish/completions/*
+dot_config/fish/work
+dot_config/zsh/work.zsh
+
+!dot_config/fish/completions/vault.fish
