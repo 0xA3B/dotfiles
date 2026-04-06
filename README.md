@@ -53,15 +53,15 @@ This repo is intentionally only the shared/public layer.
 Work-specific config should remain local to the machine, for example:
 
 - `~/.config/fish/work/`
-- `~/.config/zsh/work.zsh`
+- `~/.config/zsh/work/`
 
 The shared shell config is expected to source those local overlays when they
 exist, but the overlay files/directories themselves should not live in this
 public repo.
 
-## Fish Completions
+## Shell Completions
 
-Fish completions are split into two categories:
+Fish and zsh completions are split into two categories:
 
 - Handwritten completions that are part of the config are tracked in the repo.
 - Generated completions are not tracked and should be regenerated locally.
@@ -69,19 +69,23 @@ Fish completions are split into two categories:
 At the moment this means:
 
 - `dot_config/fish/completions/vault.fish` is tracked.
+- `dot_config/zsh/completions/_vault` is tracked.
 - Generated completions such as `codex.fish` and `ruff.fish` are ignored.
+- Generated zsh completions such as `_codex`, `_chezmoi`, and `_ruff` are ignored.
 
 The generation logic lives in:
 
 - `dot_config/fish/functions/generate-completions.fish`
 - `dot_config/fish/functions/__generate_completions_base_registry.fish`
+- `dot_config/zsh/functions/generate-completions.zsh`
+- `dot_config/zsh/functions/__generate_completions_base_registry.zsh`
 
 Use `generate-completions` locally after installing the relevant tools if you
 want those completions available on a machine.
 
 ## UV Config
 
-The repo keeps a public base [uv config](/Users/alebaker/.dotfiles/dot_config/uv/uv.toml)
+The repo keeps a public base [uv config](dot_config/uv/uv.toml)
 for reference and personal-machine use.
 
 On work machines, chezmoi is configured to skip applying `~/.config/uv/uv.toml`
@@ -94,7 +98,7 @@ system.
   still managed as directories. That matches the intended model here: manage
   individual files while allowing extra unmanaged files under config
   directories.
-- [`.chezmoiignore.tmpl`](/Users/alebaker/.dotfiles/.chezmoiignore.tmpl) excludes repo
+- [`.chezmoiignore.tmpl`](.chezmoiignore.tmpl) excludes repo
   metadata and local-only state so they are not applied into `$HOME`.
 - `~/.config/fish/fish_variables` is currently ignored because Fish manages it
   as machine-specific state.

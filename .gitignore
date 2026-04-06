@@ -327,6 +327,9 @@ tags
 dot_config/fish/fish_variables
 dot_config/fish/completions/*
 dot_config/fish/work
+dot_config/zsh/completions/*
+dot_config/zsh/work
 dot_config/zsh/work.zsh
 
 !dot_config/fish/completions/vault.fish
+!dot_config/zsh/completions/_vault
