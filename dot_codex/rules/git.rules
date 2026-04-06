@@ -1,14 +1,187 @@
 # Git execution policy rules.
 # Unlisted git subcommands will still prompt by default when escalation is requested.
+# Only clearly read-only git commands are auto-allowed here. Mutating commands and
+# ambiguous verbs with write-capable forms are intentionally omitted unless a
+# specific read-only invocation is listed below, except for intentional
+# `git add` / `git commit` workflow exceptions.
 
 prefix_rule(
     pattern = ["git", ["add", "commit"]],
     decision = "allow",
-    justification = "git commands which need to be able to write to .git/ need to execute outside the sandbox.",
+    justification = "Allowed staging and commit workflows that need to write repository metadata outside the sandbox.",
+    match = [
+        "git add dot_codex/rules/git.rules",
+        "git commit -m test",
+    ],
+    not_match = [
+        "git push origin main",
+    ],
 )
 
 prefix_rule(
     pattern = ["git", "commit", ["--no-verify", "-n"]],
     decision = "forbidden",
     justification = "Blocked hook bypass flags for commit quality and attribution checks.",
+    match = [
+        "git commit --no-verify -m test",
+        "git commit -n -m test",
+    ],
+    not_match = [
+        "git commit -m test",
+    ],
+)
+
+prefix_rule(
+    pattern = [
+        "git",
+        [
+            "version",
+            "status",
+            "diff",
+            "log",
+            "show",
+            "grep",
+            "blame",
+            "rev-parse",
+            "rev-list",
+            "describe",
+            "merge-base",
+            "shortlog",
+            "show-ref",
+            "ls-files",
+            "ls-tree",
+            "ls-remote",
+            "cat-file",
+            "diff-files",
+            "diff-index",
+            "diff-tree",
+            "for-each-ref",
+            "count-objects",
+            "fsck",
+        ],
+    ],
+    decision = "allow",
+    justification = "Allowed clearly read-only git inspection commands.",
+    match = [
+        "git status --short",
+        "git diff --cached",
+        "git log --oneline -5",
+        "git show HEAD~1",
+        "git rev-parse --show-toplevel",
+        "git ls-files",
+    ],
+    not_match = [
+        "git -C /tmp status",
+        "git commit -m test",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "config", ["--get", "--get-all", "--get-regexp", "--list", "-l"]],
+    decision = "allow",
+    justification = "Allowed read-only git config queries.",
+    match = [
+        "git config --get user.name",
+        "git config --list",
+    ],
+    not_match = [
+        "git config user.name ale",
+    ],
+)
+
+prefix_rule(
+    pattern = [
+        "git",
+        "branch",
+        ["--list", "-l", "-a", "-r", "--show-current", "--contains", "--no-contains", "--points-at"],
+    ],
+    decision = "allow",
+    justification = "Allowed read-only branch listing and inspection forms.",
+    match = [
+        "git branch --list",
+        "git branch --show-current",
+        "git branch --contains HEAD",
+    ],
+    not_match = [
+        "git branch feature/test",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "tag", ["--list", "-l"]],
+    decision = "allow",
+    justification = "Allowed read-only tag listing.",
+    match = [
+        "git tag --list",
+        "git tag -l v*",
+    ],
+    not_match = [
+        "git tag v1.2.3",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "remote", ["-v", "show", "get-url"]],
+    decision = "allow",
+    justification = "Allowed read-only remote inspection forms.",
+    match = [
+        "git remote -v",
+        "git remote show origin",
+        "git remote get-url origin",
+    ],
+    not_match = [
+        "git remote add origin https://example.com/repo.git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "reflog", ["show", "list", "exists"]],
+    decision = "allow",
+    justification = "Allowed read-only reflog inspection forms.",
+    match = [
+        "git reflog show HEAD",
+        "git reflog list",
+        "git reflog exists refs/heads/main",
+    ],
+    not_match = [
+        "git reflog expire --all",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "stash", ["list", "show"]],
+    decision = "allow",
+    justification = "Allowed read-only stash inspection forms.",
+    match = [
+        "git stash list",
+        "git stash show stash@{0}",
+    ],
+    not_match = [
+        "git stash push -m test",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "worktree", ["list"]],
+    decision = "allow",
+    justification = "Allowed read-only worktree inspection.",
+    match = [
+        "git worktree list",
+    ],
+    not_match = [
+        "git worktree add ../repo-2",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "submodule", ["status", "summary"]],
+    decision = "allow",
+    justification = "Allowed read-only submodule inspection forms.",
+    match = [
+        "git submodule status",
+        "git submodule summary",
+    ],
+    not_match = [
+        "git submodule update --init --recursive",
+    ],
 )
