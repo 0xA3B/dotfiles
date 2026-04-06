@@ -2,6 +2,11 @@ function __generate_completions_registry
     # Registries live in autoloaded helper functions:
     #   - __generate_completions_base_registry
     #   - __generate_completions_work_registry (optional)
+    #
+    # Registry format:
+    #   command<TAB>target-path<TAB>generator-argv...
+    # Older 3-field entries with a space-delimited generator command are still
+    # supported for compatibility with local work overlays.
     __generate_completions_base_registry
 
     if functions -q __generate_completions_work_registry
@@ -84,7 +89,10 @@ function __generate_completions_one --argument-names name
     end
 
     set -l fields (string split \t -- $entry)
-    set -l generator (string split ' ' -- $fields[3])
+    set -l generator $fields[3..-1]
+    if test (count $generator) -eq 1
+        set generator (string split ' ' -- $generator[1])
+    end
 
     __generate_completions_write $fields[1] $fields[2] $generator
 end

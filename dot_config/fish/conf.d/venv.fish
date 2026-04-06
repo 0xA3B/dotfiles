@@ -11,6 +11,23 @@ if status is-interactive
     set -q autovenv_dir; or set -g autovenv_dir ".venv"
 end
 
+function _autovenv_deactivate --description "Deactivate the current venv, even if fish did not define deactivate"
+    if functions -q deactivate
+        deactivate
+        return
+    end
+
+    if test -n "$VIRTUAL_ENV"
+        set -l venv_bin "$VIRTUAL_ENV/bin"
+        if contains -- $venv_bin $PATH
+            set -gx PATH (string match -v -- $venv_bin $PATH)
+        end
+    end
+
+    set -e VIRTUAL_ENV
+    set -e VIRTUAL_ENV_PROMPT
+end
+
 function _autovenv_apply
     # Skip if disabled or non-interactive
     if test "$autovenv_enable" != "yes"; or not status is-interactive
@@ -50,14 +67,14 @@ function _autovenv_apply
 
         if test -z "$venv_source"
             # Left venv project - deactivate
-            deactivate
+            _autovenv_deactivate
             if test "$autovenv_announce" = "yes"
                 echo "Deactivated Virtual Environment ($__autovenv_new)"
                 set -e __autovenv_new __autovenv_old
             end
         else if test "$in_current_venv" != "yes"
             # Switched to different venv project
-            deactivate
+            _autovenv_deactivate
             source "$venv_source"
             if test "$autovenv_announce" = "yes"
                 echo "Switched Virtual Environments ($__autovenv_old => $__autovenv_new)"

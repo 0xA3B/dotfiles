@@ -1,6 +1,9 @@
 function bash2fish --description 'Translate basic bash export/unset statements to fish'
     # Generated with GPT-5-Codex
-    # This functions also relies on export.fish and unset.fish.
+    # Supports bash-style environment output only:
+    #   KEY=value;
+    #   export ...
+    #   unset ...
     set -l lineno 0
 
     while read -l line
@@ -15,8 +18,8 @@ function bash2fish --description 'Translate basic bash export/unset statements t
             continue
         end
 
-        # Drop inline comments that follow whitespace.
-        set trimmed (string replace -r '\s#.*$' '' -- $trimmed)
+        # Drop inline comments that start outside quotes after whitespace.
+        set trimmed (__bash2fish_strip_inline_comment $trimmed)
         set trimmed (string trim -- $trimmed)
         if test -z "$trimmed"
             continue
@@ -66,4 +69,46 @@ function bash2fish --description 'Translate basic bash export/unset statements t
         printf 'bash2fish: unsupported input on line %d: %s\n' $lineno $line >&2
         return 1
     end
+end
+
+function __bash2fish_strip_inline_comment --description 'Strip bash-style inline comments while preserving quoted #'
+    set -l text $argv[1]
+    set -l length (string length -- "$text")
+    set -l in_single 0
+    set -l in_double 0
+    set -l escaped 0
+    set -l prev ''
+
+    for i in (seq $length)
+        set -l char (string sub -s $i -l 1 -- "$text")
+
+        if test "$in_single" = 1
+            if test "$char" = "'"
+                set in_single 0
+            end
+        else if test "$in_double" = 1
+            if test "$escaped" = 1
+                set escaped 0
+            else if test "$char" = "\\"
+                set escaped 1
+            else if test "$char" = '"'
+                set in_double 0
+            end
+        else
+            if test "$char" = "'"
+                set in_single 1
+            else if test "$char" = '"'
+                set in_double 1
+            else if test "$char" = '#'
+                if string match -rq '\s' -- "$prev"
+                    printf '%s\n' (string sub -s 1 -l (math "$i - 1") -- "$text")
+                    return 0
+                end
+            end
+        end
+
+        set prev "$char"
+    end
+
+    printf '%s\n' "$text"
 end
