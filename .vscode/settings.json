@@ -1,0 +1,18 @@
+{
+  "files.associations": {
+    ".chezmoi.toml.tmpl": "toml",
+    ".chezmoiignore.tmpl": "ignore",
+    "dot_config/fish/themes/*.theme": "fish",
+    "dot_config/ghostty/config": "properties",
+    "dot_config/tmux/tmux.conf": "shellscript",
+    "dot_config/yamllint/config": "yaml",
+    "dot_vimrc": "viml",
+    "dot_zshrc": "shellscript"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "[ignore]": {
+    "editor.formatOnSave": false
+  }
+}
