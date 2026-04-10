@@ -2,11 +2,11 @@
   "files.associations": {
     ".chezmoi.toml.tmpl": "toml",
     ".chezmoiignore.tmpl": "ignore",
-    "dot_codex/rules/*.rules.tmpl": "codex-rules",
-    "dot_config/fish/themes/*.theme": "fish",
-    "dot_config/ghostty/config": "properties",
-    "dot_config/tmux/tmux.conf": "shellscript",
-    "dot_config/yamllint/config": "yaml",
+    "**/dot_codex/rules/*.rules.tmpl": "codex-rules",
+    "**/dot_config/fish/themes/*.theme": "fish",
+    "**/dot_config/ghostty/config": "properties",
+    "**/dot_config/tmux/tmux.conf": "shellscript",
+    "**/dot_config/yamllint/config": "yaml",
     "dot_vimrc": "viml",
     "dot_zshrc": "shellscript"
   },
