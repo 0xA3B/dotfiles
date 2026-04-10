@@ -1,12 +1,10 @@
-# Project Instructions
+# Project Overview
 
-## Project Overview
-
-### Purpose
+## Purpose
 
 My personal dotfiles repository to manage and share my configuration files across different machines.
 
-### Project Conventions
+## Project Conventions
 
 - Use the conventional commit format for commit messages.
 
