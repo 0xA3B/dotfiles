@@ -1,4 +1,4 @@
-ZSH_WORK_ROOT="${ZSH_WORK_ROOT:-$HOME/.config/zsh/work}"
+ZSH_WORK_ROOT="${ZSH_WORK_ROOT:-$ZSH_CONFIG_DIR/work}"
 
 _source_zsh_globbed_files "$ZSH_WORK_ROOT/functions"
 
