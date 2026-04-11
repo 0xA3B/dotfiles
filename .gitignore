@@ -149,7 +149,6 @@ activemq-data/
 
 # Environments
 .env
-.envrc
 .venv
 env/
 venv/
@@ -322,6 +321,11 @@ tags
 #---Custom Rules------------------------
 
 .local/
+
+# dotenv files
+.env.local
+.envrc.local
+.envrc.private
 
 # Safety rule to prevent accidentally committing files that should not be tracked
 dot_config/fish/fish_variables

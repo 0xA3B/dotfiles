@@ -105,7 +105,8 @@ tags
 !.env.sample
 !.env.template
 !.env.schema
-.envrc
+.envrc.local
+.envrc.private
 .direnv/
 
 # Claude local settings files
