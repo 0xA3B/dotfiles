@@ -324,6 +324,7 @@ tags
 
 # dotenv files
 .env.local
+.env.*.local
 .envrc.local
 .envrc.private
 
