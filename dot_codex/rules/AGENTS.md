@@ -45,4 +45,4 @@ codex execpolicy check --pretty --rules dot_codex/rules/git.rules -- git commit 
 ```
 
 - If you changed multiple rule files, run at least one representative `codex execpolicy check` command per file.
-- Restart Codex after changing rules so the updated files are loaded for normal use.
+- Restart Codex if required so updated rules are loaded for normal use.

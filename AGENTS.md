@@ -2,7 +2,7 @@
 
 ## Purpose
 
-My personal dotfiles repository to manage and share my configuration files across different machines.
+This repository contains personal dotfiles for managing and sharing configuration across machines.
 
 ## Project Conventions
 

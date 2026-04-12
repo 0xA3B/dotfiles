@@ -16,7 +16,7 @@
 ## Change Rules
 
 - Do not introduce new zsh-only behavior unless it is required by zsh or explicitly requested.
-- Mirror fish structure conceptually: main config, `conf.d`, `functions`, `completions`, and work overlay loading.
+- Mirror the fish structure conceptually: main config, `conf.d`, `functions`, `completions`, and work overlay loading.
 - Keep zsh implementations native to zsh. Match fish behavior, not fish syntax.
 - If fish behavior changes, update zsh in the same change whenever feasible.
 - If zsh must intentionally diverge from fish, keep the divergence minimal and document the reason in code comments or the change summary.
