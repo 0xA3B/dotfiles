@@ -1,0 +1,3 @@
+zsh-restart() {
+  exec zsh
+}
