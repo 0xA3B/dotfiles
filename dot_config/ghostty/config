@@ -1,0 +1,15 @@
+font-family = "FiraCode Nerd Font Mono"
+font-size = 14
+font-feature = +calt, +liga, +dlig
+
+theme = "Catppuccin Mocha"
+
+command = /opt/homebrew/bin/fish --login --interactive
+
+clipboard-trim-trailing-spaces = true
+
+# SSH fix for terminfo
+shell-integration-features = ssh-env
+
+# Claude Code compatibility
+keybind = shift+enter=text:\x1b\r

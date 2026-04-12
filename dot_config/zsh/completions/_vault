@@ -1,0 +1,18 @@
+#compdef vault
+
+_vault() {
+  local -a candidates
+  local line
+
+  line="${(j: :)words[1,CURRENT]}"
+  if (( CURRENT > $#words )) || [[ -z ${words[CURRENT]} ]]; then
+    line+=" "
+  fi
+
+  candidates=(${(f)"$(COMP_LINE="$line" command vault 2>/dev/null)"})
+  (( ${#candidates[@]} > 0 )) || return 1
+
+  compadd -- "${candidates[@]}"
+}
+
+_vault "$@"

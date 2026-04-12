@@ -1,0 +1,15 @@
+# Claude execution policy rules.
+# Unlisted claude subcommands will still prompt by default when escalation is requested.
+
+prefix_rule(
+    pattern = ["claude", "-p"],
+    decision = "allow",
+    justification = "Non-interactive Claude writes logs and diagnostics under ~/.claude and should start outside the sandbox.",
+    match = [
+        "claude -p summarize this repository",
+    ],
+    not_match = [
+        "claude",
+        "claude --print summarize this repository",
+    ],
+)

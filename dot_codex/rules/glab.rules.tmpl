@@ -1,0 +1,124 @@
+# GitLab CLI execution policy rules.
+# Unlisted glab commands will still prompt by default when escalation is requested.
+# Keep `glab api` auto-allows narrow. Endpoint paths are a single argv token, so
+# prefix rules cannot safely express "allow anything under projects/:id/...".
+# Prefer first-class `glab mr` / `glab ci` / `glab repo` commands when possible.
+
+prefix_rule(
+    pattern = ["glab", "version"],
+    decision = "allow",
+    justification = "Allowed version checks.",
+    match = [
+        "glab version",
+    ],
+    not_match = [
+        "glab auth status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["glab", "auth", "status"],
+    decision = "allow",
+    justification = "Allowed auth status checks.",
+    match = [
+        "glab auth status",
+    ],
+    not_match = [
+        "glab auth login",
+    ],
+)
+
+prefix_rule(
+    pattern = ["glab", "auth", ["login"]],
+    decision = "forbidden",
+    justification = "Blocked glab auth login.",
+    match = [
+        "glab auth login",
+    ],
+    not_match = [
+        "glab auth status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["glab", "repo", "view"],
+    decision = "allow",
+    justification = "Allowed repo inspection.",
+    match = [
+        "glab repo view",
+        "glab repo view --web",
+    ],
+    not_match = [
+        "glab repo create test-repo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["glab", "mr", ["list", "view", "diff"]],
+    decision = "allow",
+    justification = "Allowed merge request inspection commands.",
+    match = [
+        "glab mr list",
+        "glab mr view 123",
+        "glab mr diff 123",
+    ],
+    not_match = [
+        "glab mr create --fill",
+    ],
+)
+
+prefix_rule(
+    pattern = ["glab", "ci", ["status", "get", "trace", "lint"]],
+    decision = "allow",
+    justification = "Allowed CI inspection commands.",
+    match = [
+        "glab ci status",
+        "glab ci get 123",
+        "glab ci trace 123",
+        "glab ci lint .gitlab-ci.yml",
+    ],
+    not_match = [
+        "glab ci run",
+    ],
+)
+
+prefix_rule(
+    pattern = ["glab", "pipeline", ["list", "view", "status"]],
+    decision = "allow",
+    justification = "Allowed pipeline inspection commands.",
+    match = [
+        "glab pipeline list",
+        "glab pipeline view 123",
+        "glab pipeline status",
+    ],
+    not_match = [
+        "glab pipeline run",
+    ],
+)
+
+prefix_rule(
+    pattern = ["glab", ["issue", "release", "config"]],
+    decision = "forbidden",
+    justification = "Blocked glab issue/release/config commands.",
+    match = [
+        "glab issue list",
+        "glab release list",
+        "glab config get editor",
+    ],
+    not_match = [
+        "glab repo view",
+    ],
+)
+
+prefix_rule(
+    pattern = ["glab", "repo", ["create", "delete"]],
+    decision = "forbidden",
+    justification = "Blocked glab repo creation/deletion.",
+    match = [
+        "glab repo create test-repo",
+        "glab repo delete test-repo",
+    ],
+    not_match = [
+        "glab repo view",
+    ],
+)
