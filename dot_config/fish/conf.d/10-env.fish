@@ -10,7 +10,7 @@ end
 
 if not set -q VISUAL
     set -gx VISUAL $EDITOR
-    command -q code; and set -gx VISUAL code --wait
+    # command -q code; and set -gx VISUAL code --wait
 end
 
 if command -q go
