@@ -9,7 +9,7 @@
     "**/dot_config/git/ignore": "ignore",
     "**/dot_config/tmux/tmux.conf": "shellscript",
     "**/dot_config/yamllint/config": "yaml",
-    "dot_vimrc": "viml",
+    "dot_vimrc": "Vimscript",
     "dot_zshrc": "shellscript"
   },
   "files.insertFinalNewline": true,
