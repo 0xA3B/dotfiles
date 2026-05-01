@@ -8,7 +8,7 @@ fi
 
 if [[ -z ${VISUAL+x} ]]; then
   export VISUAL="$EDITOR"
-  command -v code >/dev/null 2>&1 && export VISUAL="code --wait"
+  # command -v code >/dev/null 2>&1 && export VISUAL="code --wait"
 fi
 
 export DOTFILES_HOME="$HOME/.dotfiles"
