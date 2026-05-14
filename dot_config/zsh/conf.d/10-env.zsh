@@ -11,6 +11,26 @@ if [[ -z ${VISUAL+x} ]]; then
   # command -v code >/dev/null 2>&1 && export VISUAL="code --wait"
 fi
 
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+
+if [[ -d $HOME/.local/bin ]]; then
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) path=("$HOME/.local/bin" $path) ;;
+  esac
+fi
+
+export PNPM_HOME="$XDG_DATA_HOME/pnpm"
+if [[ -d $PNPM_HOME ]]; then
+  case ":$PATH:" in
+    *":$PNPM_HOME:"*) ;;
+    *) path=("$PNPM_HOME" $path) ;;
+  esac
+fi
+
 if command -v go >/dev/null 2>&1; then
   gobin="$(go env GOBIN)"
   if [[ -n $gobin && -d $gobin ]]; then
@@ -27,7 +47,3 @@ case "$(uname)" in
     export PYTHON_CONFIGURE_OPTS="--enable-shared"
     ;;
 esac
-
-if command -v uv >/dev/null 2>&1; then
-  path=("$HOME/.local/bin" $path)
-fi
