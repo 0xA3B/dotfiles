@@ -1,3 +1,5 @@
+exclude-newer = "3 days"
+
 [[index]]
 name = "pypi"
 url = "https://pypi.org/simple"

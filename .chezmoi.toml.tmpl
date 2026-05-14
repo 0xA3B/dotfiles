@@ -1,5 +1,5 @@
 sourceDir = {{ .chezmoi.sourceDir | quote }}
-mode = "symlink"
+mode = "file"
 
 [data]
 {{ $workMachine := promptBoolOnce . "work_machine" "Is this a work machine?" }}
