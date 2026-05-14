@@ -11,15 +11,19 @@ if not set -q VISUAL
     # command -q code; and set -gx VISUAL code --wait
 end
 
+set -q XDG_CONFIG_HOME; or set -gx XDG_CONFIG_HOME "$HOME/.config"
+set -q XDG_DATA_HOME; or set -gx XDG_DATA_HOME "$HOME/.local/share"
+set -q XDG_STATE_HOME; or set -gx XDG_STATE_HOME "$HOME/.local/state"
+set -q XDG_CACHE_HOME; or set -gx XDG_CACHE_HOME "$HOME/.cache"
+
+fish_add_path --prepend --path "$HOME/.local/bin"
+
+set -gx PNPM_HOME "$XDG_DATA_HOME/pnpm"
+fish_add_path --prepend --path "$PNPM_HOME"
+
 if command -q go
     set -l gobin (go env GOBIN)
-    if test -n "$gobin"; and test -d "$gobin"
-        fish_add_path --append "$gobin"
-    end
-end
-
-if command -q uv
-    fish_add_path --prepend "$HOME/.local/bin"
+    test -n "$gobin"; and fish_add_path --append --path "$gobin"
 end
 
 switch (uname)

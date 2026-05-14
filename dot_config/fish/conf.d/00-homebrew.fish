@@ -9,8 +9,5 @@ if test -f $brewbin
     set -gx HOMEBREW_NO_ANALYTICS 1
     set -gx HOMEBREW_NO_ENV_HINTS 1
 
-    set -l gnubin "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin"
-    if test -d $gnubin
-        fish_add_path --prepend $gnubin
-    end
+    fish_add_path --prepend --path "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin"
 end
