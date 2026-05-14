@@ -11,8 +11,6 @@ if [[ -z ${VISUAL+x} ]]; then
   # command -v code >/dev/null 2>&1 && export VISUAL="code --wait"
 fi
 
-export DOTFILES_HOME="$HOME/.dotfiles"
-
 if command -v go >/dev/null 2>&1; then
   gobin="$(go env GOBIN)"
   if [[ -n $gobin && -d $gobin ]]; then

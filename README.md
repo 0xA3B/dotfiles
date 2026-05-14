@@ -16,10 +16,10 @@ Other package-manager and binary install options are available in the official d
 
 ## Bootstrap This Repo
 
-If this repo is already cloned to `~/.dotfiles`:
+Initialize the default chezmoi source directory from GitHub:
 
 ```sh
-chezmoi init --source="$HOME/.dotfiles"
+chezmoi init 0xA3B
 chezmoi apply --dry-run --verbose
 chezmoi apply
 ```
@@ -27,13 +27,12 @@ chezmoi apply
 If setting up a new machine directly from the hosted repo:
 
 ```sh
-chezmoi init --apply <repo>
+chezmoi init --apply 0xA3B
 ```
 
 The repo includes a `.chezmoi.toml.tmpl` so `chezmoi init` can create an initial
 machine-local config automatically. It sets:
 
-- `sourceDir` to the actual source directory used by `chezmoi init`
 - `mode = "file"` so managed files are materialized as normal files
 - `work_machine` via an init-time prompt, which is used for machine-specific
   ignore behavior
