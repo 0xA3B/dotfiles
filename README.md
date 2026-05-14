@@ -34,6 +34,6 @@ The repo includes a `.chezmoi.toml.tmpl` so `chezmoi init` can create an initial
 machine-local config automatically. It sets:
 
 - `sourceDir` to the actual source directory used by `chezmoi init`
-- `mode = "symlink"` so regular managed files are symlinked back to the repo
+- `mode = "file"` so managed files are materialized as normal files
 - `work_machine` via an init-time prompt, which is used for machine-specific
   ignore behavior

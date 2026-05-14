@@ -1,5 +1,4 @@
 function unset --description 'Bash-like unset helper for fish'
-    # Generated with GPT-5-Codex
     if not set -q argv[1]
         printf 'unset: not enough arguments\n' >&2
         return 1

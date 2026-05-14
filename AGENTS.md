@@ -11,8 +11,9 @@ This repository contains personal dotfiles for managing and sharing configuratio
 ## Repository Model
 
 - This repository is a `chezmoi` source repository, not a GNU Stow repository.
-- Managed files are intended to be materialized with `chezmoi` in `symlink` mode.
-- Treat files under `dot_*` as the source of truth even if the live file in `$HOME` is a symlink.
+- Managed files are intended to be materialized with `chezmoi` in `file` mode.
+- Treat files under `dot_*` as the source of truth for committed configuration.
+- Inspect live files under `$HOME` only when diagnosing local drift or machine-specific behavior.
 
 ## Public and Private Boundaries
 
