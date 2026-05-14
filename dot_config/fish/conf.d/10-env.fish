@@ -1,8 +1,6 @@
 # Base shell environment shared across interactive and non-interactive fish
 # sessions.
 
-set -g DOTFILES_HOME "$HOME/.dotfiles"
-
 if not set -q EDITOR
     set -gx EDITOR vim
     command -q nvim; and set -gx EDITOR nvim
