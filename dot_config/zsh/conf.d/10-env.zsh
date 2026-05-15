@@ -23,11 +23,11 @@ if [[ -d $HOME/.local/bin ]]; then
   esac
 fi
 
-export PNPM_HOME="$XDG_DATA_HOME/pnpm"
-if [[ -d $PNPM_HOME ]]; then
+export PNPM_HOME="$HOME/Library/pnpm"
+if [[ -d $PNPM_HOME/bin ]]; then
   case ":$PATH:" in
-    *":$PNPM_HOME:"*) ;;
-    *) path=("$PNPM_HOME" $path) ;;
+    *":$PNPM_HOME/bin:"*) ;;
+    *) path=("$PNPM_HOME/bin" $path) ;;
   esac
 fi
 

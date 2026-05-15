@@ -18,8 +18,8 @@ set -q XDG_CACHE_HOME; or set -gx XDG_CACHE_HOME "$HOME/.cache"
 
 fish_add_path --prepend --path "$HOME/.local/bin"
 
-set -gx PNPM_HOME "$XDG_DATA_HOME/pnpm"
-fish_add_path --prepend --path "$PNPM_HOME"
+set -gx PNPM_HOME "$HOME/Library/pnpm"
+fish_add_path --prepend --path "$PNPM_HOME/bin"
 
 if command -q go
     set -l gobin (go env GOBIN)
