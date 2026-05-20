@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository contains personal dotfiles for managing and sharing configuration across machines.
+Chezmoi dotfile repo.
 
 ## Project Conventions
 
@@ -10,7 +10,7 @@ This repository contains personal dotfiles for managing and sharing configuratio
 
 ## Repository Model
 
-- This repository is a `chezmoi` source repository, not a GNU Stow repository.
+- This repository is a `chezmoi` source repository.
 - Managed files are intended to be materialized with `chezmoi` in `file` mode.
 - Treat files under `dot_*` as the source of truth for committed configuration.
 - Inspect live files under `$HOME` only when diagnosing local drift or machine-specific behavior.
@@ -35,8 +35,3 @@ This repository contains personal dotfiles for managing and sharing configuratio
 - Do not introduce new zsh-only behavior unless it is required by zsh or explicitly requested.
 - Generated fish completions are generally not tracked.
 - Only handwritten completions should be committed unless the user explicitly asks to track a generated completion file.
-
-## Workspace Hygiene
-
-- Keep `.vscode/` minimal and limited to settings that materially help this repository.
-- Do not add empty recommendation files or personal editor-preference extensions unless the user explicitly wants them tracked.
