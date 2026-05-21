@@ -2,3 +2,8 @@
 idiomatic_version_file_enable_tools = ["node", "python"]
 node.corepack = true
 python.uv_venv_auto = "source"
+
+[tools]
+node = "26"
+python = "3.14"
+uv = "latest"
