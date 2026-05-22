@@ -8,7 +8,9 @@
     "**/dot_config/ghostty/config": "properties",
     "**/dot_config/git/ignore": "ignore",
     "**/dot_config/tmux/tmux.conf": "shellscript",
+    "**/dot_config/uv/modify_uv.toml": "python",
     "**/dot_config/yamllint/config": "yaml",
+    "**/modify_dot_npmrc": "properties",
     "dot_vimrc": "Vimscript",
     "dot_zshrc": "shellscript"
   },

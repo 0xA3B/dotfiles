@@ -3,6 +3,9 @@ README.md
 **/AGENTS.md
 **/CLAUDE.md
 .gitignore
+.vscode
+.vscode/**
+**/*.managed.*
 
 # Local-only scratch/state content in this repo is intentionally unmanaged.
 .local
@@ -16,9 +19,6 @@ README.md
 .config/zsh/conf.d/disabled/**
 
 {{ if .work_machine -}}
-# Keep the public base uv config in the repo, but do not apply it on work
-# machines where the live user config includes private/internal indexes.
-.config/uv/uv.toml
 .claude/settings.json
 .claude/status-line.sh
 {{ end -}}

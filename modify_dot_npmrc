@@ -1,0 +1,13 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* vim: set filetype=dosini : */ -}}
+{{- $body := .chezmoi.stdin
+  | replaceAllRegex "(?m)^[ \t]*registry[ \t]*=.*\r?\n?" ""
+  | replaceAllRegex "(?m)^[ \t]*min-release-age[ \t]*=.*\r?\n?" ""
+  | trimSuffix "\n"
+-}}
+registry=https://registry.npmjs.org/
+min-release-age=3
+{{- if ne (trim $body) "" }}
+
+{{ $body }}
+{{- end -}}
