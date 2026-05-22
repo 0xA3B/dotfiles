@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Chezmoi dotfile repo.
+Chezmoi managed personal dotfile repo.
 
 ## Project Conventions
 
