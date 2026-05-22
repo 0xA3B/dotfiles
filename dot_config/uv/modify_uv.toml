@@ -1,0 +1,105 @@
+#!/usr/bin/env -S uv run --quiet --script
+# vim: set filetype=python :
+#
+# /// script
+# requires-python = ">=3.13"
+# dependencies = ["tomlkit>=0.13.2"]
+# ///
+
+from __future__ import annotations
+
+import os
+import subprocess
+import sys
+from copy import deepcopy
+from pathlib import Path
+
+import tomlkit
+from tomlkit.items import AoT, Table
+
+MANAGED_CONFIG_SOURCE_PATH = Path("dot_config/uv/uv.managed.toml")
+
+
+def source_dir() -> Path:
+    if chezmoi_source_dir := os.environ.get("CHEZMOI_SOURCE_DIR"):
+        return Path(chezmoi_source_dir)
+
+    return Path(
+        subprocess.run(
+            ["chezmoi", "source-path"],
+            check=True,
+            text=True,
+            stdout=subprocess.PIPE,
+        ).stdout.strip()
+    )
+
+
+def load_managed_config() -> tomlkit.TOMLDocument:
+    managed_text = (source_dir() / MANAGED_CONFIG_SOURCE_PATH).read_text()
+    return tomlkit.parse(managed_text)
+
+
+def managed_index_identity(index: Table) -> tuple[object | None, object | None]:
+    return index.get("name"), index.get("url")
+
+
+def indexes_match(index: Table, managed_index: Table) -> bool:
+    name, url = managed_index_identity(index)
+    managed_name, managed_url = managed_index_identity(managed_index)
+    return (name is not None and name == managed_name) or (
+        url is not None and url == managed_url
+    )
+
+
+def matching_index(indexes: AoT, managed_index: Table) -> Table | None:
+    return next(
+        (index for index in indexes if indexes_match(index, managed_index)),
+        None,
+    )
+
+
+def merge_index(target: Table, managed_index: Table) -> None:
+    for key, value in managed_index.items():
+        target[key] = deepcopy(value)
+
+
+def merge_indexes(input_doc: tomlkit.TOMLDocument, managed_indexes: AoT) -> None:
+    indexes = input_doc.get("index")
+    if indexes is None:
+        input_doc["index"] = deepcopy(managed_indexes)
+        return
+    if not isinstance(indexes, AoT):
+        raise TypeError("uv config 'index' must be an array of tables")
+
+    for managed_index in managed_indexes:
+        target_index = matching_index(indexes, managed_index)
+        if target_index is None:
+            indexes.append(deepcopy(managed_index))
+        else:
+            merge_index(target_index, managed_index)
+
+
+def merge_managed_config(
+    input_doc: tomlkit.TOMLDocument,
+    managed_doc: tomlkit.TOMLDocument,
+) -> tomlkit.TOMLDocument:
+    for key, value in managed_doc.items():
+        if key == "index":
+            if not isinstance(value, AoT):
+                raise TypeError("managed uv config 'index' must be an array of tables")
+            merge_indexes(input_doc, value)
+            continue
+
+        input_doc[key] = deepcopy(value)
+
+    return input_doc
+
+
+def main() -> None:
+    managed_doc = load_managed_config()
+    input_doc = tomlkit.parse(sys.stdin.read())
+    sys.stdout.write(tomlkit.dumps(merge_managed_config(input_doc, managed_doc)))
+
+
+if __name__ == "__main__":
+    main()
