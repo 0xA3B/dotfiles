@@ -6,7 +6,14 @@ README.md
 .gitignore
 .vscode
 .vscode/**
-**/*.managed.*
+
+# Managed-config payloads consumed by adjacent modify_ scripts. These are
+# read from the source dir at apply time and must not be materialized.
+.config/uv/uv.managed.toml
+
+# Bytecode caches written by `uv run` next to inline-script modify_ files.
+**/__pycache__
+**/__pycache__/**
 
 # Local-only scratch/state content in this repo is intentionally unmanaged.
 .local
