@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import os
-import subprocess
 import sys
 from copy import deepcopy
 from pathlib import Path
@@ -21,17 +20,13 @@ MANAGED_CONFIG_SOURCE_PATH = Path("dot_config/uv/uv.managed.toml")
 
 
 def source_dir() -> Path:
-    if chezmoi_source_dir := os.environ.get("CHEZMOI_SOURCE_DIR"):
-        return Path(chezmoi_source_dir)
-
-    return Path(
-        subprocess.run(
-            ["chezmoi", "source-path"],
-            check=True,
-            text=True,
-            stdout=subprocess.PIPE,
-        ).stdout.strip()
-    )
+    chezmoi_source_dir = os.environ.get("CHEZMOI_SOURCE_DIR")
+    if not chezmoi_source_dir:
+        sys.exit(
+            "modify_uv.toml: CHEZMOI_SOURCE_DIR is not set. "
+            "This script is meant to be invoked by chezmoi as a modify script."
+        )
+    return Path(chezmoi_source_dir)
 
 
 def load_managed_config() -> tomlkit.TOMLDocument:
