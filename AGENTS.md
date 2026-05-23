@@ -27,6 +27,27 @@ Chezmoi managed personal dotfile repo.
 
 - Local work overlays such as `~/.config/fish/work` and `~/.config/zsh/work` are outside this repository and should only be edited when the user explicitly asks for live-environment changes.
 
+## Glossary
+
+- Managed overlay: a repo-owned sidecar file, usually named `*.managed.*`, that authoritatively manages selected keys or settings while preserving unrelated live configuration.
+- Modify script: a chezmoi `modify_` script or modify template that transforms existing target-file content instead of replacing the whole file.
+- Modify helper library: Python helper code under `tools/chezmoi_modify` for use by PEP 723 modify scripts.
+
+## Python Helper Conventions
+
+- Keep modify helper code under `tools/chezmoi_modify`.
+- Keep tests for modify helper code under `tests`.
+- Keep `pyproject.toml`, `uv.lock`, `tools`, and `tests` out of materialized home files via `.chezmoiignore.tmpl`.
+- Treat `*.managed.*` overlays as authoritative for the keys or settings they contain.
+- Keep modify scripts as PEP 723 scripts and declare runtime dependencies inline in each script.
+- Do not rely on the root `pyproject.toml` dependencies when a modify script runs under `uv run --script`; the root project is only for local development and tests.
+- When modify scripts use the helper library, import it from `CHEZMOI_SOURCE_DIR/tools`.
+- Helper functions should transform text content only; file metadata remains chezmoi's responsibility.
+
+## Development Commands
+
+- For modify helper library changes, prefer `uv run pytest`, `uv run ruff check`, `uv run ruff format --check`, and `uv run mypy`.
+
 ## Shell Conventions
 
 - `dot_config/fish` is the canonical shell configuration in this repository.
