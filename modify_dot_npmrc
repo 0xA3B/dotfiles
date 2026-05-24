@@ -2,7 +2,7 @@
 # vim: set filetype=python :
 #
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.14,<3.15"
 # ///
 
 from __future__ import annotations
