@@ -12,4 +12,3 @@ These instructions apply when developing code under `tools`.
 - Raise `ChezmoiModifyError` for invalid managed overlays, invalid structured live input, missing source files, or unsafe source paths.
 - Prefer parser-backed implementations for structured formats such as TOML, JSON, and YAML.
 - Keep format-specific behavior in format-specific modules rather than adding tool-specific logic to generic helpers.
-
