@@ -24,8 +24,14 @@ tools/**
 tests
 tests/**
 
-# Project-local runtime files should not be materialized in $HOME.
+# Project-local tooling files should not be materialized in $HOME.
+.pre-commit-config.yaml
 mise.toml
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+node_modules
+node_modules/**
 
 # Local-only scratch/state content in this repo is intentionally unmanaged.
 .local
