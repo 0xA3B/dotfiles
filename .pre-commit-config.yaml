@@ -33,6 +33,14 @@ repos:
         stages: [commit-msg]
         always_run: true
 
+      - id: oxfmt
+        name: oxfmt
+        entry: pnpm exec oxfmt --write
+        language: system
+        types_or: [json, markdown, toml, yaml]
+        exclude: ^dot_config/uv/modify_uv\.toml$
+        stages: [pre-commit]
+
       - id: ruff-check
         name: ruff check
         entry: uv run ruff check --fix

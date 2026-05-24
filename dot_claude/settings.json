@@ -134,9 +134,7 @@
       "Bash(glab repo create *)",
       "Bash(glab repo delete *)"
     ],
-    "ask": [
-      "Bash(sudo *)"
-    ],
+    "ask": ["Bash(sudo *)"],
     "defaultMode": "acceptEdits"
   },
   "statusLine": {

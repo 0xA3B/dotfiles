@@ -5,9 +5,7 @@ description = "chezmoi helper lib"
 requires-python = ">=3.14,<3.15"
 classifiers = ["Private :: Do Not Upload"]
 readme = "README.md"
-dependencies = [
-    "tomlkit>=0.15.0,<1.0.0",
-]
+dependencies = ["tomlkit>=0.15.0,<1.0.0"]
 
 [project.urls]
 Repository = "https://github.com/0xA3B/dotfiles"
@@ -37,64 +35,64 @@ extend-include = []
 # Ruff rule selection - organized alphabetically by category
 # See: https://docs.astral.sh/ruff/rules/
 select = [
-    "A",     # flake8-builtins - prevent shadowing Python builtins
-    "ARG",   # flake8-unused-arguments - detect unused function arguments
+    "A", # flake8-builtins - prevent shadowing Python builtins
+    "ARG", # flake8-unused-arguments - detect unused function arguments
     "ASYNC", # flake8-async - detect blocking calls in async functions
-    "B",     # flake8-bugbear - detect likely bugs and design problems
-    "C4",    # flake8-comprehensions - simplify comprehensions
-    "D",     # pydocstyle - docstring style checking
-    "DTZ",   # flake8-datetimez - prevent naive datetime usage and timezone footguns
-    "E",     # pycodestyle errors - PEP 8 error codes
-    "F",     # Pyflakes - detect undefined names, unused imports
-    "I",     # isort - import sorting and organization
-    "ISC",   # flake8-implicit-str-concat - string literal concatenation
-    "LOG",   # flake8-logging - logging best practices
-    "N",     # pep8-naming - enforce PEP 8 naming conventions
-    "PERF",  # Perflint - performance anti-patterns
-    "PT",    # flake8-pytest-style - pytest best practices
-    "PTH",   # flake8-use-pathlib - prefer pathlib over os.path
-    "Q",     # flake8-quotes - enforce quote consistency
-    "RET",   # flake8-return - simplify return statements
-    "RUF",   # Ruff-specific rules - additional checks and performance
-    "S",     # flake8-bandit - security issue detection
-    "SIM",   # flake8-simplify - simplify code structure
-    "SLF",   # flake8-self - private member access detection
-    "T10",   # flake8-debugger - detect committed debugger and breakpoint calls
-    "TRY",   # tryceratops - exception handling best practices
-    "UP",    # pyupgrade - modernize Python code (f-strings, type hints)
-    "W",     # pycodestyle warnings - PEP 8 warning codes
+    "B", # flake8-bugbear - detect likely bugs and design problems
+    "C4", # flake8-comprehensions - simplify comprehensions
+    "D", # pydocstyle - docstring style checking
+    "DTZ", # flake8-datetimez - prevent naive datetime usage and timezone footguns
+    "E", # pycodestyle errors - PEP 8 error codes
+    "F", # Pyflakes - detect undefined names, unused imports
+    "I", # isort - import sorting and organization
+    "ISC", # flake8-implicit-str-concat - string literal concatenation
+    "LOG", # flake8-logging - logging best practices
+    "N", # pep8-naming - enforce PEP 8 naming conventions
+    "PERF", # Perflint - performance anti-patterns
+    "PT", # flake8-pytest-style - pytest best practices
+    "PTH", # flake8-use-pathlib - prefer pathlib over os.path
+    "Q", # flake8-quotes - enforce quote consistency
+    "RET", # flake8-return - simplify return statements
+    "RUF", # Ruff-specific rules - additional checks and performance
+    "S", # flake8-bandit - security issue detection
+    "SIM", # flake8-simplify - simplify code structure
+    "SLF", # flake8-self - private member access detection
+    "T10", # flake8-debugger - detect committed debugger and breakpoint calls
+    "TRY", # tryceratops - exception handling best practices
+    "UP", # pyupgrade - modernize Python code (f-strings, type hints)
+    "W", # pycodestyle warnings - PEP 8 warning codes
 ]
 
 # Targeted extensions beyond the core rule families above
 extend-select = [
-    "PLC0415",  # pylint convention - keep imports at module top level unless intentionally deferred
-    "PLE1310",  # pylint error - catch suspicious str.strip calls that often meant prefix/suffix removal
-    "PLW2901",  # pylint warning - prevent loop or with-target variables from being overwritten in scope
+    "PLC0415", # pylint convention - keep imports at module top level unless intentionally deferred
+    "PLE1310", # pylint error - catch suspicious str.strip calls that often meant prefix/suffix removal
+    "PLW2901", # pylint warning - prevent loop or with-target variables from being overwritten in scope
 ]
 
 # Global ignores for overly strict/opinionated rules
 ignore = [
-    "TRY002",   # Disallow raise Exception (prefer custom exceptions) - too restrictive for tests
-    "TRY003",   # Require exception messages as class attributes (too restrictive)
-    "TRY300",   # Consider else block after try-except (stylistic preference)
+    "TRY002", # Disallow raise Exception (prefer custom exceptions) - too restrictive for tests
+    "TRY003", # Require exception messages as class attributes (too restrictive)
+    "TRY300", # Consider else block after try-except (stylistic preference)
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "**/modify_*" = [
-    "D100",  # Modify scripts are operational shims, not importable modules
-    "E402",  # Allow CHEZMOI_SOURCE_DIR/tools bootstrap before helper imports
+    "D100", # Modify scripts are operational shims, not importable modules
+    "E402", # Allow CHEZMOI_SOURCE_DIR/tools bootstrap before helper imports
 ]
 "tests/**/*" = [
-    "D100",    # Allow behavior-focused test modules without docstrings
-    "D103",    # Allow descriptive test names instead of function docstrings
-    "S101",    # Allow asserts in test suite while enforcing elsewhere
-    "S105",    # Allow hardcoded passwords in tests (test fixtures)
-    "S106",    # Allow hardcoded password function arguments in tests
-    "S107",    # Allow hardcoded passwords in function defaults (test helpers)
-    "SLF001",  # Allow private member access in tests
+    "D100", # Allow behavior-focused test modules without docstrings
+    "D103", # Allow descriptive test names instead of function docstrings
+    "S101", # Allow asserts in test suite while enforcing elsewhere
+    "S105", # Allow hardcoded passwords in tests (test fixtures)
+    "S106", # Allow hardcoded password function arguments in tests
+    "S107", # Allow hardcoded passwords in function defaults (test helpers)
+    "SLF001", # Allow private member access in tests
 ]
 "tools/**/*" = [
-    "PT",  # Disable pytest rules for src files
+    "PT", # Disable pytest rules for src files
 ]
 
 [tool.ruff.lint.flake8-quotes]
