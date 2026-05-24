@@ -30,9 +30,8 @@ If setting up a new machine directly from the hosted repo:
 chezmoi init --apply 0xA3B
 ```
 
-The repo includes a `.chezmoi.toml.tmpl` so `chezmoi init` can create an initial
-machine-local config automatically. It sets:
+The repo includes a `.chezmoi.toml.tmpl` so `chezmoi init` can create an initial machine-local
+config automatically. It sets:
 
 - `mode = "file"` so managed files are materialized as normal files
-- `work_machine` via an init-time prompt, which is used for machine-specific
-  ignore behavior
+- `work_machine` via an init-time prompt, which is used for machine-specific ignore behavior
