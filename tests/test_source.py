@@ -1,7 +1,8 @@
 from pathlib import Path
 
 import pytest
-from chezmoi_modify import ChezmoiModifyError, read_source_text
+from chezmoi_modify.exceptions import ChezmoiModifyError
+from chezmoi_modify.source import read_source_text
 
 
 def test_read_source_text_resolves_relative_paths_from_chezmoi_source_dir(

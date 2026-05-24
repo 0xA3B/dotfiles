@@ -1,7 +1,9 @@
 from textwrap import dedent
 
 import pytest
-from chezmoi_modify import ChezmoiModifyError, Diagnostic, merge_managed_keys
+from chezmoi_modify.diagnostics import Diagnostic
+from chezmoi_modify.exceptions import ChezmoiModifyError
+from chezmoi_modify.line_kv import merge_managed_keys
 
 
 def test_managed_key_replaces_first_occurrence_and_removes_duplicates() -> None:
