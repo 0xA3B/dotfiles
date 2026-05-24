@@ -80,6 +80,10 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"**/modify_*" = [
+    "D100",  # Modify scripts are operational shims, not importable modules
+    "E402",  # Allow CHEZMOI_SOURCE_DIR/tools bootstrap before helper imports
+]
 "tests/**/*" = [
     "D100",    # Allow behavior-focused test modules without docstrings
     "D103",    # Allow descriptive test names instead of function docstrings
