@@ -8,7 +8,8 @@
     "**/dot_config/tmux/tmux.conf": "shellscript",
     "**/dot_config/uv/modify_uv.toml": "python",
     "**/dot_config/yamllint/config": "yaml",
-    "**/modify_dot_npmrc": "properties",
+    "**/dot_npmrc.managed": "properties",
+    "**/modify_dot_npmrc": "python",
     "dot_vimrc": "Vimscript",
     "dot_zshrc": "shellscript"
   },

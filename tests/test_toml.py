@@ -2,7 +2,9 @@ from textwrap import dedent
 
 import pytest
 import tomlkit
-from chezmoi_modify import ChezmoiModifyError, Diagnostic, merge_toml_overlay
+from chezmoi_modify.diagnostics import Diagnostic
+from chezmoi_modify.exceptions import ChezmoiModifyError
+from chezmoi_modify.toml import merge_toml_overlay
 
 
 def test_toml_overlay_overwrites_scalars_and_recursively_merges_tables() -> None:
