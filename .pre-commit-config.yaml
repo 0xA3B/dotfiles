@@ -35,10 +35,24 @@ repos:
 
       - id: oxfmt
         name: oxfmt
-        entry: pnpm exec oxfmt --write
+        entry: pnpm exec oxfmt --write --no-error-on-unmatched-pattern
         language: system
         types_or: [json, markdown, toml, yaml]
         exclude: ^dot_config/uv/modify_uv\.toml$
+        stages: [pre-commit]
+
+      - id: stylua
+        name: stylua
+        entry: pnpm exec stylua
+        language: system
+        types_or: [lua]
+        stages: [pre-commit]
+
+      - id: fish-format
+        name: fish format
+        entry: fish_indent --write
+        language: system
+        types_or: [fish]
         stages: [pre-commit]
 
       - id: ruff-check

@@ -12,15 +12,15 @@
 # The original value is restored when leaving the directory.
 
 if status is-interactive
-    set -q dotenv_enable; or set -g dotenv_enable "yes"
-    set -q dotenv_announce; or set -g dotenv_announce "yes"
+    set -q dotenv_enable; or set -g dotenv_enable yes
+    set -q dotenv_announce; or set -g dotenv_announce yes
     set -q dotenv_filename; or set -g dotenv_filename ".env"
 end
 
 # State tracking
-set -g _dotenv_stack        # Active .env file paths (root to deepest)
-set -g _dotenv_file_vars    # "filepath:varname" for each var we set
-set -g _dotenv_saved_vals   # Parallel array: saved value or "__DOTENV_UNSET__"
+set -g _dotenv_stack # Active .env file paths (root to deepest)
+set -g _dotenv_file_vars # "filepath:varname" for each var we set
+set -g _dotenv_saved_vals # Parallel array: saved value or "__DOTENV_UNSET__"
 set -g _dotenv_initialized 0
 
 function _dotenv_parse --description "Parse .env file, output KEY=VALUE or !KEY (unset)"
@@ -52,7 +52,7 @@ function _dotenv_parse --description "Parse .env file, output KEY=VALUE or !KEY 
         set val (string replace -r '^["\'](.*)["\']$' '$1' -- "$val")
 
         echo "$key=$val"
-    end < "$file"
+    end <"$file"
 end
 
 function _dotenv_load --description "Load a .env file, tracking original values"
@@ -69,7 +69,7 @@ function _dotenv_load --description "Load a .env file, tracking original values"
             if set -q $key
                 set -a _dotenv_saved_vals "$$key"
             else
-                set -a _dotenv_saved_vals "__DOTENV_UNSET__"
+                set -a _dotenv_saved_vals __DOTENV_UNSET__
             end
 
             # Unset the variable
@@ -85,7 +85,7 @@ function _dotenv_load --description "Load a .env file, tracking original values"
             if set -q $key
                 set -a _dotenv_saved_vals "$$key"
             else
-                set -a _dotenv_saved_vals "__DOTENV_UNSET__"
+                set -a _dotenv_saved_vals __DOTENV_UNSET__
             end
 
             # Set new value
@@ -107,7 +107,7 @@ function _dotenv_unload --description "Unload a .env file, restoring original va
             set -l key (string replace "$file:" '' -- "$entry")
             set -l saved $_dotenv_saved_vals[$i]
 
-            if test "$saved" = "__DOTENV_UNSET__"
+            if test "$saved" = __DOTENV_UNSET__
                 set -e $key
             else
                 set -gx $key "$saved"
@@ -135,10 +135,10 @@ function _dotenv_get_target_stack --description "Get .env files that should be a
     set -l result
     set -l dir (pwd)
 
-    while test "$dir" != "/"
+    while test "$dir" != /
         set -l envfile "$dir/$dotenv_filename"
         if test -f "$envfile"
-            set -p result "$envfile"  # Prepend to get root-to-leaf order
+            set -p result "$envfile" # Prepend to get root-to-leaf order
         end
         set dir (dirname "$dir")
     end
@@ -147,7 +147,7 @@ function _dotenv_get_target_stack --description "Get .env files that should be a
 end
 
 function _dotenv_apply
-    test "$dotenv_enable" != "yes"; and return
+    test "$dotenv_enable" != yes; and return
     not status is-interactive; and return
 
     set -l target (_dotenv_get_target_stack)
@@ -167,7 +167,7 @@ function _dotenv_apply
     if test (count $_dotenv_stack) -gt $common
         for i in (seq (count $_dotenv_stack) -1 (math "$common + 1"))
             set -l file $_dotenv_stack[$i]
-            if test "$dotenv_announce" = "yes"
+            if test "$dotenv_announce" = yes
                 echo "Unloaded $file"
             end
             _dotenv_unload "$file"
@@ -179,7 +179,7 @@ function _dotenv_apply
         for i in (seq (math "$common + 1") (count $target))
             set -l file $target[$i]
             test -f "$file"; or continue
-            if test "$dotenv_announce" = "yes"
+            if test "$dotenv_announce" = yes
                 echo "Loaded $file"
             end
             _dotenv_load "$file"
@@ -192,7 +192,7 @@ function _dotenv_on_pwd --on-variable PWD --description "Auto-load .env on direc
 end
 
 function _dotenv_on_init --on-event fish_prompt --description "Auto-load .env on shell init"
-    if test "$_dotenv_initialized" != "1"
+    if test "$_dotenv_initialized" != 1
         set -g _dotenv_initialized 1
         _dotenv_apply
     end
