@@ -59,8 +59,11 @@ Chezmoi managed personal dotfile repo.
 
 ## Development Commands
 
-- For modify helper library changes, prefer `uv run pytest`, `uv run ruff check`,
-  `uv run ruff format --check`, and `uv run mypy`.
+- Prefer the `package.json` command surface for local validation and formatting.
+- Use `pnpm run format` to normalize all supported file types through pre-commit hooks.
+- Use `pnpm run check` as the default pre-commit or pre-push local gate.
+- Use targeted scripts such as `pnpm run format:python:check`, `pnpm run format:shell:check`,
+  `pnpm run typecheck`, and `pnpm run test` when narrowing validation to a specific area.
 
 ## Shell Conventions
 
