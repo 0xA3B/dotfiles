@@ -1,8 +1,8 @@
 # Deprecated: mise now handles uv project venv activation via
-# python.uv_venv_auto in dot_config/mise/config.toml.
+# python.uv_venv_auto in managed/dot_config/mise/config.toml.
 #
 # To restore this fish-only fallback, move this file back to
-# dot_config/fish/conf.d/22-venv.fish.
+# managed/dot_config/fish/conf.d/22-venv.fish.
 #
 # Auto-activate Python virtual environments on directory change
 #

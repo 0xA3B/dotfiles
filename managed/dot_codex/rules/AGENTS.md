@@ -1,6 +1,6 @@
 # Codex Rules Instructions
 
-These instructions apply to files under `dot_codex/rules/`.
+These instructions apply to files under `managed/dot_codex/rules/`.
 
 ## Purpose
 
@@ -47,9 +47,9 @@ These instructions apply to files under `dot_codex/rules/`.
 - Example:
 
 ```fish
-codex execpolicy check --pretty --rules dot_codex/rules/git.rules -- git status
-codex execpolicy check --pretty --rules dot_codex/rules/git.rules -- git commit -m test
-codex execpolicy check --pretty --rules dot_codex/rules/git.rules -- git commit --no-verify -m test
+codex execpolicy check --pretty --rules managed/dot_codex/rules/git.rules -- git status
+codex execpolicy check --pretty --rules managed/dot_codex/rules/git.rules -- git commit -m test
+codex execpolicy check --pretty --rules managed/dot_codex/rules/git.rules -- git commit --no-verify -m test
 ```
 
 - If you changed multiple rule files, run at least one representative `codex execpolicy check`

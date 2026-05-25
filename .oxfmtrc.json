@@ -28,7 +28,7 @@
     ".pnpm-store",
     ".local",
     "pnpm-lock.yaml",
-    "dot_config/nvim/lazy-lock.json",
-    "dot_config/uv/modify_uv.toml"
+    "managed/dot_config/nvim/lazy-lock.json",
+    "managed/dot_config/uv/modify_uv.toml"
   ]
 }

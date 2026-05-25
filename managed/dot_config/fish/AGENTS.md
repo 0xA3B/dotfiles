@@ -2,7 +2,7 @@
 
 ## Role
 
-- `dot_config/fish` is the canonical shell configuration in this repository.
+- `managed/dot_config/fish` is the canonical shell configuration in this repository.
 - When shell behavior changes here, review the zsh configuration and mirror the change there unless
   the behavior is inherently fish-specific.
 - Prefer updating fish first, then porting the behavior to zsh in a zsh-native way.
@@ -13,7 +13,8 @@
   `config.fish`.
 - Keep fish implementations idiomatic to fish. Do not contort fish code to look like zsh.
 - If adding or changing functions, aliases, environment defaults, startup hooks, or completion
-  generation here, check whether zsh needs an equivalent update under [`dot_config/zsh`](../zsh).
+  generation here, check whether zsh needs an equivalent update under
+  [`managed/dot_config/zsh`](../zsh).
 - If a feature should exist only in fish, document why in the change or nearby comments.
 
 ## Completions

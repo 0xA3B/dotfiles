@@ -2,8 +2,8 @@
 
 ## Role
 
-- `dot_config/zsh` is not the canonical shell configuration. Fish is the source of truth.
-- Keep zsh behavior aligned with [`dot_config/fish`](../fish) as closely as practical.
+- `managed/dot_config/zsh` is not the canonical shell configuration. Fish is the source of truth.
+- Keep zsh behavior aligned with [`managed/dot_config/fish`](../fish) as closely as practical.
 - When fish changes, mirror the user-facing behavior in zsh unless the feature is fish-specific or
   zsh cannot support it cleanly.
 

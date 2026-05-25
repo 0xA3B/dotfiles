@@ -1,7 +1,7 @@
 {
   "files.associations": {
-    ".chezmoi.toml.tmpl": "toml",
-    ".chezmoiignore.tmpl": "ignore",
+    "**/.chezmoi.toml.tmpl": "toml",
+    "**/.chezmoiignore.tmpl": "ignore",
     "**/dot_config/fish/themes/*.theme": "shellscript",
     "**/dot_config/ghostty/config": "properties",
     "**/dot_config/git/ignore": "ignore",
@@ -10,8 +10,8 @@
     "**/dot_config/yamllint/config": "yaml",
     "**/dot_npmrc.managed": "properties",
     "**/modify_dot_npmrc": "python",
-    "dot_vimrc": "Vimscript",
-    "dot_zshrc": "shellscript"
+    "**/dot_vimrc": "Vimscript",
+    "**/dot_zshrc": "shellscript"
   },
   "python.analysis.extraPaths": ["./tools"],
   "files.insertFinalNewline": true,
