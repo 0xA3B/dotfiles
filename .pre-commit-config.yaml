@@ -55,19 +55,26 @@ repos:
         types_or: [fish]
         stages: [pre-commit]
 
-      - id: shfmt-shell
-        name: shfmt shell
-        entry: mise exec -- shfmt -w -i=2 -ci
+      - id: fish-check
+        name: fish check
+        entry: fish_indent --check
         language: system
-        files: \.(sh|bash)$
+        types_or: [fish]
+        stages: [manual]
+
+      - id: shfmt
+        name: shfmt
+        entry: mise exec -- shfmt -w
+        language: system
+        files: ^(.*\.(sh|bash|zsh)|dot_zshrc|dot_config/zsh/completions/_.*)$
         stages: [pre-commit]
 
-      - id: shfmt-zsh
-        name: shfmt zsh
-        entry: mise exec -- shfmt -w -ln=zsh -i=2 -ci
+      - id: shfmt-check
+        name: shfmt check
+        entry: mise exec -- shfmt -l
         language: system
-        files: ^(dot_zshrc|dot_config/zsh/.*\.zsh|dot_config/zsh/completions/_.*)$
-        stages: [pre-commit]
+        files: ^(.*\.(sh|bash|zsh)|dot_zshrc|dot_config/zsh/completions/_.*)$
+        stages: [manual]
 
       - id: ruff-check
         name: ruff check
