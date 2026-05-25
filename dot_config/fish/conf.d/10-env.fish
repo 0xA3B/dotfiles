@@ -31,5 +31,5 @@ switch (uname)
         set -gx PYTHON_CONFIGURE_OPTS "--enable-framework --enable-optimizations --with-lto"
         set -gx PYTHON_CFLAGS "-march=native -mtune=native"
     case '*'
-        set -gx PYTHON_CONFIGURE_OPTS "--enable-shared"
+        set -gx PYTHON_CONFIGURE_OPTS --enable-shared
 end
