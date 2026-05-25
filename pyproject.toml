@@ -20,7 +20,6 @@ dev = [
 ]
 
 [tool.uv]
-cache-dir = ".cache/uv"
 package = false
 
 [tool.ruff]

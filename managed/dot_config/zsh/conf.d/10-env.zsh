@@ -23,13 +23,12 @@ if [[ -d $HOME/.local/bin ]]; then
   esac
 fi
 
-export PNPM_HOME="$HOME/Library/pnpm"
-if [[ -d $PNPM_HOME/bin ]]; then
-  case ":$PATH:" in
-    *":$PNPM_HOME/bin:"*) ;;
-    *) path=("$PNPM_HOME/bin" $path) ;;
-  esac
-fi
+export PNPM_HOME="$XDG_DATA_HOME/pnpm"
+mkdir -p "$PNPM_HOME/bin"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) path=("$PNPM_HOME/bin" $path) ;;
+esac
 
 if command -v go >/dev/null 2>&1; then
   gobin="$(go env GOBIN)"
