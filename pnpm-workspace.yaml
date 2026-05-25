@@ -1,0 +1,6 @@
+allowBuilds:
+  esbuild: true
+cacheDir: .cache/pnpm/cache
+stateDir: .cache/pnpm/state
+storeDir: .cache/pnpm/store
+minimumReleaseAge: 4320 # 3 days

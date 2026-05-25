@@ -1,17 +1,19 @@
 {
   "files.associations": {
-    ".chezmoi.toml.tmpl": "toml",
-    ".chezmoiignore.tmpl": "ignore",
-    ".envrc.local": "shellscript",
-    "**/dot_codex/rules/*.rules.tmpl": "codex-rules",
-    "**/dot_config/fish/themes/*.theme": "fish",
+    "**/.chezmoi.toml.tmpl": "toml",
+    "**/.chezmoiignore.tmpl": "ignore",
+    "**/dot_config/fish/themes/*.theme": "shellscript",
     "**/dot_config/ghostty/config": "properties",
     "**/dot_config/git/ignore": "ignore",
     "**/dot_config/tmux/tmux.conf": "shellscript",
+    "**/dot_config/uv/modify_uv.toml": "python",
     "**/dot_config/yamllint/config": "yaml",
-    "dot_vimrc": "Vimscript",
-    "dot_zshrc": "shellscript"
+    "**/dot_npmrc.managed": "properties",
+    "**/modify_dot_npmrc": "python",
+    "**/dot_vimrc": "Vimscript",
+    "**/dot_zshrc": "shellscript"
   },
+  "python.analysis.extraPaths": ["./tools"],
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,

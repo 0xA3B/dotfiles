@@ -1,0 +1,29 @@
+{{- /* vim: set filetype=gitignore : */ -}}
+# Source-state guidance should not be materialized in $HOME.
+**/AGENTS.md
+**/CLAUDE.md
+
+# Managed-config payloads consumed by adjacent modify_ scripts. These are
+# read from the source dir at apply time and must not be materialized.
+.npmrc.managed
+.config/uv/uv.managed.toml
+
+# Bytecode caches written by `uv run` next to inline-script modify_ files.
+**/__pycache__
+**/__pycache__/**
+
+# Local-only scratch/state content in this repo is intentionally unmanaged.
+.local
+.local/**
+
+# Fish writes this file itself and it varies across machines.
+.config/fish/fish_variables
+
+# Keep archived shell hooks in the source repo without materializing them into $HOME.
+.config/fish/conf.d/disabled/**
+.config/zsh/conf.d/disabled/**
+
+{{ if .work_machine -}}
+.claude/settings.json
+.claude/status-line.sh
+{{ end -}}

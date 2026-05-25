@@ -1,0 +1,4 @@
+[tools]
+node = "26"
+python = "3.14"
+shfmt = "3"

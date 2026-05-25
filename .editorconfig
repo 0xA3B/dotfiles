@@ -1,0 +1,37 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+max_line_length = 100
+trim_trailing_whitespace = true
+
+[*.{py,pyi}]
+indent_size = 4
+
+[*.toml]
+indent_size = 4
+
+[*.sh]
+shell_variant = posix
+
+[*.bash]
+shell_variant = bash
+
+[*.zsh]
+shell_variant = zsh
+switch_case_indent = true
+
+[managed/dot_zshrc]
+shell_variant = zsh
+switch_case_indent = true
+
+[managed/dot_config/zsh/completions/_*]
+shell_variant = zsh
+switch_case_indent = true
+
+[*.{md,markdown}]
+trim_trailing_whitespace = false

@@ -1,0 +1,35 @@
+"""Safe source-repository file reads for modify scripts."""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+from chezmoi_modify.exceptions import ChezmoiModifyError
+
+
+def read_source_text(relative_path: str) -> str:
+    """Read a UTF-8 file below CHEZMOI_SOURCE_DIR."""
+    source_dir = _source_dir()
+    requested_path = Path(relative_path)
+    if requested_path.is_absolute():
+        msg = f"source path must be relative: {relative_path}"
+        raise ChezmoiModifyError(msg)
+
+    source_path = (source_dir / requested_path).resolve()
+    if not source_path.is_relative_to(source_dir):
+        msg = f"source path resolves outside CHEZMOI_SOURCE_DIR: {relative_path}"
+        raise ChezmoiModifyError(msg)
+    if not source_path.exists():
+        msg = f"source file does not exist: {relative_path}"
+        raise ChezmoiModifyError(msg)
+
+    return source_path.read_text(encoding="utf-8")
+
+
+def _source_dir() -> Path:
+    chezmoi_source_dir = os.environ.get("CHEZMOI_SOURCE_DIR")
+    if not chezmoi_source_dir:
+        msg = "CHEZMOI_SOURCE_DIR is not set"
+        raise ChezmoiModifyError(msg)
+    return Path(chezmoi_source_dir).resolve()

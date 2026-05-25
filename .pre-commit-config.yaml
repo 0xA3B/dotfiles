@@ -1,0 +1,101 @@
+default_install_hook_types: [commit-msg, pre-commit, pre-push]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+        stages: [pre-commit]
+
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        stages: [pre-commit]
+
+      - id: check-merge-conflict
+        stages: [pre-commit]
+
+      - id: check-json
+        stages: [pre-commit]
+
+      - id: check-toml
+        exclude: ^managed/dot_config/uv/modify_uv\.toml$
+        stages: [pre-commit]
+
+      - id: check-yaml
+        stages: [pre-commit]
+
+  - repo: local
+    hooks:
+      - id: commitlint
+        name: commitlint
+        entry: pnpm exec commitlint --edit
+        language: system
+        stages: [commit-msg]
+        always_run: true
+
+      - id: oxfmt
+        name: oxfmt
+        entry: pnpm exec oxfmt --write --no-error-on-unmatched-pattern
+        language: system
+        types_or: [json, markdown, toml, yaml]
+        exclude: ^managed/dot_config/uv/modify_uv\.toml$
+        stages: [pre-commit]
+
+      - id: stylua
+        name: stylua
+        entry: pnpm exec stylua
+        language: system
+        types_or: [lua]
+        stages: [pre-commit]
+
+      - id: fish-format
+        name: fish format
+        entry: fish_indent --write
+        language: system
+        types_or: [fish]
+        stages: [pre-commit]
+
+      - id: fish-check
+        name: fish check
+        entry: fish_indent --check
+        language: system
+        types_or: [fish]
+        stages: [manual]
+
+      - id: shfmt
+        name: shfmt
+        entry: mise exec -- shfmt -w
+        language: system
+        files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
+        stages: [pre-commit]
+
+      - id: shfmt-check
+        name: shfmt check
+        entry: mise exec -- shfmt -l
+        language: system
+        files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
+        stages: [manual]
+
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+        stages: [pre-commit]
+
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+        stages: [pre-commit]
+
+      - id: pytest
+        name: pytest
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
