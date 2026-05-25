@@ -15,5 +15,23 @@ indent_size = 4
 [*.toml]
 indent_size = 4
 
+[*.sh]
+shell_variant = posix
+
+[*.bash]
+shell_variant = bash
+
+[*.zsh]
+shell_variant = zsh
+switch_case_indent = true
+
+[dot_zshrc]
+shell_variant = zsh
+switch_case_indent = true
+
+[dot_config/zsh/completions/_*]
+shell_variant = zsh
+switch_case_indent = true
+
 [*.{md,markdown}]
 trim_trailing_whitespace = false

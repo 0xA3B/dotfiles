@@ -51,7 +51,7 @@ _dotenv_parse() {
 
       echo "$key=$val"
     fi
-  done < "$file"
+  done <"$file"
 }
 
 _dotenv_load() {
@@ -93,7 +93,7 @@ _dotenv_unload() {
   local file="$1"
 
   local i
-  for (( i=${#_dotenv_file_vars[@]}; i>=1; i-- )); do
+  for ((i = ${#_dotenv_file_vars[@]}; i >= 1; i--)); do
     local entry="${_dotenv_file_vars[i]}"
     if [[ $entry == "$file:"* ]]; then
       local key="${entry#"$file:"}"
@@ -135,10 +135,10 @@ _dotenv_apply() {
   target=(${(f)"$(_dotenv_get_target_stack)"})
 
   local common=0
-  local max_common=$(( ${#_dotenv_stack[@]} < ${#target[@]} ? ${#_dotenv_stack[@]} : ${#target[@]} ))
+  local max_common=$((${#_dotenv_stack[@]} < ${#target[@]} ? ${#_dotenv_stack[@]} : ${#target[@]}))
 
   local i
-  for (( i=1; i<=max_common; i++ )); do
+  for ((i = 1; i <= max_common; i++)); do
     if [[ ${_dotenv_stack[i]} == ${target[i]} ]]; then
       common=$i
     else
@@ -146,8 +146,8 @@ _dotenv_apply() {
     fi
   done
 
-  if (( ${#_dotenv_stack[@]} > common )); then
-    for (( i=${#_dotenv_stack[@]}; i>common; i-- )); do
+  if ((${#_dotenv_stack[@]} > common)); then
+    for ((i = ${#_dotenv_stack[@]}; i > common; i--)); do
       local file="${_dotenv_stack[i]}"
       if [[ $dotenv_announce == "yes" ]]; then
         echo "Unloaded $file"
@@ -156,8 +156,8 @@ _dotenv_apply() {
     done
   fi
 
-  if (( ${#target[@]} > common )); then
-    for (( i=common+1; i<=${#target[@]}; i++ )); do
+  if ((${#target[@]} > common)); then
+    for ((i = common + 1; i <= ${#target[@]}; i++)); do
       local file="${target[i]}"
       [[ -f $file ]] || continue
       if [[ $dotenv_announce == "yes" ]]; then

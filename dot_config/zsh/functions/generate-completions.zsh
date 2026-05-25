@@ -9,7 +9,7 @@ __generate_completions_registry() {
   # supported for compatibility with local work overlays.
   __generate_completions_base_registry
 
-  if (( $+functions[__generate_completions_work_registry] )); then
+  if (($+functions[__generate_completions_work_registry])); then
     __generate_completions_work_registry
   fi
 }
@@ -139,7 +139,7 @@ generate-completions() {
 
   local status_code=0
   for name in "${unique_requested[@]}"; do
-    if (( ${supported[(Ie)$name]} == 0 )); then
+    if ((${supported[(Ie)$name]} == 0)); then
       echo "Unsupported command '$name'. Supported commands: ${supported[*]}" >&2
       status_code=1
       continue

@@ -55,6 +55,20 @@ repos:
         types_or: [fish]
         stages: [pre-commit]
 
+      - id: shfmt-shell
+        name: shfmt shell
+        entry: mise exec -- shfmt -w -i=2 -ci
+        language: system
+        files: \.(sh|bash)$
+        stages: [pre-commit]
+
+      - id: shfmt-zsh
+        name: shfmt zsh
+        entry: mise exec -- shfmt -w -ln=zsh -i=2 -ci
+        language: system
+        files: ^(dot_zshrc|dot_config/zsh/.*\.zsh|dot_config/zsh/completions/_.*)$
+        stages: [pre-commit]
+
       - id: ruff-check
         name: ruff check
         entry: uv run ruff check --fix
