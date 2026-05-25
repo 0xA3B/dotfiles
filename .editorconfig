@@ -25,11 +25,11 @@ shell_variant = bash
 shell_variant = zsh
 switch_case_indent = true
 
-[dot_zshrc]
+[managed/dot_zshrc]
 shell_variant = zsh
 switch_case_indent = true
 
-[dot_config/zsh/completions/_*]
+[managed/dot_config/zsh/completions/_*]
 shell_variant = zsh
 switch_case_indent = true
 

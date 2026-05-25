@@ -18,7 +18,7 @@ repos:
         stages: [pre-commit]
 
       - id: check-toml
-        exclude: ^dot_config/uv/modify_uv\.toml$
+        exclude: ^managed/dot_config/uv/modify_uv\.toml$
         stages: [pre-commit]
 
       - id: check-yaml
@@ -38,7 +38,7 @@ repos:
         entry: pnpm exec oxfmt --write --no-error-on-unmatched-pattern
         language: system
         types_or: [json, markdown, toml, yaml]
-        exclude: ^dot_config/uv/modify_uv\.toml$
+        exclude: ^managed/dot_config/uv/modify_uv\.toml$
         stages: [pre-commit]
 
       - id: stylua
@@ -66,14 +66,14 @@ repos:
         name: shfmt
         entry: mise exec -- shfmt -w
         language: system
-        files: ^(.*\.(sh|bash|zsh)|dot_zshrc|dot_config/zsh/completions/_.*)$
+        files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
         stages: [pre-commit]
 
       - id: shfmt-check
         name: shfmt check
         entry: mise exec -- shfmt -l
         language: system
-        files: ^(.*\.(sh|bash|zsh)|dot_zshrc|dot_config/zsh/completions/_.*)$
+        files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
         stages: [manual]
 
       - id: ruff-check

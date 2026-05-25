@@ -1,8 +1,8 @@
 # Deprecated: mise now handles uv project venv activation via
-# python.uv_venv_auto in dot_config/mise/config.toml.
+# python.uv_venv_auto in managed/dot_config/mise/config.toml.
 #
 # To restore this zsh-only fallback, move this file back to
-# dot_config/zsh/conf.d/22-venv.zsh.
+# managed/dot_config/zsh/conf.d/22-venv.zsh.
 #
 # Auto-activate Python virtual environments on directory change
 #

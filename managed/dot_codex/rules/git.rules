@@ -10,7 +10,7 @@ prefix_rule(
     decision = "allow",
     justification = "Allowed staging and commit workflows that need to write repository metadata outside the sandbox.",
     match = [
-        "git add dot_codex/rules/git.rules",
+        "git add managed/dot_codex/rules/git.rules",
         "git commit -m test",
     ],
     not_match = [

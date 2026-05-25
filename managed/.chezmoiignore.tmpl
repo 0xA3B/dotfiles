@@ -1,11 +1,7 @@
 {{- /* vim: set filetype=gitignore : */ -}}
-# Repository metadata and docs should not be materialized in $HOME.
-README.md
+# Source-state guidance should not be materialized in $HOME.
 **/AGENTS.md
 **/CLAUDE.md
-.gitignore
-.vscode
-.vscode/**
 
 # Managed-config payloads consumed by adjacent modify_ scripts. These are
 # read from the source dir at apply time and must not be materialized.
@@ -15,26 +11,6 @@ README.md
 # Bytecode caches written by `uv run` next to inline-script modify_ files.
 **/__pycache__
 **/__pycache__/**
-
-# Python lib ignores
-pyproject.toml
-uv.lock
-tools
-tools/**
-tests
-tests/**
-
-# Project-local tooling files should not be materialized in $HOME.
-.editorconfig
-.oxfmtrc.json
-.pre-commit-config.yaml
-.stylua.toml
-mise.toml
-package.json
-pnpm-lock.yaml
-pnpm-workspace.yaml
-node_modules
-node_modules/**
 
 # Local-only scratch/state content in this repo is intentionally unmanaged.
 .local
