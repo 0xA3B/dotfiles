@@ -50,14 +50,14 @@ repos:
 
       - id: fish-format
         name: fish format
-        entry: mise exec -- fish_indent --write
+        entry: fish_indent --write
         language: system
         types_or: [fish]
         stages: [pre-commit]
 
       - id: fish-check
         name: fish check
-        entry: mise exec -- fish_indent --check
+        entry: fish_indent --check
         language: system
         types_or: [fish]
         stages: [manual]
