@@ -41,3 +41,17 @@ config automatically. It sets:
 
 The root `.chezmoiroot` file points chezmoi at `managed/`, keeping managed dotfiles separate from
 project-local test, lint, and package-manager configuration.
+
+## Bootstrap Homebrew
+
+The repo manages a curated global Brewfile at
+[`managed/dot_config/homebrew/Brewfile`](managed/dot_config/homebrew/Brewfile).
+
+Install the fresh-machine Homebrew (requires `chezmoi apply`):
+
+```sh
+brew bundle install --global
+```
+
+The Brewfile is intentionally limited to machine bootstrap tools, shell/editor utilities, desktop
+apps, and fonts. Developer runtimes are managed by mise.

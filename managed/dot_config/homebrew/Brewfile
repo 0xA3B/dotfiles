@@ -1,0 +1,51 @@
+# Curated Homebrew bundle for fresh-machine bootstrap.
+#
+# Keep developer runtimes in mise or project-local config instead of Homebrew.
+# This includes Node, Python, uv, pnpm, Go, and Bun unless a package has a
+# specific bootstrap reason to live in Homebrew.
+
+# Bootstrap and source control
+brew "chezmoi"
+brew "git"
+brew "git-filter-repo"
+brew "gh"
+brew "mise"
+
+# Shells and shell integrations
+brew "bash"
+brew "fish"
+brew "zsh"
+brew "starship"
+
+# Core command-line tools
+brew "bat"
+brew "cloc"
+brew "coreutils"
+brew "eza"
+brew "fd"
+brew "fzf"
+brew "glow"
+brew "make"
+brew "openssh"
+brew "ripgrep"
+brew "tmux"
+brew "tree"
+brew "vivid"
+brew "zoxide"
+
+# Editors
+brew "vim"
+brew "neovim"
+
+# Other command-line tools
+brew "nmap"
+
+# Desktop apps
+cask "1password-cli"
+cask "codex"
+cask "ghostty"
+
+# Fonts
+cask "font-fira-code-nerd-font"
+cask "font-hack-nerd-font"
+cask "font-iosevka-nerd-font"
