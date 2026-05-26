@@ -3,6 +3,7 @@ disable_hints = ["*"]
 idiomatic_version_file_enable_tools = ["node", "python"]
 node.corepack = true
 python.uv_venv_auto = "source"
+minimum_release_age = "7d"
 
 [tools]
 node = "26"

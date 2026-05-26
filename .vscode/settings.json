@@ -11,7 +11,8 @@
     "**/dot_npmrc.managed": "properties",
     "**/modify_dot_npmrc": "python",
     "**/dot_vimrc": "Vimscript",
-    "**/dot_zshrc": "shellscript"
+    "**/dot_zshrc": "shellscript",
+    "mise.lock": "toml"
   },
   "python.analysis.extraPaths": ["./tools"],
   "files.insertFinalNewline": true,

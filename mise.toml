@@ -1,4 +1,9 @@
+[settings]
+lockfile = true
+
 [tools]
 node = "26"
 python = "3.14"
 shfmt = "3"
+uv = "0.11"
+"aqua:fish-shell/fish-shell" = "4"
