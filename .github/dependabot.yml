@@ -31,6 +31,7 @@ updates:
       semver-minor-days: 7
       semver-patch-days: 3
     open-pull-requests-limit: 5
+    versioning-strategy: "increase-if-necessary"
     groups:
       python-dependencies:
         patterns:
