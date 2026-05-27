@@ -3,7 +3,7 @@
 
 brewbin="/opt/homebrew/bin/brew"
 if [[ -f $brewbin ]]; then
-  eval "$("$brewbin" shellenv)"
+  eval "$("$brewbin" shellenv zsh)"
 
   export HOMEBREW_NO_AUTO_UPDATE=1
   export HOMEBREW_NO_ANALYTICS=1

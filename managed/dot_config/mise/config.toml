@@ -7,5 +7,7 @@ minimum_release_age = "7d"
 [tools]
 node = "26"
 python = "3.14"
+go = "1.26"
+rust = "1.95"
 uv = "latest"
 pnpm = "latest"

@@ -24,25 +24,14 @@ if [[ -d $HOME/.local/bin ]]; then
 fi
 
 export PNPM_HOME="$XDG_DATA_HOME/pnpm"
-mkdir -p "$PNPM_HOME/bin"
 case ":$PATH:" in
   *":$PNPM_HOME/bin:"*) ;;
   *) path=("$PNPM_HOME/bin" $path) ;;
 esac
 
-if command -v go >/dev/null 2>&1; then
-  gobin="$(go env GOBIN)"
-  if [[ -n $gobin && -d $gobin ]]; then
-    path+=("$gobin")
-  fi
-fi
-
-case "$(uname)" in
-  Darwin)
-    export PYTHON_CONFIGURE_OPTS="--enable-framework --enable-optimizations --with-lto"
-    export PYTHON_CFLAGS="-march=native -mtune=native"
-    ;;
-  *)
-    export PYTHON_CONFIGURE_OPTS="--enable-shared"
-    ;;
+export GOPATH="$XDG_DATA_HOME/go"
+export GOBIN="$GOPATH/bin"
+case ":$PATH:" in
+  *":$GOBIN:"*) ;;
+  *) path+=("$GOBIN") ;;
 esac

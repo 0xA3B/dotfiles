@@ -11,11 +11,11 @@
 # Unset directive: Use `# unset: VAR` in .env to unset a variable.
 # The original value is restored when leaving the directory.
 
-if [[ -o interactive ]]; then
-  [[ -z ${dotenv_enable+x} ]] && dotenv_enable="yes"
-  [[ -z ${dotenv_announce+x} ]] && dotenv_announce="yes"
-  [[ -z ${dotenv_filename+x} ]] && dotenv_filename=".env"
-fi
+[[ -o interactive ]] || return
+
+[[ -z ${dotenv_enable+x} ]] && dotenv_enable="yes"
+[[ -z ${dotenv_announce+x} ]] && dotenv_announce="yes"
+[[ -z ${dotenv_filename+x} ]] && dotenv_filename=".env"
 
 typeset -a _dotenv_stack
 typeset -a _dotenv_file_vars
@@ -129,7 +129,6 @@ _dotenv_get_target_stack() {
 
 _dotenv_apply() {
   [[ $dotenv_enable == "yes" ]] || return
-  [[ -o interactive ]] || return
 
   local -a target
   target=(${(f)"$(_dotenv_get_target_stack)"})

@@ -11,11 +11,11 @@
 # Unset directive: Use `# unset: VAR` in .env to unset a variable.
 # The original value is restored when leaving the directory.
 
-if status is-interactive
-    set -q dotenv_enable; or set -g dotenv_enable yes
-    set -q dotenv_announce; or set -g dotenv_announce yes
-    set -q dotenv_filename; or set -g dotenv_filename ".env"
-end
+status is-interactive; or return
+
+set -q dotenv_enable; or set -g dotenv_enable yes
+set -q dotenv_announce; or set -g dotenv_announce yes
+set -q dotenv_filename; or set -g dotenv_filename ".env"
 
 # State tracking
 set -g _dotenv_stack # Active .env file paths (root to deepest)
@@ -148,7 +148,6 @@ end
 
 function _dotenv_apply
     test "$dotenv_enable" != yes; and return
-    not status is-interactive; and return
 
     set -l target (_dotenv_get_target_stack)
 
