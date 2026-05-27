@@ -4,6 +4,10 @@ idiomatic_version_file_enable_tools = ["node", "python"]
 python.uv_venv_auto = "source"
 minimum_release_age = "7d"
 
+[env]
+GOPATH = "{{env.XDG_DATA_HOME}}/go"
+GOBIN = "{{env.XDG_DATA_HOME}}/go/bin"
+
 [tools]
 node = "26"
 python = "3.14"
