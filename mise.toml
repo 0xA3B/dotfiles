@@ -3,7 +3,6 @@ lockfile = true
 
 [tools]
 node = "26"
-pnpm = "11"
 python = "3.14"
 shfmt = "3"
 uv = "0.11"
