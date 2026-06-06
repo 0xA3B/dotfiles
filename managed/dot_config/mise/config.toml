@@ -2,16 +2,16 @@
 disable_hints = ["*"]
 idiomatic_version_file_enable_tools = ["node", "python"]
 python.uv_venv_auto = "source"
-minimum_release_age = "7d"
+minimum_release_age = "3d"
 
 [env]
 GOPATH = "{{env.XDG_DATA_HOME}}/go"
 GOBIN = "{{env.XDG_DATA_HOME}}/go/bin"
 
 [tools]
+uv = "latest"
+pnpm = "latest"
 node = "26"
 python = "3.14"
 go = "1.26"
-rust = "1.95"
-uv = "latest"
-pnpm = "latest"
+rust = "1.96"
