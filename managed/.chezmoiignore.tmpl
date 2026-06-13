@@ -19,7 +19,6 @@
 .config/fish/conf.d/disabled/**
 .config/zsh/conf.d/disabled/**
 
-{{ if .work_machine -}}
-.claude/settings.json
-.claude/status-line.sh
-{{ end -}}
+# Keep Agent configs in source repo for reference but do not materialize them into $HOME.
+.claude/**
+.codex/**
