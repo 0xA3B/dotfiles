@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "oxc.oxc-vscode",
+    "charliermarsh.ruff",
+    "johnnymorganz.stylua",
+    "editorconfig.editorconfig"
+  ]
+}

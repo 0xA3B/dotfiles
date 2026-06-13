@@ -52,6 +52,9 @@ chezmoi. Changes should preserve these outcomes:
 - Use `pnpm run check` as the default full local gate.
 - Use the smallest relevant targeted script when narrowing validation.
 - Scripts with the `check` suffix should be non-mutating.
+- `mise.lock` is the canonical `stylua` version for repo scripts. When updating `stylua`, keep
+  `.vscode/settings.json#stylua.targetReleaseVersion` pinned to the same version, including the VS
+  Code extension's `v` prefix.
 - Keep README user-facing and lightweight.
 - Keep AGENTS files agent-facing, lightweight, and focused on durable guidance. Avoid temporary
   notes or details that may go stale quickly.

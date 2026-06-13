@@ -1,4 +1,10 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "always",
+    "source.fixAll.ruff": "always",
+    "source.organizeImports.ruff": "always"
+  },
+  "editor.rulers": [100],
   "files.associations": {
     "**/.chezmoi.toml.tmpl": "toml",
     "**/.chezmoiignore.tmpl": "ignore",
@@ -14,10 +20,47 @@
     "**/dot_zshrc": "shellscript",
     "mise.lock": "toml"
   },
-  "python.analysis.extraPaths": ["./tools"],
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
+  "oxc.fmt.configPath": ".oxfmtrc.json",
+  "python.analysis.extraPaths": ["./tools"],
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["tests"],
+  "ruff.configurationPreference": "filesystemFirst",
+  "ruff.organizeImports": true,
+  "stylua.disableVersionCheck": true,
+  "stylua.searchBinaryInPATH": false,
+  "stylua.targetReleaseVersion": "v2.5.2",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "[lua]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "files.trimTrailingWhitespace": false
+  },
   "[ignore]": {
     "editor.formatOnSave": false
   }
