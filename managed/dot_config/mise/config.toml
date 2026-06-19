@@ -5,8 +5,10 @@ python.uv_venv_auto = "source"
 minimum_release_age = "3d"
 
 [env]
-GOPATH = "{{env.XDG_DATA_HOME}}/go"
-GOBIN = "{{env.XDG_DATA_HOME}}/go/bin"
+# Default XDG_DATA_HOME so mise shims still render when spawned outside a
+# configured shell (e.g. VS Code's resolvers), where the shell-set value is absent.
+GOPATH = "{{ env.XDG_DATA_HOME | default(value=env.HOME ~ '/.local/share') }}/go"
+GOBIN = "{{ env.XDG_DATA_HOME | default(value=env.HOME ~ '/.local/share') }}/go/bin"
 
 [tools]
 uv = "latest"
