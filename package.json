@@ -25,7 +25,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.0",
     "@commitlint/config-conventional": "^21.0.0",
-    "oxfmt": "^0.52.0"
+    "oxfmt": "^0.54.0"
   },
   "commitlint": {
     "extends": [
