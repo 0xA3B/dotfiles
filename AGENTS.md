@@ -77,3 +77,16 @@ chezmoi. Changes should preserve these outcomes:
 - Keep shell implementations idiomatic to their shell.
 - Do not track generated shell completions unless explicitly requested; handwritten completions may
   be tracked.
+
+## Editor Conventions
+
+- Neovim (`managed/dot_config/nvim`) and the managed VS Code settings
+  (`managed/Library/Application Support/Code/User`) both provide Vim-style editing.
+- Keep portable, environment-agnostic Vim keybindings (pure modal motions such as `jj` to exit
+  insert, clear-search, and open-line) in sync between Neovim's `init.lua` and the VS Code Vim
+  extension settings so muscle memory stays consistent across editors.
+- Keep environment-specific behavior where it belongs: Neovim, Lua, and plugin maps (LSP,
+  terminal-mode, buffer navigation) stay in `init.lua`; VS Code host concerns (`vim.handleKeys`,
+  extension affinity) stay in the VS Code settings.
+- The VS Code Vim extension only uses Neovim to execute Ex commands; it does not read `init.lua`
+  keymaps, so shared keybindings must be defined in both places.

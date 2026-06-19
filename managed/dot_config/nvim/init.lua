@@ -136,14 +136,32 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+-- `<leader>n` mirrors the VS Code Vim binding so the clear-search gesture matches
+-- across editors. `<Esc>` is kept as the Neovim-native shortcut.
+vim.keymap.set("n", "<leader>n", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
+
+-- Exit insert mode with `jj`. Mirrors the VS Code Vim binding for shared muscle memory.
+vim.keymap.set("i", "jj", "<Esc>", { desc = "Exit insert mode" })
 
 -- Newline Keymaps
 vim.keymap.set(
   "n",
-  "<S-k>",
+  "<leader>o",
   "o<Esc>k",
   { desc = "Add newline below without entering insert mode." }
 )
+vim.keymap.set(
+  "n",
+  "<leader>O",
+  "O<Esc>j",
+  { desc = "Add newline above without entering insert mode." }
+)
+
+-- Route text-object deletes to the black hole register so a prior yank survives
+-- the delete (yi" -> di" -> p). Plain dd/dw/x still use the default register.
+-- Mirrored in the VS Code Vim extension settings for shared muscle memory.
+vim.keymap.set("n", "di", '"_di', { desc = "Delete inside text object (keep register)" })
+vim.keymap.set("n", "da", '"_da', { desc = "Delete around text object (keep register)" })
 
 -- Diagnostic keymaps
 vim.keymap.set(
