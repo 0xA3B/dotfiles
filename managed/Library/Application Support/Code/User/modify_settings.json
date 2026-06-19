@@ -1,0 +1,45 @@
+#!/usr/bin/env -S uv run --quiet --script
+# vim: set filetype=python :
+#
+# /// script
+# requires-python = ">=3.14,<3.15"
+# ///
+
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+
+
+def add_helper_path() -> None:
+    """Add the repo helper library to sys.path."""
+    chezmoi_source_dir = os.environ.get("CHEZMOI_SOURCE_DIR")
+    if chezmoi_source_dir is None:
+        sys.exit("modify_settings.json: CHEZMOI_SOURCE_DIR is not set")
+    sys.path.insert(0, str(Path(chezmoi_source_dir).parent / "tools"))
+
+
+add_helper_path()
+
+from chezmoi_modify.exceptions import ChezmoiModifyError
+from chezmoi_modify.jsonc import merge_jsonc_overlay
+from chezmoi_modify.source import read_source_template_text
+
+MANAGED_CONFIG_SOURCE_PATH = "Library/Application Support/Code/User/settings.managed.jsonc"
+
+
+def main() -> None:
+    """Merge managed VS Code settings into the live user settings."""
+    managed = read_source_template_text(MANAGED_CONFIG_SOURCE_PATH)
+    result = merge_jsonc_overlay(sys.stdin.read(), managed)
+    for diagnostic in result.diagnostics:
+        print(f"{diagnostic.severity}: {diagnostic.message}", file=sys.stderr)
+    sys.stdout.write(result.text)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except ChezmoiModifyError as error:
+        sys.exit(f"modify_settings.json: {error}")

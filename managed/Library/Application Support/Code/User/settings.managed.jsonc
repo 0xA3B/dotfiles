@@ -1,0 +1,217 @@
+{
+  // Core editor behavior
+  "diffEditor.renderSideBySide": false,
+  "editor.fontFamily": "FiraCode Nerd Font Mono",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.formatOnPaste": true,
+  "editor.minimap.enabled": false,
+  "editor.rulers": [100],
+  "editor.wordWrapColumn": 100,
+  "explorer.confirmDelete": false,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "telemetry.feedback.enabled": false,
+  "terminal.integrated.enableKittyKeyboardProtocol": false,
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.fontSize": 13,
+  "terminal.integrated.suggest.enabled": false,
+
+  // Workbench appearance
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.iconTheme": "catppuccin-mocha",
+  "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
+  "workbench.preferredLightColorTheme": "Catppuccin Frappé",
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "workbench.startupEditor": "none",
+
+  // Shared markdown-like language behavior
+  "[markdown]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "bounded",
+    "files.trimTrailingWhitespace": false,
+  },
+  "[skill]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "bounded",
+    "files.trimTrailingWhitespace": false,
+  },
+  "[instructions]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "bounded",
+    "files.trimTrailingWhitespace": false,
+  },
+  "[prompt]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "bounded",
+    "files.trimTrailingWhitespace": false,
+  },
+  "[chatagent]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "bounded",
+    "files.trimTrailingWhitespace": false,
+  },
+
+  // Formatter and linter defaults
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[lua]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.formatOnSave": true,
+  },
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "always",
+      "source.organizeImports.ruff": "always",
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[javascript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    },
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    },
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    },
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    },
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "oxc.enable": true,
+  "oxc.enable.oxfmt": true,
+  "oxc.enable.oxlint": true,
+  "oxc.fixKind": "safe_fix",
+  "oxc.requireConfig": true,
+  "ruff.configurationPreference": "filesystemFirst",
+  "ruff.organizeImports": true,
+  "ruff.format.backend": "uv",
+  "stylua.searchBinaryInPATH": false,
+  "stylua.styluaPath": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/stylua",
+
+  // python preferences
+  "python.defaultInterpreterPath": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/python",
+  "python.analysis.autoFormatStrings": true,
+  "python.analysis.completeFunctionParens": true,
+  "python.analysis.importFormat": "relative",
+  "debugpy.showPythonInlineValues": true,
+
+  // Portable extension preferences
+  "extensions.autoUpdate": "off",
+  "extensions.experimental.affinity": {
+    "vscodevim.vim": 1
+  },
+  "json.schemaDownload.trustedDomains": {
+    "https://docs.renovatebot.com": true,
+    "https://json-schema.org/": true,
+    "https://json.schemastore.org/": true,
+    "https://raw.githubusercontent.com/": true,
+    "https://schemastore.azurewebsites.net/": true,
+    "https://www.schemastore.org/": true,
+  },
+  "makefile.configureOnOpen": true,
+  "markdown.validate.enabled": true,
+  "markdown.validate.fileLinks.enabled": "ignore",
+  "markdown.validate.fragmentLinks.enabled": "ignore",
+  "markdown.validate.referenceLinks.enabled": "ignore",
+  "prettier.useEditorConfig": false,
+
+  // File associations that are not repo-specific
+  "files.associations": {
+    ".sieve": "ruby",
+    ".siv": "ruby",
+    "uv.lock": "toml",
+    "mise.lock": "toml",
+  },
+
+  // Vim extension settings
+  "vim.cursorStylePerMode.insert": "line",
+  "vim.cursorStylePerMode.normal": "block",
+  "vim.cursorStylePerMode.replace": "underline",
+  "vim.easymotion": true,
+  "vim.hlsearch": true,
+  "vim.incsearch": true,
+  "vim.leader": "\u003cspace\u003e",
+  "vim.textwidth": 100,
+  "vim.useSystemClipboard": true,
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["j", "j"],
+      "after": ["<Esc>"],
+    },
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<leader>", "n"],
+      "commands": [":nohl"],
+    },
+    {
+      "before": ["<leader>", "/"],
+      "commands": ["actions.find"],
+    },
+    {
+      "before": ["d", "i"],
+      "after": ["\"", "_", "d", "i"],
+    },
+    {
+      "before": ["d", "a"],
+      "after": ["\"", "_", "d", "a"],
+    },
+    {
+      "before": ["<leader>", "o"],
+      "after": ["o", "<Esc>", "k"],
+    },
+    {
+      "before": ["<leader>", "O"],
+      "after": ["O", "<Esc>", "j"],
+    },
+  ],
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false,
+  },
+
+  // OS specific settings
+  {{- if eq .chezmoi.os "darwin" }}
+  "vim.enableNeovim": true,
+  "vim.neovimUseConfigFile": true,
+  "vim.neovimPath": "/opt/homebrew/bin/nvim",
+  {{- end }}
+}
