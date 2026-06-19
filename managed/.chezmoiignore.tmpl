@@ -7,6 +7,8 @@
 # read from the source dir at apply time and must not be materialized.
 .npmrc.managed
 .config/uv/uv.managed.toml
+Library/Application Support/Code/User/extensions.managed.txt
+Library/Application Support/Code/User/settings.managed.jsonc
 
 # Bytecode caches written by `uv run` next to inline-script modify_ files.
 **/__pycache__
@@ -22,3 +24,10 @@
 # Keep Agent configs in source repo for reference but do not materialize them into $HOME.
 .claude/**
 .codex/**
+
+# OS specific ignores
+{{- if ne .chezmoi.os "darwin" }}
+Library/Application Support/Code/User/settings.json
+.config/homebrew
+.config/homebrew/**
+{{- end }}

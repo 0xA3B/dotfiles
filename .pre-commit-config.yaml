@@ -16,6 +16,7 @@ repos:
         stages: [pre-commit]
 
       - id: check-json
+        exclude: ^managed/Library/Application Support/Code/User/modify_settings\.json$
         stages: [pre-commit]
 
       - id: check-toml

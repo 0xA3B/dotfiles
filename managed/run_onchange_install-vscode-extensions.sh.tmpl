@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+if ! command -v code >/dev/null 2>&1; then
+  echo "code command not found; skipping VS Code extension install" >&2
+  exit 0
+fi
+
+cat <<'EXTENSIONS' | while IFS= read -r extension; do
+{{ include "Library/Application Support/Code/User/extensions.managed.txt" -}}
+EXTENSIONS
+  extension=${extension%%#*}
+  extension=$(printf '%s' "$extension" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+  if [ -z "$extension" ]; then
+    continue
+  fi
+  code --install-extension "$extension"
+done
