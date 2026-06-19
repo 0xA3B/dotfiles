@@ -1,5 +1,5 @@
 brew-update() {
   brew update
-  brew upgrade
+  brew upgrade --no-ask
   brew cleanup
 }
