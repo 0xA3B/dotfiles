@@ -189,7 +189,7 @@
     },
     {
       "before": ["<leader>", "/"],
-      "commands": ["actions.find"],
+      "commands": ["workbench.action.quickTextSearch"],
     },
     {
       "before": ["d", "i"],
