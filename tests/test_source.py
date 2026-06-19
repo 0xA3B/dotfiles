@@ -1,8 +1,9 @@
+import subprocess
 from pathlib import Path
 
 import pytest
 from chezmoi_modify.exceptions import ChezmoiModifyError
-from chezmoi_modify.source import read_source_text
+from chezmoi_modify.source import read_source_template_text, read_source_text
 
 
 def test_read_source_text_resolves_relative_paths_from_chezmoi_source_dir(
@@ -73,3 +74,66 @@ def test_read_source_text_raises_for_missing_file(
 
     with pytest.raises(ChezmoiModifyError, match="source file does not exist"):
         read_source_text("missing.managed")
+
+
+def test_read_source_template_text_renders_with_chezmoi(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    template = source_dir / "settings.managed.jsonc"
+    template.write_text('{"home": "{{ .chezmoi.homeDir }}"}\n', encoding="utf-8")
+    monkeypatch.setenv("CHEZMOI_SOURCE_DIR", str(source_dir))
+
+    def fake_run(
+        args: list[str],
+        *,
+        check: bool,
+        capture_output: bool,
+        text: bool,
+    ) -> subprocess.CompletedProcess[str]:
+        assert args == [
+            "chezmoi",
+            "execute-template",
+            "--source",
+            str(source_dir),
+            "--file",
+            str(template),
+        ]
+        assert check is True
+        assert capture_output is True
+        assert text is True
+        return subprocess.CompletedProcess(args, 0, stdout='{"home": "/Users/example"}\n')
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    assert read_source_template_text("settings.managed.jsonc") == '{"home": "/Users/example"}\n'
+
+
+def test_read_source_template_text_reports_render_errors(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    template = source_dir / "settings.managed.jsonc"
+    template.write_text("{{ bad template }}\n", encoding="utf-8")
+    monkeypatch.setenv("CHEZMOI_SOURCE_DIR", str(source_dir))
+
+    def fake_run(
+        args: list[str],
+        *,
+        check: bool,
+        capture_output: bool,
+        text: bool,
+    ) -> subprocess.CompletedProcess[str]:
+        assert check is True
+        assert capture_output is True
+        assert text is True
+        raise subprocess.CalledProcessError(1, args, stderr="template failed")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    with pytest.raises(ChezmoiModifyError, match="source template could not be rendered"):
+        read_source_template_text("settings.managed.jsonc")
