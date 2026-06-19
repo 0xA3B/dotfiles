@@ -7,7 +7,7 @@ if ! command -v code >/dev/null 2>&1; then
 fi
 
 cat <<'EXTENSIONS' | while IFS= read -r extension; do
-{{ include "Library/Application Support/Code/User/extensions.managed.txt" -}}
+{{ include "private_Library/private_Application Support/private_Code/User/extensions.managed.txt" -}}
 EXTENSIONS
   extension=${extension%%#*}
   extension=$(printf '%s' "$extension" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
