@@ -127,7 +127,12 @@
   "stylua.styluaPath": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/stylua",
 
   // python preferences
-  "python.defaultInterpreterPath": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/python",
+  // Point at the per-project uv/mise virtualenv. The mise python shim is a symlink to
+  // the mise binary, which the Python extension's resolver cannot bootstrap (it spawns
+  // the interpreter directly without mise's env), so it falls back to auto-discovery and
+  // logs errors. A workspace-relative venv path resolves cleanly and matches the uv `.venv`
+  // convention; projects without a `.venv` simply fall back to auto-discovery.
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
   "python.analysis.autoFormatStrings": true,
   "python.analysis.completeFunctionParens": true,
   "python.analysis.importFormat": "relative",
