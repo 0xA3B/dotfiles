@@ -2,9 +2,9 @@
 name = "dotfiles"
 version = "0.0.0"
 description = "chezmoi modify helper lib"
+readme = "README.md"
 requires-python = ">=3.14,<3.15"
 classifiers = ["Private :: Do Not Upload"]
-readme = "README.md"
 dependencies = ["tomlkit>=0.15.0,<1.0.0"]
 
 [project.urls]
@@ -19,9 +19,33 @@ dev = [
     "ruff>=0.15.15,<1.0.0",
 ]
 
-[tool.uv]
-exclude-newer = "3 days"
-package = false
+[tool.mypy]
+cache_dir = ".cache/mypy"
+python_version = "3.14"
+files = ["tools"]
+strict = false
+
+# Gradual typing - stricter baseline for new code
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_reexport = true
+strict_equality = true
+extra_checks = true
+
+# Useful warnings that help prevent drift
+warn_return_any = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+no_implicit_optional = true
+strict_optional = true
+
+[tool.pytest.ini_options]
+cache_dir = ".cache/pytest"
+pythonpath = ["tools"]
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
@@ -108,30 +132,6 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 docstring-code-format = true
 
-[tool.pytest.ini_options]
-cache_dir = ".cache/pytest"
-pythonpath = ["tools"]
-testpaths = ["tests"]
-
-[tool.mypy]
-cache_dir = ".cache/mypy"
-python_version = "3.14"
-files = ["tools"]
-strict = false
-
-# Gradual typing - stricter baseline for new code
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_any_generics = true
-no_implicit_reexport = true
-strict_equality = true
-extra_checks = true
-
-# Useful warnings that help prevent drift
-warn_return_any = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-warn_unused_configs = true
-no_implicit_optional = true
-strict_optional = true
+[tool.uv]
+exclude-newer = "3 days"
+package = false
