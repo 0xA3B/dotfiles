@@ -1,5 +1,9 @@
 exclude-newer = "3 days"
 
+# Prefer mise-managed Python while allowing uv-managed fallbacks.
+python-preference = "system"
+python-downloads = "manual"
+
 [[index]]
 name = "pypi"
 url = "https://pypi.org/simple"
