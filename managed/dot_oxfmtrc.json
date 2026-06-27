@@ -18,6 +18,7 @@
     "**/.cache",
     "**/.pnpm-store",
     "**/.local",
+    "**/*.toml",
     "**/pnpm-lock.yaml"
   ]
 }
