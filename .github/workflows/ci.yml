@@ -19,10 +19,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Set up tools
-        uses: jdx/mise-action@v4.0.1
+        uses: jdx/mise-action@v4.1.0
 
       - name: Install fish tooling
         run: |
