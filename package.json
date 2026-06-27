@@ -4,7 +4,7 @@
   "scripts": {
     "check": "pnpm run format:check && pnpm run lint:yaml && pnpm run typecheck && pnpm run test",
     "format": "uv run pre-commit run --all-files",
-    "format:check": "pnpm run format:oxfmt:check && pnpm run format:lua:check && pnpm run format:python:check && pnpm run format:shell:check",
+    "format:check": "pnpm run format:oxfmt:check && pnpm run format:toml:check && pnpm run format:lua:check && pnpm run format:python:check && pnpm run format:shell:check",
     "format:fish": "uv run pre-commit run fish-format --all-files",
     "format:fish:check": "uv run pre-commit run fish-check --hook-stage manual --all-files",
     "format:lua": "mise exec -- stylua .",
@@ -17,6 +17,8 @@
     "format:sh:check": "uv run pre-commit run shfmt-check --hook-stage manual --all-files",
     "format:shell": "pnpm run format:fish && pnpm run format:sh",
     "format:shell:check": "pnpm run format:fish:check && pnpm run format:sh:check",
+    "format:toml": "pnpm exec tombi format",
+    "format:toml:check": "pnpm exec tombi format --check",
     "hooks:run": "uv run pre-commit run --all-files",
     "lint:yaml": "mise exec -- yamllint .",
     "test": "uv run pytest",
@@ -25,7 +27,8 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.0",
     "@commitlint/config-conventional": "^21.0.0",
-    "oxfmt": "^0.52.0"
+    "oxfmt": "^0.52.0",
+    "tombi": "^1.1.5"
   },
   "commitlint": {
     "extends": [

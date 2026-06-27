@@ -3,6 +3,7 @@
     "oxc.oxc-vscode",
     "charliermarsh.ruff",
     "johnnymorganz.stylua",
+    "tombi-toml.tombi",
     "editorconfig.editorconfig"
   ]
 }

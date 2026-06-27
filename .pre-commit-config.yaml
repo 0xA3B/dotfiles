@@ -20,7 +20,7 @@ repos:
         stages: [pre-commit]
 
       - id: check-toml
-        exclude: ^managed/dot_config/uv/modify_uv\.toml$
+        exclude: ^managed/.*/modify_.*\.toml$
         stages: [pre-commit]
 
       - id: check-yaml
@@ -39,8 +39,14 @@ repos:
         name: oxfmt
         entry: pnpm exec oxfmt --write --no-error-on-unmatched-pattern
         language: system
-        types_or: [json, markdown, toml, yaml]
-        exclude: ^managed/dot_config/uv/modify_uv\.toml$
+        types_or: [json, markdown, yaml]
+        stages: [pre-commit]
+
+      - id: tombi
+        name: tombi
+        entry: pnpm exec tombi format
+        language: system
+        types_or: [toml]
         stages: [pre-commit]
 
       - id: stylua

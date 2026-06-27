@@ -1,4 +1,5 @@
 ---
 allowBuilds:
   esbuild: true
+  tombi: true
 minimumReleaseAge: 4320 # 3 days

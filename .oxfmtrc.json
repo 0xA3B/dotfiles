@@ -13,24 +13,16 @@
   "sortPackageJson": {
     "sortScripts": true
   },
-  "overrides": [
-    {
-      "files": ["*.toml"],
-      "options": {
-        "tabWidth": 4
-      }
-    }
-  ],
   "ignorePatterns": [
     "dist",
     "node_modules",
     ".cache",
     ".pnpm-store",
     ".local",
+    "**/*.toml",
     "pnpm-lock.yaml",
     "managed/dot_config/nvim/lazy-lock.json",
     "managed/private_Library/private_Application Support/private_Code/User/modify_settings.json",
-    "managed/private_Library/private_Application Support/private_Code/User/settings.managed.jsonc",
-    "managed/dot_config/uv/modify_uv.toml"
+    "managed/private_Library/private_Application Support/private_Code/User/settings.managed.jsonc"
   ]
 }

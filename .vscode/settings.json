@@ -54,7 +54,7 @@
     "editor.formatOnSave": true
   },
   "[toml]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.defaultFormatter": "tombi-toml.tombi",
     "editor.formatOnSave": true
   },
   "[markdown]": {
