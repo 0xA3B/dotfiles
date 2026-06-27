@@ -7,6 +7,7 @@
   "editor.formatOnPaste": true,
   "editor.minimap.enabled": false,
   "editor.rulers": [100],
+  "editor.wordWrap": "bounded",
   "editor.wordWrapColumn": 100,
   "explorer.confirmDelete": false,
   "files.insertFinalNewline": true,
@@ -61,11 +62,11 @@
   // Formatter and linter defaults
   "[json]": {
     "editor.defaultFormatter": "oxc.oxc-vscode",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
   },
   "[jsonc]": {
     "editor.defaultFormatter": "oxc.oxc-vscode",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
   },
   "[lua]": {
     "editor.defaultFormatter": "JohnnyMorganz.stylua",
@@ -81,11 +82,11 @@
   },
   "[toml]": {
     "editor.defaultFormatter": "oxc.oxc-vscode",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
   },
   "[yaml]": {
     "editor.defaultFormatter": "oxc.oxc-vscode",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
   },
   "[javascript]": {
     "editor.codeActionsOnSave": {

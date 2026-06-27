@@ -17,8 +17,8 @@ ms-python.python
 ms-python.vscode-pylance
 ms-python.vscode-python-envs
 oxc.oxc-vscode
+tombi-toml.tombi
 vitest.explorer
-tamasfe.even-better-toml
 
 # Project and infrastructure tooling
 ms-azuretools.vscode-containers
