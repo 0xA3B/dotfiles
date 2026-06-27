@@ -32,7 +32,6 @@
   "ruff.organizeImports": true,
   "stylua.disableVersionCheck": true,
   "stylua.searchBinaryInPATH": false,
-  "stylua.targetReleaseVersion": "v2.5.2",
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true
