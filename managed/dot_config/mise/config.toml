@@ -5,6 +5,8 @@ python.uv_venv_auto = "source"
 minimum_release_age = "3d"
 
 [env]
+# Let Node.js trust system CAs in addition to its bundled roots.
+NODE_USE_SYSTEM_CA = "1"
 # Default XDG_DATA_HOME so mise shims still render when spawned outside a
 # configured shell (e.g. VS Code's resolvers), where the shell-set value is absent.
 GOPATH = "{{ env.XDG_DATA_HOME | default(value=env.HOME ~ '/.local/share') }}/go"
