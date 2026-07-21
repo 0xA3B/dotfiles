@@ -1,0 +1,21 @@
+#!/bin/sh
+# Shadow the 1Password CLI so every caller (any shell, scripts, agents) runs it
+# as the automation service account. The CLI is intentionally disconnected from
+# the desktop app; the keychain token grants access to the automation vault only.
+if [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
+	if token=$(security find-generic-password -s op-automation-token -w 2>/dev/null); then
+		OP_SERVICE_ACCOUNT_TOKEN=$token
+		export OP_SERVICE_ACCOUNT_TOKEN
+	else
+		echo "op shim: op-automation-token not found in keychain; running without service account token" >&2
+	fi
+fi
+
+for real_op in "${HOMEBREW_PREFIX:-}/bin/op" /opt/homebrew/bin/op /usr/local/bin/op; do
+	if [ -x "$real_op" ]; then
+		exec "$real_op" "$@"
+	fi
+done
+
+echo "op shim: 1Password CLI binary not found" >&2
+exit 127

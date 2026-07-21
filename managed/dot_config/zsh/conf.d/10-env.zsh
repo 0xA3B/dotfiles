@@ -16,11 +16,10 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 
+# Move-to-front keeps ~/.local/bin ahead of Homebrew in inherited PATHs so
+# shims there (e.g. the op service-account shim) shadow the real binaries.
 if [[ -d $HOME/.local/bin ]]; then
-  case ":$PATH:" in
-    *":$HOME/.local/bin:"*) ;;
-    *) path=("$HOME/.local/bin" $path) ;;
-  esac
+  path=("$HOME/.local/bin" ${path:#$HOME/.local/bin})
 fi
 
 export PNPM_HOME="$XDG_DATA_HOME/pnpm"

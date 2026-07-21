@@ -16,7 +16,9 @@ set -q XDG_DATA_HOME; or set -gx XDG_DATA_HOME "$HOME/.local/share"
 set -q XDG_STATE_HOME; or set -gx XDG_STATE_HOME "$HOME/.local/state"
 set -q XDG_CACHE_HOME; or set -gx XDG_CACHE_HOME "$HOME/.cache"
 
-fish_add_path --prepend --path "$HOME/.local/bin"
+# --move keeps ~/.local/bin ahead of Homebrew in inherited PATHs so shims there
+# (e.g. the op service-account shim) shadow the real binaries.
+fish_add_path --move --prepend --path "$HOME/.local/bin"
 
 set -gx PNPM_HOME "$XDG_DATA_HOME/pnpm"
 contains -- "$PNPM_HOME/bin" $PATH; or set -p PATH "$PNPM_HOME/bin"
