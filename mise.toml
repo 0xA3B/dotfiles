@@ -103,7 +103,20 @@ run = "yamllint ."
 
 [tasks.setup]
 description = "Install dependencies and git hooks"
-run = ["pnpm install", "uv sync", "uv run pre-commit install"]
+run = [
+    "pnpm install --frozen-lockfile",
+    "uv sync --frozen",
+    "uv run pre-commit install",
+]
+
+[tasks."setup:clean"]
+description = "Reinstall dependencies from scratch using lockfiles"
+run = [
+    "pnpm ci",
+    "uv venv --clear",
+    "uv sync --frozen",
+    "uv run pre-commit install",
+]
 
 [tasks.test]
 description = "Run the Python test suite"
