@@ -101,6 +101,10 @@ run = "uv run ruff check --fix"
 description = "Lint YAML files"
 run = "yamllint ."
 
+[tasks.setup]
+description = "Install dependencies and git hooks"
+run = ["pnpm install", "uv sync", "uv run pre-commit install"]
+
 [tasks.test]
 description = "Run the Python test suite"
 run = "uv run pytest"
