@@ -37,3 +37,6 @@ jobs:
 
       - name: Run checks
         run: mise run check
+
+      - name: Run pre-commit hooks
+        run: uv run pre-commit run --all-files
