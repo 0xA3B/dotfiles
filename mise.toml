@@ -10,3 +10,101 @@ shfmt = "3"
 stylua = "2"
 tombi = "1"
 yamllint = "1"
+
+[tasks.check]
+depends = ["format:check", "lint", "typecheck", "test"]
+description = "Run the full local gate"
+
+[tasks.format]
+description = "Run all pre-commit formatters"
+run = "uv run pre-commit run --all-files"
+
+[tasks."format:check"]
+depends = [
+    "format:oxfmt:check",
+    "format:toml:check",
+    "format:lua:check",
+    "format:python:check",
+    "format:shell:check",
+]
+description = "Check all formatting without mutating"
+
+[tasks."format:fish"]
+description = "Format fish files"
+run = "uv run pre-commit run fish-format --all-files"
+
+[tasks."format:fish:check"]
+description = "Check fish formatting"
+run = "uv run pre-commit run fish-check --hook-stage manual --all-files"
+
+[tasks."format:lua"]
+description = "Format Lua files"
+run = "stylua ."
+
+[tasks."format:lua:check"]
+description = "Check Lua formatting"
+run = "stylua --check ."
+
+[tasks."format:oxfmt"]
+description = "Format JS-adjacent files (JSON, Markdown, YAML)"
+run = "pnpm exec oxfmt --write"
+
+[tasks."format:oxfmt:check"]
+description = "Check oxfmt formatting"
+run = "pnpm exec oxfmt --check"
+
+[tasks."format:python"]
+description = "Format Python files"
+run = "uv run ruff format"
+
+[tasks."format:python:check"]
+description = "Check Python formatting"
+run = "uv run ruff format --check"
+
+[tasks."format:sh"]
+description = "Format POSIX shell files"
+run = "uv run pre-commit run shfmt --all-files"
+
+[tasks."format:sh:check"]
+description = "Check POSIX shell formatting"
+run = "uv run pre-commit run shfmt-check --hook-stage manual --all-files"
+
+[tasks."format:shell"]
+depends = ["format:fish", "format:sh"]
+description = "Format all shell files"
+
+[tasks."format:shell:check"]
+depends = ["format:fish:check", "format:sh:check"]
+description = "Check all shell formatting"
+
+[tasks."format:toml"]
+description = "Format TOML files"
+run = "tombi format"
+
+[tasks."format:toml:check"]
+description = "Check TOML formatting"
+run = "tombi format --check"
+
+[tasks.lint]
+depends = ["lint:python", "lint:yaml"]
+description = "Run all linters"
+
+[tasks."lint:python"]
+description = "Lint Python files"
+run = "uv run ruff check"
+
+[tasks."lint:python:fix"]
+description = "Apply safe Python lint fixes"
+run = "uv run ruff check --fix"
+
+[tasks."lint:yaml"]
+description = "Lint YAML files"
+run = "yamllint ."
+
+[tasks.test]
+description = "Run the Python test suite"
+run = "uv run pytest"
+
+[tasks.typecheck]
+description = "Type-check the Python helper library"
+run = "uv run mypy"

@@ -45,13 +45,15 @@ chezmoi. Changes should preserve these outcomes:
 ## Project Conventions
 
 - Use the conventional commit format for commit messages.
-- Use mise for runtime management.
+- Use mise for runtime management and project tasks.
 - Use `mise exec --` in non-interactive shells when the command relies on a runtime tool managed by
   mise.
-- Use the `package.json` script surface for validation and formatting.
-- Use `pnpm run check` as the default full local gate.
-- Use the smallest relevant targeted script when narrowing validation.
-- Scripts with the `check` suffix should be non-mutating.
+- Use the `mise.toml` task surface (`mise run`) for validation and formatting.
+- Use `mise run check` as the default full local gate.
+- Use the smallest relevant targeted task when narrowing validation.
+- Tasks with the `check` suffix should be non-mutating.
+- `format` tasks mutate by default and pair with `:check` variants; `lint` tasks are non-mutating by
+  default and pair with `:fix` variants when the linter supports autofixes.
 - Keep README user-facing and lightweight.
 - Keep AGENTS files agent-facing, lightweight, and focused on durable guidance. Avoid temporary
   notes or details that may go stale quickly.
