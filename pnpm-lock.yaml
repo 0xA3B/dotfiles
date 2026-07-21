@@ -17,9 +17,6 @@ importers:
       oxfmt:
         specifier: ^0.56.0
         version: 0.56.0
-      tombi:
-        specifier: ^1.1.5
-        version: 1.1.6
 
 packages:
 
@@ -250,58 +247,6 @@ packages:
     resolution: {integrity: sha512-fCTuZK4QBa+39Oz9l4OGfJfz+GpwCp3AqO7Zch3to99xHPgstVsRFpeQ8LNd2o1Gv8raL2mCFwiaHh7bFSp5DQ==}
     engines: {node: '>=22'}
 
-  '@tombi-toml/cli-darwin-arm64@1.1.6':
-    resolution: {integrity: sha512-LwW7QK0asZa0F+rf65kZoMx8nR+Cp+v2+j5CmKhUmcW/0cGuWvtxPjmbaAsbwzdcl2o2cFizOm4YAezUE+KKJw==}
-    engines: {node: '>=14.0.0'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@tombi-toml/cli-darwin-x64@1.1.6':
-    resolution: {integrity: sha512-yA50KGTSnbrGClZjzWrQomO8Ez/W+8/9XwWPgFNDybv8SuY25S0bLhc1vr0P6IR9aVgoNMp58Q1DmiiZbxLJEQ==}
-    engines: {node: '>=14.0.0'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@tombi-toml/cli-linux-arm64-musl@1.1.6':
-    resolution: {integrity: sha512-8OmjCxZgH6Ur1faEcJqsFrwdNaeTBOYz5yUs72NICSL5Tu3KPJnmh0igWaU/V6C1WGjYtIwYWb8dGQpS6z6BmA==}
-    engines: {node: '>=14.0.0'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
-  '@tombi-toml/cli-linux-arm64@1.1.6':
-    resolution: {integrity: sha512-6pax1/vvA//A4IpUdsvdLr+T/UYJ0FNSvXGjLOW2bR3G9ONmXfVypyyEnXrvtyNxIwazXJX2iXrX+anZAnO50Q==}
-    engines: {node: '>=14.0.0'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@tombi-toml/cli-linux-x64-musl@1.1.6':
-    resolution: {integrity: sha512-r7l2OlmNnhsWljZWwOqlDzEbiisdxC4VjuL1Xcgaw/J0WT7qbgGm8Oajzk6egxTY6zr2Ss3KMuQUVmz8RWXTog==}
-    engines: {node: '>=14.0.0'}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
-  '@tombi-toml/cli-linux-x64@1.1.6':
-    resolution: {integrity: sha512-Zgz8nF1ZEb1MskIM0AavoMYYSJzcF39BLCg+vD1GnipJHyatkkSwsg904GQkmrAvmmaRyYZ47qYRbfQfUF9fnw==}
-    engines: {node: '>=14.0.0'}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@tombi-toml/cli-win32-arm64@1.1.6':
-    resolution: {integrity: sha512-B2iX/GLld+laxwMEyh7t/L2V7CQx6Hr78tlDSoRqSCeZ/d5tE7QPU9V51vI04HSAuVotti8YfhHvJ8+356+4Og==}
-    engines: {node: '>=14.0.0'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@tombi-toml/cli-win32-x64@1.1.6':
-    resolution: {integrity: sha512-O5ghLa/xQqxARgAIvzOou6yAL8yModwPyyjcBKyTeQPHN6H/Mb0qnSSMrALP1CHeq7PsvKkWbQubiDuwselfzQ==}
-    engines: {node: '>=14.0.0'}
-    cpu: [x64]
-    os: [win32]
-
   '@types/node@25.9.1':
     resolution: {integrity: sha512-xfrlY7UD5rMJk3ZVJP8BNzS28J36YJg+xp+LPXV1TdWxr8uMH5A860QNxYDGQe/ylDSgjxE52Q9VnO7p75tJxg==}
 
@@ -516,11 +461,6 @@ packages:
   tinypool@2.1.0:
     resolution: {integrity: sha512-Pugqs6M0m7Lv1I7FtxN4aoyToKg1C4tu+/381vH35y8oENM/Ai7f7C4StcoK4/+BSw9ebcS8jRiVrORFKCALLw==}
     engines: {node: ^20.0.0 || >=22.0.0}
-
-  tombi@1.1.6:
-    resolution: {integrity: sha512-R24DZQjpw2lGOJch3lmOnrMkrsH47ZIjc/tqi0TnyCLzdZ8+5Yh5m5KcUxR48vmLEEkISFmSJ0zgRbylGfHjzA==}
-    engines: {node: '>=14.0.0'}
-    hasBin: true
 
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
@@ -740,30 +680,6 @@ snapshots:
 
   '@simple-libs/stream-utils@2.0.0': {}
 
-  '@tombi-toml/cli-darwin-arm64@1.1.6':
-    optional: true
-
-  '@tombi-toml/cli-darwin-x64@1.1.6':
-    optional: true
-
-  '@tombi-toml/cli-linux-arm64-musl@1.1.6':
-    optional: true
-
-  '@tombi-toml/cli-linux-arm64@1.1.6':
-    optional: true
-
-  '@tombi-toml/cli-linux-x64-musl@1.1.6':
-    optional: true
-
-  '@tombi-toml/cli-linux-x64@1.1.6':
-    optional: true
-
-  '@tombi-toml/cli-win32-arm64@1.1.6':
-    optional: true
-
-  '@tombi-toml/cli-win32-x64@1.1.6':
-    optional: true
-
   '@types/node@25.9.1':
     dependencies:
       undici-types: 7.24.6
@@ -956,17 +872,6 @@ snapshots:
   tinyexec@1.2.4: {}
 
   tinypool@2.1.0: {}
-
-  tombi@1.1.6:
-    optionalDependencies:
-      '@tombi-toml/cli-darwin-arm64': 1.1.6
-      '@tombi-toml/cli-darwin-x64': 1.1.6
-      '@tombi-toml/cli-linux-arm64': 1.1.6
-      '@tombi-toml/cli-linux-arm64-musl': 1.1.6
-      '@tombi-toml/cli-linux-x64': 1.1.6
-      '@tombi-toml/cli-linux-x64-musl': 1.1.6
-      '@tombi-toml/cli-win32-arm64': 1.1.6
-      '@tombi-toml/cli-win32-x64': 1.1.6
 
   typescript@6.0.3: {}
 
