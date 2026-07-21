@@ -5,6 +5,7 @@
     "source.organizeImports.ruff": "always"
   },
   "editor.rulers": [100],
+  "editor.wordWrapColumn": 100,
   "files.associations": {
     "**/.chezmoi.toml.tmpl": "toml",
     "**/.chezmoiignore.tmpl": "ignore",
@@ -19,7 +20,8 @@
     "**/modify_private_dot_npmrc": "python",
     "**/dot_vimrc": "Vimscript",
     "**/dot_zshrc": "shellscript",
-    "mise.lock": "toml"
+    "mise.lock": "toml",
+    "uv.lock": "toml"
   },
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
