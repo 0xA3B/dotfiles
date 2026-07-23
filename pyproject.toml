@@ -5,18 +5,18 @@ description = "chezmoi modify helper lib"
 readme = "README.md"
 requires-python = ">=3.14,<3.15"
 classifiers = ["Private :: Do Not Upload"]
-dependencies = ["tomlkit>=0.15.0,<1.0.0"]
+dependencies = ["tomlkit"]
 
 [project.urls]
 Repository = "https://github.com/0xA3B/dotfiles"
 
 [dependency-groups]
 dev = [
-    "mypy>=2.2.0,<3.0.0",
-    "pre-commit>=4.6.0,<5.0.0",
-    "pytest>=9.1.1,<10.0.0",
-    "pytest-mock>=3.15.1,<4.0.0",
-    "ruff>=0.15.21,<1.0.0",
+    "mypy",
+    "pre-commit",
+    "pytest",
+    "pytest-mock",
+    "ruff",
 ]
 
 [tool.mypy]

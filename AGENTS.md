@@ -60,6 +60,25 @@ chezmoi. Changes should preserve these outcomes:
 - Treat `AGENTS.md` as canonical agent guidance; sibling `CLAUDE.md` files must import `@AGENTS.md`
   and may add Claude-specific guidance only when it doesn't belong in `AGENTS.md`.
 
+## Dependency Policy
+
+- Treat `pyproject.toml` and `package.json` as compatibility manifests. Leave direct dependencies
+  unbounded unless a compatibility or security requirement justifies a constraint.
+- Add lower bounds for required features or vulnerable older releases, upper bounds for
+  intentionally deferred incompatibilities, exclusions for known-bad releases, and exact pins only
+  when a single version is required.
+- Constrain transitive Python dependencies with `tool.uv.constraint-dependencies` instead of
+  declaring them as direct dependencies.
+- Treat `uv.lock` and `pnpm-lock.yaml` as the exact tested resolutions; do not edit them manually.
+- Keep lockfiles current through Dependabot updates using the `lockfile-only` versioning strategy;
+  Dependabot does not reliably update transitive dependencies, so refresh them with
+  `uv lock --upgrade` and `pnpm up` during routine dependency maintenance.
+- Treat the `[tools]` table in `mise.toml` as the compatibility manifest for repo tooling and
+  `mise.lock` as its tested resolution; Dependabot does not support mise, so refresh pinned tool
+  versions manually.
+- Apply a three-day cooldown to new releases from public registries, enforced consistently through
+  Dependabot `cooldown`, pnpm `minimumReleaseAge`, and mise `minimum_release_age`.
+
 ## Python Helper Conventions
 
 - Keep modify helper code in `tools/chezmoi_modify` with tests in `tests`.
