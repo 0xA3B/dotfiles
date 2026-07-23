@@ -112,3 +112,8 @@ tags
 
 # Claude local settings files
 **/.claude/settings.local.json
+**/.claude/.cc-writes/
+
+# mise
+mise.local.toml
+mise.*.local.toml
