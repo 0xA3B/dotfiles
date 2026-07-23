@@ -54,7 +54,6 @@ repos:
         entry: mise run format:lua
         language: system
         types_or: [lua]
-        pass_filenames: false
         stages: [pre-commit]
 
       - id: lint-yaml
@@ -63,7 +62,6 @@ repos:
         language: system
         types_or: [yaml]
         exclude: ^pnpm-lock\.yaml$
-        pass_filenames: false
         stages: [pre-commit]
 
       # fish and shell hooks own their commands: chezmoi source names (dot_zshrc,

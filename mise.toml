@@ -51,9 +51,12 @@ run = "uv run pre-commit run format-fish-check --hook-stage manual --all-files"
 description = "Run pre-commit hygiene hooks across all files; may modify files"
 run = "uv run pre-commit run --all-files --hook-stage manual"
 
+# eval re-splits $usage_paths (mise shell-quotes each value) so pre-commit can pass
+# staged filenames — including paths with spaces — while defaulting to the whole repo.
 [tasks."format:lua"]
 description = "Format Lua files with StyLua"
-run = "stylua ."
+usage = 'arg "[paths]" var=#true default="."'
+run = "eval stylua $usage_paths"
 
 [tasks."format:lua:check"]
 description = "Check Lua formatting with StyLua"
@@ -111,9 +114,11 @@ run = "uv run ruff check"
 description = "Apply safe Ruff fixes to Python files"
 run = "uv run ruff check --fix"
 
+# eval + usage: see the format:lua comment.
 [tasks."lint:yaml"]
 description = "Lint YAML files with yamllint"
-run = "yamllint ."
+usage = 'arg "[paths]" var=#true default="."'
+run = "eval yamllint $usage_paths"
 
 [tasks.setup]
 description = "Install dependencies and git hooks"
