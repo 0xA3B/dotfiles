@@ -1,0 +1,13 @@
+{
+  "commands": {
+    "cargo": { "generator": ["rustup", "completions", "{shell}", "cargo"], "shells": ["zsh"] },
+    "chezmoi": { "generator": ["chezmoi", "completion", "{shell}"] },
+    "codex": { "generator": ["codex", "completion", "{shell}"] },
+    "pnpm": { "generator": ["pnpm", "completion", "{shell}"] },
+    "ruff": { "generator": ["ruff", "generate-shell-completion", "{shell}"] },
+    "rustup": { "generator": ["rustup", "completions", "{shell}", "rustup"] },
+    "tombi": { "generator": ["tombi", "completion", "{shell}"] },
+    "uv": { "generator": ["uv", "generate-shell-completion", "{shell}"] },
+    "uvx": { "generator": ["uvx", "--generate-shell-completion", "{shell}"] }
+  }
+}

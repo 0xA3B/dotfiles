@@ -1,0 +1,6 @@
+.config/fish/functions/brew-update.fish
+.config/fish/functions/generate-completions.fish
+.config/fish/functions/__generate_completions_base_registry.fish
+.config/zsh/functions/brew-update.zsh
+.config/zsh/functions/generate-completions.zsh
+.config/zsh/functions/__generate_completions_base_registry.zsh

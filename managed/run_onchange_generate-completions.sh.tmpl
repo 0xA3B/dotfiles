@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+# Rerun completion generation whenever the managed registry changes.
+# config.json hash: {{ include "dot_config/generate-completions/config.json" | sha256sum }}
+
+generate_completions="$HOME/.local/bin/generate-completions"
+
+if [ ! -x "$generate_completions" ]; then
+  echo "generate-completions not found; skipping completion generation" >&2
+  exit 0
+fi
+
+# Missing generator commands are expected on fresh machines; report the
+# failures without failing the apply.
+"$generate_completions" || {
+  echo "generate-completions reported failures; rerun it after installing the missing tools" >&2
+}

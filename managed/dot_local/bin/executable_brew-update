@@ -1,0 +1,7 @@
+#!/bin/sh
+# Update, upgrade, and clean up Homebrew in one pass.
+set -eu
+
+brew update
+brew upgrade --no-ask
+brew cleanup

@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+"""(Re)generate fish and zsh completions for supported commands.
+
+Lives on PATH instead of per-shell functions so the completion registry is
+defined once and the command works from any shell, including non-interactive
+callers. Python (stdlib only) rather than sh because of the config handling;
+thin wrapper shims stay POSIX sh.
+
+Configuration lives in ~/.config/generate-completions/:
+
+- config.json: chezmoi-managed base registry.
+- config.local.json: optional machine-local overlay (e.g. work-only tools).
+
+Both files share the same shape:
+
+    {
+      "commands": {
+        "chezmoi": {"generator": ["chezmoi", "completion", "{shell}"]},
+        "example": {
+          "generator": ["example", "--completions={shell}"],
+          "shells": ["fish"],
+          "targets": {"fish": "~/.config/fish/completions/example.fish"}
+        },
+        "removed": null
+      }
+    }
+
+Overlay commands merge over the base by name; a null entry removes the
+command. "{shell}" in generator arguments is replaced with the shell being
+generated for. "shells" defaults to fish and zsh, and "targets" overrides the
+conventional per-shell target paths.
+"""
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any
+
+DEFAULT_SHELLS = ("fish", "zsh")
+CONFIG_FILES = ("config.json", "config.local.json")
+
+CommandEntry = dict[str, Any]
+
+
+class ConfigError(Exception):
+    """Raised when the configuration files are missing or malformed."""
+
+
+def config_home() -> Path:
+    """Return the XDG config home."""
+    return Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
+
+
+def config_dir() -> Path:
+    """Return the generate-completions configuration directory."""
+    return config_home() / "generate-completions"
+
+
+def load_commands() -> dict[str, CommandEntry]:
+    """Merge the base and local config files into a command registry."""
+    commands: dict[str, CommandEntry] = {}
+    found = False
+
+    for filename in CONFIG_FILES:
+        path = config_dir() / filename
+        if not path.is_file():
+            continue
+        found = True
+
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError) as error:
+            raise ConfigError(f"{path}: {error}") from error
+
+        entries = data.get("commands") if isinstance(data, dict) else None
+        if not isinstance(entries, dict):
+            raise ConfigError(f'{path}: expected a top-level "commands" object')
+
+        for name, entry in entries.items():
+            if entry is None:
+                commands.pop(name, None)
+            elif isinstance(entry, dict):
+                commands[name] = entry
+            else:
+                raise ConfigError(f"{path}: command {name!r} must be an object or null")
+
+    if not found:
+        raise ConfigError(
+            f"no config found under {config_dir()} (is the chezmoi-managed config.json applied?)"
+        )
+    return commands
+
+
+def command_shells(name: str, entry: CommandEntry) -> list[str]:
+    """Return the shells a command generates completions for."""
+    shells = entry.get("shells", list(DEFAULT_SHELLS))
+    if not isinstance(shells, list) or not all(isinstance(shell, str) for shell in shells):
+        raise ConfigError(f'command {name!r}: "shells" must be a list of strings')
+    return shells
+
+
+def command_generator(name: str, entry: CommandEntry, shell: str) -> list[str]:
+    """Return the generator argv for a command with "{shell}" substituted."""
+    generator = entry.get("generator")
+    if (
+        not isinstance(generator, list)
+        or not generator
+        or not all(isinstance(arg, str) for arg in generator)
+    ):
+        raise ConfigError(f'command {name!r}: "generator" must be a non-empty list of strings')
+    return [arg.replace("{shell}", shell) for arg in generator]
+
+
+def resolve_target(name: str, entry: CommandEntry, shell: str) -> Path:
+    """Return the completions target path for a command and shell."""
+    targets = entry.get("targets", {})
+    if not isinstance(targets, dict):
+        raise ConfigError(f'command {name!r}: "targets" must be an object')
+
+    override = targets.get(shell)
+    if override is None:
+        if shell == "fish":
+            return config_home() / "fish" / "completions" / f"{name}.fish"
+        if shell == "zsh":
+            return config_home() / "zsh" / "completions" / f"_{name}"
+        raise ConfigError(f"command {name!r}: no default target for shell {shell!r}")
+    if not isinstance(override, str):
+        raise ConfigError(f"command {name!r}: target for {shell!r} must be a string")
+    return Path(override).expanduser()
+
+
+def generate_shell(name: str, entry: CommandEntry, shell: str) -> bool:
+    """Generate completions for one command and shell, returning success."""
+    argv = command_generator(name, entry, shell)
+    target = resolve_target(name, entry, shell)
+
+    if shutil.which(argv[0]) is None:
+        print(f"{name} not found in PATH, skipping {shell} completions", file=sys.stderr)
+        return False
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        dir=target.parent, prefix=f"{target.name}.tmp.", delete=False
+    ) as stream:
+        tmp = Path(stream.name)
+        # argv comes from the user-owned config files and runs without a shell
+        result = subprocess.run(argv, stdout=stream, check=False)  # noqa: S603
+
+    if result.returncode == 0 and tmp.stat().st_size > 0:
+        tmp.replace(target)
+        print(f"Generated {shell} completions for {name}")
+        return True
+
+    if result.returncode != 0:
+        print(f"Failed to generate {shell} completions for {name}", file=sys.stderr)
+    else:
+        print(f"Completion generator for {name} produced empty {shell} output", file=sys.stderr)
+    tmp.unlink(missing_ok=True)
+    return False
+
+
+def generate_command(name: str, entry: CommandEntry) -> bool:
+    """Generate completions for every shell a command supports."""
+    ok = True
+    for shell in command_shells(name, entry):
+        ok = generate_shell(name, entry, shell) and ok
+    return ok
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Run the command-line interface."""
+    parser = argparse.ArgumentParser(
+        description="Regenerate fish and zsh completions for supported commands.",
+        epilog=(
+            "When no commands are provided, regenerate all supported completions."
+            " Supported commands come from config.json and config.local.json under"
+            " ~/.config/generate-completions/."
+        ),
+    )
+    parser.add_argument("commands", nargs="*", metavar="COMMAND", help="commands to regenerate")
+    args = parser.parse_args(argv)
+
+    try:
+        registry = load_commands()
+    except ConfigError as error:
+        print(f"generate-completions: {error}", file=sys.stderr)
+        return 1
+
+    requested = list(dict.fromkeys(args.commands)) or sorted(registry)
+
+    status = 0
+    for name in requested:
+        entry = registry.get(name)
+        if entry is None:
+            supported = ", ".join(sorted(registry))
+            print(f"Unsupported command '{name}'. Supported commands: {supported}", file=sys.stderr)
+            status = 1
+            continue
+
+        try:
+            if not generate_command(name, entry):
+                status = 1
+        except ConfigError as error:
+            print(f"generate-completions: {error}", file=sys.stderr)
+            status = 1
+
+    return status
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -22,7 +22,7 @@ dev = [
 [tool.mypy]
 cache_dir = ".cache/mypy"
 python_version = "3.14"
-files = ["tools"]
+files = ["tools", "managed/dot_local/bin/executable_generate-completions"]
 strict = false
 
 # Gradual typing - stricter baseline for new code
@@ -53,6 +53,8 @@ cache-dir = ".cache/ruff"
 target-version = "py314"
 unsafe-fixes = false
 extend-exclude = [".venv/", ".cache/", ".local/", "node_modules/"]
+# Extensionless Python shims are not matched by the default *.py include
+extend-include = ["managed/dot_local/bin/executable_generate-completions"]
 
 [tool.ruff.lint]
 # Ruff rule selection - organized alphabetically by category
