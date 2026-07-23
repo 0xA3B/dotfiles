@@ -73,6 +73,23 @@ def test_jsonc_overlay_accepts_comments_trailing_commas_and_comment_markers_in_s
     assert merged["managed"] is True
 
 
+def test_semantically_satisfied_overlay_preserves_live_formatting() -> None:
+    live = dedent(
+        """\
+        {
+          // Unmanaged settings keep their existing representation.
+          "claudeCode.environmentVariables": [{"name":"MODEL","value":"opus"}],
+          "editor.fontSize": 14,
+        }
+        """,
+    )
+
+    result = merge_jsonc_overlay(live, '{"editor.fontSize": 14}')
+
+    assert result.text == live
+    assert result.diagnostics == ()
+
+
 def test_empty_managed_jsonc_overlay_is_quiet_noop() -> None:
     result = merge_jsonc_overlay('{"local": true}', "// no managed settings yet\n")
 

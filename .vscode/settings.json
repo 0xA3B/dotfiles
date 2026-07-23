@@ -15,7 +15,7 @@
     "**/dot_config/tmux/tmux.conf": "shellscript",
     "**/dot_config/uv/modify_uv.toml": "python",
     "**/dot_config/yamllint/config": "yaml",
-    "**/private_Code/User/modify_settings.json": "python",
+    "**/private_Code/User/modify_private_settings.json": "python",
     "**/dot_npmrc.managed": "properties",
     "**/modify_private_dot_npmrc": "python",
     "**/dot_vimrc": "Vimscript",

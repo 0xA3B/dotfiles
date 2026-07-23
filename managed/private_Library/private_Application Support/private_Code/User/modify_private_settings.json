@@ -16,7 +16,7 @@ def add_helper_path() -> None:
     """Add the repo helper library to sys.path."""
     chezmoi_source_dir = os.environ.get("CHEZMOI_SOURCE_DIR")
     if chezmoi_source_dir is None:
-        sys.exit("modify_settings.json: CHEZMOI_SOURCE_DIR is not set")
+        sys.exit("modify_private_settings.json: CHEZMOI_SOURCE_DIR is not set")
     sys.path.insert(0, str(Path(chezmoi_source_dir).parent / "tools"))
 
 
@@ -37,7 +37,7 @@ def managed_config_source_path() -> str:
     """
     source_file = os.environ.get("CHEZMOI_SOURCE_FILE")
     if not source_file:
-        sys.exit("modify_settings.json: CHEZMOI_SOURCE_FILE is not set")
+        sys.exit("modify_private_settings.json: CHEZMOI_SOURCE_FILE is not set")
     return str(Path(source_file).parent / MANAGED_CONFIG_FILENAME)
 
 
@@ -54,4 +54,4 @@ if __name__ == "__main__":
     try:
         main()
     except ChezmoiModifyError as error:
-        sys.exit(f"modify_settings.json: {error}")
+        sys.exit(f"modify_private_settings.json: {error}")

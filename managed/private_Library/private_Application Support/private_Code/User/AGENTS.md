@@ -4,7 +4,7 @@
 
 - This directory holds the managed VS Code user configuration applied through chezmoi.
 - `settings.managed.jsonc` is an authoritative overlay merged into the live `settings.json` by the
-  adjacent `modify_settings.json` script. It manages only the keys it contains and preserves
+  adjacent `modify_private_settings.json` script. It manages only the keys it contains and preserves
   unrelated live settings.
 - `extensions.managed.txt` lists extensions installed by
   `managed/run_onchange_install-vscode-extensions.sh.tmpl`.
@@ -18,8 +18,8 @@
 - When using chezmoi template directives in this JSONC file, do not let a `{{-` trim marker consume
   the newline after a comment line; it will glue the next key onto the comment and the JSONC parser
   will drop it. Prefer `{{- if ... }}` ... `{{- end }}` so content stays on its own lines.
-- `settings.managed.jsonc` and `modify_settings.json` are excluded from formatting; keep them
-  hand-formatted and valid JSONC.
+- `settings.managed.jsonc` and `modify_private_settings.json` are excluded from formatting; keep
+  them hand-formatted and valid JSONC.
 
 ## Keybinding Sync
 

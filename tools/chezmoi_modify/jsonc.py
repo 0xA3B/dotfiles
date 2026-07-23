@@ -1,7 +1,7 @@
 """Merge helpers for JSONC managed overlays.
 
-JSONC comments and trailing commas are accepted as input, but merged output is
-canonical JSON. Preserving comments is intentionally outside this workflow.
+JSONC comments and trailing commas are accepted as input. Changes emit canonical
+JSON, while semantic no-ops preserve the original live text.
 """
 
 from __future__ import annotations
@@ -21,7 +21,10 @@ def merge_jsonc_overlay(live: str, managed: str) -> MergeResult:
     if not managed_doc:
         return MergeResult(text=_dump_json(live_doc), diagnostics=())
 
+    original_doc = deepcopy(live_doc)
     _merge_object(live_doc, managed_doc)
+    if live_doc == original_doc:
+        return MergeResult(text=live, diagnostics=())
     return MergeResult(text=_dump_json(live_doc), diagnostics=())
 
 

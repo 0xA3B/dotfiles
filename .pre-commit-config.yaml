@@ -16,7 +16,7 @@ repos:
         stages: [pre-commit, manual]
 
       - id: check-json
-        exclude: ^managed/private_Library/private_Application.Support/private_Code/User/modify_settings\.json$
+        exclude: ^managed/private_Library/private_Application.Support/private_Code/User/modify_private_settings\.json$
         stages: [pre-commit, manual]
 
       - id: check-toml
