@@ -21,5 +21,8 @@
 
 - Handwritten fish completions may be tracked in [`completions/`](completions).
 - Generated fish completions should remain untracked unless explicitly requested.
-- When changing completion generation registries or command mappings, update the zsh registry in
-  parallel.
+- Completion generation for both shells is handled by the shared `generate-completions` shim in
+  [`managed/dot_local/bin`](../../dot_local/bin); its registry is the chezmoi-managed
+  [`config.json`](../generate-completions/config.json) instead of per-shell generation functions.
+  Machine-local commands belong in `~/.config/generate-completions/config.local.json`. A
+  `run_onchange_` script reruns generation on `chezmoi apply` when the managed registry changes.

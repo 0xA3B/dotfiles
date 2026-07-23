@@ -97,6 +97,20 @@ chezmoi. Changes should preserve these outcomes:
 ## Shell Conventions
 
 - `managed/dot_config/fish` is the canonical shell configuration.
+- `managed/dot_local/bin` holds POSIX `sh` shims applied to `~/.local/bin`, which the shells keep
+  first on `PATH`. Decide between a shim and shell config with this matrix:
+
+  | Put it in                                                | When                                                                                                                                                                                                                              |
+  | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | Shim (`managed/dot_local/bin`)                           | The command never mutates the live shell session, should behave identically for every caller (scripts, agents, and non-interactive shells included), and its logic is shell-agnostic and would otherwise be duplicated per shell. |
+  | Shell config (`functions/`, `conf.d/`, abbrs or aliases) | The behavior changes live shell state (environment variables, `source`, `exec`), is an interactive keystroke convenience, or is inherently specific to one shell.                                                                 |
+
+- A shim that shadows a real binary's name (like the `op` shim) changes behavior for every process
+  on the machine; shadow deliberately and document why in the shim. Give new commands distinct
+  names.
+- Write shims in POSIX `sh` while they stay thin wrappers; move a shim to a self-contained,
+  stdlib-only Python script once it grows configuration parsing or logic worth testing (like
+  `generate-completions`), and wire it into the Python lint, type-check, and test surface.
 - Keep zsh behavior aligned with fish for user-facing shell behavior unless the behavior is
   fish-specific, zsh-specific, or intentionally divergent.
 - Keep shell implementations idiomatic to their shell.
