@@ -85,14 +85,16 @@ repos:
         name: format-sh
         entry: mise exec -- shfmt -w
         language: system
-        files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
+        files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*|managed/dot_local/bin/executable_.*)$
+        exclude: ^managed/dot_local/bin/executable_generate-completions$
         stages: [pre-commit]
 
       - id: format-sh-check
         name: format-sh-check
         entry: mise exec -- shfmt -d
         language: system
-        files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
+        files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*|managed/dot_local/bin/executable_.*)$
+        exclude: ^managed/dot_local/bin/executable_generate-completions$
         stages: [manual]
 
       - id: lint-python-fix
