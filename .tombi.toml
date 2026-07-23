@@ -1,10 +1,12 @@
 [files]
 exclude = ["managed/**/modify_*.toml", "mise.lock", "uv.lock"]
+respect-ignore-files = true
 
 [format.rules]
 indent-width = 4
 line-width = 100
-trailing-comment-space-width = 1
+trailing-comment-alignment = true
+trailing-comment-space-width = 2
 
 [[schemas]]
 path = "tombi://www.schemastore.org/pyproject.json"
