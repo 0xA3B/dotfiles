@@ -6,25 +6,25 @@ repos:
     rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
-        stages: [pre-commit]
+        stages: [pre-commit, manual]
 
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        stages: [pre-commit]
+        stages: [pre-commit, manual]
 
       - id: check-merge-conflict
-        stages: [pre-commit]
+        stages: [pre-commit, manual]
 
       - id: check-json
         exclude: ^managed/private_Library/private_Application.Support/private_Code/User/modify_settings\.json$
-        stages: [pre-commit]
+        stages: [pre-commit, manual]
 
       - id: check-toml
         exclude: ^managed/.*/modify_.*\.toml$
-        stages: [pre-commit]
+        stages: [pre-commit, manual]
 
       - id: check-yaml
-        stages: [pre-commit]
+        stages: [pre-commit, manual]
 
   - repo: local
     hooks:
@@ -35,82 +35,87 @@ repos:
         stages: [commit-msg]
         always_run: true
 
-      - id: oxfmt
-        name: oxfmt
-        entry: pnpm exec oxfmt --write --no-error-on-unmatched-pattern
+      - id: format-oxfmt
+        name: format-oxfmt
+        entry: mise run format:oxfmt
         language: system
         types_or: [json, markdown, yaml]
         stages: [pre-commit]
 
-      - id: tombi
-        name: tombi
-        entry: mise exec -- tombi format
+      - id: format-toml
+        name: format-toml
+        entry: mise run format:toml
         language: system
         types_or: [toml]
         stages: [pre-commit]
 
-      - id: stylua
-        name: stylua
-        entry: mise exec -- stylua
+      - id: format-lua
+        name: format-lua
+        entry: mise run format:lua
         language: system
         types_or: [lua]
+        pass_filenames: false
         stages: [pre-commit]
 
-      - id: yamllint
-        name: yamllint
-        entry: mise exec -- yamllint
+      - id: lint-yaml
+        name: lint-yaml
+        entry: mise run lint:yaml
         language: system
         types_or: [yaml]
         exclude: ^pnpm-lock\.yaml$
+        pass_filenames: false
         stages: [pre-commit]
 
-      - id: fish-format
-        name: fish format
+      # fish and shell hooks own their commands: chezmoi source names (dot_zshrc,
+      # completions/_*) defeat type-based filtering, so file discovery lives here
+      # and the mise format:fish/format:sh tasks wrap these hooks.
+      - id: format-fish
+        name: format-fish
         entry: fish_indent --write
         language: system
         types_or: [fish]
         stages: [pre-commit]
 
-      - id: fish-check
-        name: fish check
+      - id: format-fish-check
+        name: format-fish-check
         entry: fish_indent --check
         language: system
         types_or: [fish]
         stages: [manual]
 
-      - id: shfmt
-        name: shfmt
+      - id: format-sh
+        name: format-sh
         entry: mise exec -- shfmt -w
         language: system
         files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
         stages: [pre-commit]
 
-      - id: shfmt-check
-        name: shfmt check
-        entry: mise exec -- shfmt -l
+      - id: format-sh-check
+        name: format-sh-check
+        entry: mise exec -- shfmt -d
         language: system
         files: ^(.*\.(sh|bash|zsh)|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
         stages: [manual]
 
-      - id: ruff-check
-        name: ruff check
-        entry: uv run ruff check --fix
+      - id: lint-python-fix
+        name: lint-python-fix
+        entry: mise run lint:python:fix
         language: system
         types_or: [python, pyi]
         require_serial: true
         stages: [pre-commit]
 
-      - id: ruff-format
-        name: ruff format
-        entry: uv run ruff format
+      - id: format-python
+        name: format-python
+        entry: mise run format:python
         language: system
         types_or: [python, pyi]
         require_serial: true
         stages: [pre-commit]
 
-      - id: pytest
-        name: pytest
-        entry: uv run pytest
+      - id: test
+        name: test
+        entry: mise run test
         language: system
         pass_filenames: false
         always_run: true

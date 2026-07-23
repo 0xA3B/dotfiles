@@ -54,6 +54,11 @@ chezmoi. Changes should preserve these outcomes:
 - Tasks with the `check` suffix should be non-mutating.
 - `format` tasks mutate by default and pair with `:check` variants; `lint` tasks are non-mutating by
   default and pair with `:fix` variants when the linter supports autofixes.
+- Define each format and lint command once in the mise task surface; pre-commit hooks delegate to
+  `mise run` and stay focused on fast checks and safe fixes for files participating in Git
+  operations, plus the pre-push test gate.
+- Reserve the pre-commit `manual` stage for hooks that do not run at commit time; CI covers them via
+  `mise run format:hygiene`.
 - Keep README user-facing and lightweight.
 - Keep AGENTS files agent-facing, lightweight, and focused on durable guidance. Avoid temporary
   notes or details that may go stale quickly.

@@ -38,5 +38,5 @@ jobs:
       - name: Run checks
         run: mise run check
 
-      - name: Run pre-commit hooks
-        run: uv run pre-commit run --all-files
+      - name: Run hygiene hooks
+        run: mise run format:hygiene
