@@ -31,9 +31,16 @@
     { "matchManagers": ["pre-commit"], "groupName": "pre-commit hooks" },
     { "matchManagers": ["mise"], "groupName": "mise tools" },
     // Runtime versions are managed manually: never update .node-version or
-    // .python-version, requires-python in pyproject.toml, or package.json
-    // engines. These disable rules are last so they win over the groups.
+    // .python-version, requires-python in pyproject.toml, package.json
+    // engines, or the node/python pins in mise configs (the managed global
+    // mise config pins both). These disable rules are last so they win over
+    // the groups.
     { "matchManagers": ["nodenv", "pyenv"], "enabled": false },
+    {
+      "matchManagers": ["mise"],
+      "matchPackageNames": ["node", "python"],
+      "enabled": false
+    },
     {
       "matchManagers": ["pep621"],
       "matchDepTypes": ["requires-python"],
