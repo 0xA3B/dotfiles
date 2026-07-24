@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":enablePreCommit"],
+  "timezone": "America/New_York",
+  // Weekly cadence matching the previous Dependabot schedule (Friday mornings).
+  "schedule": ["* 0-9 * * 5"],
+  // Three-day cooldown, consistent with pnpm minimumReleaseAge, mise
+  // minimum_release_age, and uv exclude-newer.
+  "minimumReleaseAge": "3 days",
+  // Direct dependencies are intentionally unbounded (see AGENTS.md Dependency
+  // Policy); in-range updates must land as lockfile-only PRs.
+  "rangeStrategy": "update-lockfile",
+  "labels": ["dependencies"],
+  // Full transitive refresh, replacing the old local uv lock --upgrade /
+  // pnpm up workflow.
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["* 0-9 * * 5"]
+  },
+  // PEP 723 inline deps in chezmoi modify scripts (which are not *.py, so the
+  // manager's opt-in file matching needs this pattern). Scripts declare
+  // major-bounded ranges with no lockfile, so in-range releases produce no
+  // PRs; only an out-of-range release (a new major) proposes a range bump.
+  "pep723": {
+    "managerFilePatterns": ["/(^|/)modify_[^/]+$/"]
+  },
+  "packageRules": [
+    { "matchManagers": ["npm"], "groupName": "npm dependencies" },
+    { "matchManagers": ["pep621", "pep723"], "groupName": "python dependencies" },
+    { "matchManagers": ["github-actions"], "groupName": "github actions" },
+    { "matchManagers": ["pre-commit"], "groupName": "pre-commit hooks" },
+    { "matchManagers": ["mise"], "groupName": "mise tools" },
+    // Runtime versions are managed manually: never update .node-version or
+    // .python-version, requires-python in pyproject.toml, or package.json
+    // engines. These disable rules are last so they win over the groups.
+    { "matchManagers": ["nodenv", "pyenv"], "enabled": false },
+    {
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["requires-python"],
+      "enabled": false
+    },
+    { "matchManagers": ["npm"], "matchDepTypes": ["engines"], "enabled": false }
+  ]
+}

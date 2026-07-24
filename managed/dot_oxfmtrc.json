@@ -12,13 +12,25 @@
   "sortPackageJson": {
     "sortScripts": true
   },
+  "overrides": [
+    {
+      "files": ["*.jsonc"],
+      "options": {
+        "trailingComma": "none"
+      }
+    }
+  ],
   "ignorePatterns": [
     "**/dist",
     "**/node_modules",
     "**/.cache",
     "**/.pnpm-store",
     "**/.local",
+    "**/.venv",
     "**/*.toml",
-    "**/pnpm-lock.yaml"
+    "**/pnpm-lock.yaml",
+    "**/package-lock.json",
+    "**/uv.lock",
+    "**/mise.lock"
   ]
 }
