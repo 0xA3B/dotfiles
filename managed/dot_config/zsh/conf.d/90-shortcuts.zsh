@@ -17,8 +17,8 @@ alias td="tmux kill-session -t"
 alias fr="zsh-reload"
 alias fs="zsh-restart"
 alias cc="claude"
-alias ccl="cc-login"
-alias cce="cc-env"
+
+alias uvr="uv run"
 
 alias pip="python3 -m pip"
 alias virtualenv="python3 -m virtualenv"

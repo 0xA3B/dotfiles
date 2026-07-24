@@ -16,6 +16,8 @@ if status is-interactive
     abbr -ag fr fish-reload
     abbr -ag fs fish-restart
 
+    abbr -ag uvr "uv run"
+
     alias pip "python3 -m pip"
     alias virtualenv "python3 -m virtualenv"
     alias mkvenv "python3 -m virtualenv .venv"
