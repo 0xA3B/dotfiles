@@ -82,8 +82,8 @@ chezmoi. Changes should preserve these outcomes:
   `mise.lock` as its tested resolution; Renovate manages both, including `mise.lock` regeneration
   and the `package.json` `packageManager` pin.
 - Runtime versions are managed manually: Renovate is configured not to update `.node-version`,
-  `.python-version`, `requires-python` in `pyproject.toml` or PEP 723 script blocks, or
-  `package.json` `engines`.
+  `.python-version`, `requires-python` in `pyproject.toml` or PEP 723 script blocks, `package.json`
+  `engines`, or the `node`/`python` pins in mise configs.
 - Declare PEP 723 script dependencies as major-bounded compatibility ranges (for example
   `>=0.15.0,<1.0.0`). Scripts resolve at runtime under uv's `exclude-newer` cooldown and do not use
   script lockfiles; Renovate scans `modify_*` scripts and proposes a range bump when a release falls
