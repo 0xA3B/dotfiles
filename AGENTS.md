@@ -75,14 +75,18 @@ chezmoi. Changes should preserve these outcomes:
 - Constrain transitive Python dependencies with `tool.uv.constraint-dependencies` instead of
   declaring them as direct dependencies.
 - Treat `uv.lock` and `pnpm-lock.yaml` as the exact tested resolutions; do not edit them manually.
-- Keep lockfiles current through Dependabot updates using the `lockfile-only` versioning strategy;
-  Dependabot does not reliably update transitive dependencies, so refresh them with
-  `uv lock --upgrade` and `pnpm up` during routine dependency maintenance.
+- Keep lockfiles current through Renovate (`.github/renovate.jsonc`): in-range updates land as
+  lockfile-only PRs via `rangeStrategy: update-lockfile`, and scheduled `lockFileMaintenance`
+  refreshes transitive dependencies; do not regenerate lockfiles locally as routine maintenance.
 - Treat the `[tools]` table in `mise.toml` as the compatibility manifest for repo tooling and
-  `mise.lock` as its tested resolution; Dependabot does not support mise, so refresh pinned tool
-  versions manually.
+  `mise.lock` as its tested resolution; Renovate manages both, including `mise.lock` regeneration
+  and the `package.json` `packageManager` pin.
+- Runtime versions are managed manually: Renovate is configured not to update `.node-version`,
+  `.python-version`, `requires-python` in `pyproject.toml` or PEP 723 script blocks, or
+  `package.json` `engines`.
 - Apply a three-day cooldown to new releases from public registries, enforced consistently through
-  Dependabot `cooldown`, pnpm `minimumReleaseAge`, and mise `minimum_release_age`.
+  Renovate `minimumReleaseAge`, pnpm `minimumReleaseAge`, mise `minimum_release_age`, and uv
+  `exclude-newer`.
 
 ## Python Helper Conventions
 
