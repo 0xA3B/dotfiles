@@ -1,0 +1,25 @@
+#!/bin/sh
+# Commit current changes with generated Conventional Commit messages by running
+# the conventional-commits:commit skill through a non-interactive `claude -p`
+# session, so committing hand-made changes doesn't need a full session. Extra
+# arguments are passed to the skill as instructions, e.g.
+# `claude-commit only the docs changes`.
+set -eu
+
+# Requires the conventional-commits plugin from
+# https://github.com/0xA3B/skills/tree/main/plugins/conventional-commits to be
+# installed in the resolved Claude account.
+prompt="/conventional-commits:commit Commit the current worktree changes in the requested scope (all of them by default). Multiple commits are allowed per the skill's guidance, but do not push. If a git hook auto-fixes files, re-stage the fixes and retry the commit once. Otherwise, if the commits cannot be made safely (an obvious or egregious problem in the diff, failing git hooks, merge conflicts, etc.), stop and report the errors instead of fixing them or working around them."
+if [ "$#" -gt 0 ]; then
+  prompt="$prompt Additional instructions: $*"
+fi
+
+# Print mode cannot answer permission prompts, so pre-allow the git commands
+# the skill needs: state inspection, staging (including unstage via
+# `restore --staged`, but not working-tree restore), and commit. The prompt
+# must precede --allowedTools: that option is variadic and would swallow a
+# trailing positional argument.
+exec claude -p "$prompt" \
+  --model sonnet \
+  --effort medium \
+  --allowedTools "Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git rev-parse:*),Bash(git check-ignore:*),Bash(git add:*),Bash(git restore --staged:*),Bash(git commit:*)"
