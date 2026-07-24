@@ -13,12 +13,21 @@
   "sortPackageJson": {
     "sortScripts": true
   },
+  "overrides": [
+    {
+      "files": ["*.jsonc"],
+      "options": {
+        "trailingComma": "none"
+      }
+    }
+  ],
   "ignorePatterns": [
     "dist",
     "node_modules",
     ".cache",
     ".pnpm-store",
     ".local",
+    ".venv",
     "**/*.toml",
     "pnpm-lock.yaml",
     "managed/dot_config/nvim/lazy-lock.json",
