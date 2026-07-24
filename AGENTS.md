@@ -84,6 +84,10 @@ chezmoi. Changes should preserve these outcomes:
 - Runtime versions are managed manually: Renovate is configured not to update `.node-version`,
   `.python-version`, `requires-python` in `pyproject.toml` or PEP 723 script blocks, or
   `package.json` `engines`.
+- Declare PEP 723 script dependencies as major-bounded compatibility ranges (for example
+  `>=0.15.0,<1.0.0`). Scripts resolve at runtime under uv's `exclude-newer` cooldown and do not use
+  script lockfiles; Renovate scans `modify_*` scripts and proposes a range bump when a release falls
+  out of bounds, to be tested and adopted manually.
 - Apply a three-day cooldown to new releases from public registries, enforced consistently through
   Renovate `minimumReleaseAge`, pnpm `minimumReleaseAge`, mise `minimum_release_age`, and uv
   `exclude-newer`.
