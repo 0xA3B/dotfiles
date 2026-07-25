@@ -72,25 +72,17 @@ chezmoi. Changes should preserve these outcomes:
 - Add lower bounds for required features or vulnerable older releases, upper bounds for
   intentionally deferred incompatibilities, exclusions for known-bad releases, and exact pins only
   when a single version is required.
+- Mise tool pins and PEP 723 script dependencies use major-bounded compatibility ranges.
 - Constrain transitive Python dependencies with `tool.uv.constraint-dependencies` instead of
   declaring them as direct dependencies.
-- Treat `uv.lock` and `pnpm-lock.yaml` as the exact tested resolutions; do not edit them manually.
-- Keep lockfiles current through Renovate (`.github/renovate.jsonc`): in-range updates land as
-  lockfile-only PRs via `rangeStrategy: update-lockfile`, and scheduled `lockFileMaintenance`
-  refreshes transitive dependencies; do not regenerate lockfiles locally as routine maintenance.
-- Treat the `[tools]` table in `mise.toml` as the compatibility manifest for repo tooling and
-  `mise.lock` as its tested resolution; Renovate manages both, including `mise.lock` regeneration
-  and the `package.json` `packageManager` pin.
-- Runtime versions are managed manually: Renovate is configured not to update `.node-version`,
-  `.python-version`, `requires-python` in `pyproject.toml` or PEP 723 script blocks, `package.json`
-  `engines`, or the `node`/`python` pins in mise configs.
-- Declare PEP 723 script dependencies as major-bounded compatibility ranges (for example
-  `>=0.15.0,<1.0.0`). Scripts resolve at runtime under uv's `exclude-newer` cooldown and do not use
-  script lockfiles; Renovate scans `modify_*` scripts and proposes a range bump when a release falls
-  out of bounds, to be tested and adopted manually.
-- Apply a three-day cooldown to new releases from public registries, enforced consistently through
-  Renovate `minimumReleaseAge`, pnpm `minimumReleaseAge`, mise `minimum_release_age`, and uv
-  `exclude-newer`.
+- Treat `mise.lock`, `uv.lock`, and `pnpm-lock.yaml` as the exact tested resolutions; Renovate keeps
+  them updated through routine maintenance; do not update lockfiles locally during routine
+  dependency maintenance.
+- Renovate does not update major `node` and `python` versions. Those remain an explicit, manual
+  update.
+- All dependencies follow a three-day cooldown to new releases from public registries, enforced
+  consistently through Renovate, pnpm, mise, and uv configs.
+- The three-day cooldown policy can be bypassed for security patches.
 
 ## Python Helper Conventions
 
