@@ -1,6 +1,6 @@
 # Codex Rules Instructions
 
-These instructions apply to files under `managed/dot_codex/rules/`.
+These instructions apply to the reference rules under `managed/dot_codex/rules/`.
 
 ## Purpose
 
@@ -54,4 +54,5 @@ codex execpolicy check --pretty --rules managed/dot_codex/rules/git.rules -- git
 
 - If you changed multiple rule files, run at least one representative `codex execpolicy check`
   command per file.
-- Restart Codex if required so updated rules are loaded for normal use.
+- Validation confirms the reference rules only. Do not restart Codex or report that active policy
+  changed unless the reference files were explicitly synchronized to `~/.codex/rules`.
