@@ -82,7 +82,7 @@ def test_read_source_template_text_renders_with_chezmoi(
 ) -> None:
     source_dir = tmp_path / "source"
     source_dir.mkdir()
-    template = source_dir / "settings.managed.jsonc"
+    template = source_dir / "settings.managed.jsonc.tmpl"
     template.write_text('{"home": "{{ .chezmoi.homeDir }}"}\n', encoding="utf-8")
     monkeypatch.setenv("CHEZMOI_SOURCE_DIR", str(source_dir))
 
@@ -108,7 +108,9 @@ def test_read_source_template_text_renders_with_chezmoi(
 
     monkeypatch.setattr(subprocess, "run", fake_run)
 
-    assert read_source_template_text("settings.managed.jsonc") == '{"home": "/Users/example"}\n'
+    assert read_source_template_text("settings.managed.jsonc.tmpl") == (
+        '{"home": "/Users/example"}\n'
+    )
 
 
 def test_read_source_template_text_reports_render_errors(
@@ -117,7 +119,7 @@ def test_read_source_template_text_reports_render_errors(
 ) -> None:
     source_dir = tmp_path / "source"
     source_dir.mkdir()
-    template = source_dir / "settings.managed.jsonc"
+    template = source_dir / "settings.managed.jsonc.tmpl"
     template.write_text("{{ bad template }}\n", encoding="utf-8")
     monkeypatch.setenv("CHEZMOI_SOURCE_DIR", str(source_dir))
 
@@ -136,4 +138,4 @@ def test_read_source_template_text_reports_render_errors(
     monkeypatch.setattr(subprocess, "run", fake_run)
 
     with pytest.raises(ChezmoiModifyError, match="source template could not be rendered"):
-        read_source_template_text("settings.managed.jsonc")
+        read_source_template_text("settings.managed.jsonc.tmpl")

@@ -26,7 +26,7 @@ from chezmoi_modify.exceptions import ChezmoiModifyError
 from chezmoi_modify.jsonc import merge_jsonc_overlay
 from chezmoi_modify.source import read_source_template_text
 
-MANAGED_CONFIG_FILENAME = "settings.managed.jsonc"
+MANAGED_CONFIG_FILENAME = "settings.managed.jsonc.tmpl"
 
 
 def managed_config_source_path() -> str:
