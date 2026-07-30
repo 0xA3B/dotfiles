@@ -15,6 +15,7 @@ GOBIN = "{{ env.XDG_DATA_HOME | default(value=env.HOME ~ '/.local/share') }}/go/
 [tools]
 uv = "latest"
 pnpm = "latest"
+npm = "latest"
 node = "26"
 python = "3.14"
 go = "1.26"
