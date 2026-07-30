@@ -16,6 +16,8 @@ fi
 
 # Workspace-write lets the skill stage hook fixes in the worktree. Non-interactive
 # git metadata writes still depend on the active Codex execution-policy rules.
+# Disable OTEL exporters so unavailable telemetry endpoints cannot delay this
+# headless command's shutdown.
 # Capture Codex's progress stream and replay it only when the command fails.
 stderr_file=$(mktemp "${TMPDIR:-/tmp}/codex-commit.XXXXXX")
 trap 'rm -f "$stderr_file"' 0
@@ -23,6 +25,9 @@ trap 'rm -f "$stderr_file"' 0
 if codex exec \
   --model gpt-5.6-luna \
   --config 'model_reasoning_effort="medium"' \
+  --config 'otel.exporter="none"' \
+  --config 'otel.metrics_exporter="none"' \
+  --config 'otel.trace_exporter="none"' \
   --sandbox workspace-write \
   --ephemeral \
   "$prompt" 2>"$stderr_file"; then
