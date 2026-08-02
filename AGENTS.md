@@ -44,7 +44,6 @@ chezmoi. Changes should preserve these outcomes:
 
 ## Project Conventions
 
-- Use the conventional commit format for commit messages.
 - Use mise for runtime management and project tasks.
 - Use `mise exec --` in non-interactive shells when the command relies on a runtime tool managed by
   mise.
@@ -65,6 +64,13 @@ chezmoi. Changes should preserve these outcomes:
   notes or details that may go stale quickly.
 - Treat `AGENTS.md` as canonical agent guidance; sibling `CLAUDE.md` files must import `@AGENTS.md`
   and may add Claude-specific guidance only when it doesn't belong in `AGENTS.md`.
+
+## Commit Conventions
+
+- Commits must follow
+  [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification).
+- Include a `scope` when it meaningfully improves clarity.
+- Partition changes into separate commits by type, scope, or rollback boundary when feasible.
 
 ## Dependency Policy
 
