@@ -7,9 +7,9 @@
 set -eu
 
 # Requires the conventional-commits plugin from
-# https://github.com/0xA3B/skills/tree/main/plugins/conventional-commits to be
+# https://github.com/0xA3B/skills/tree/main/plugins/git-workflows to be
 # installed in the resolved Claude account.
-prompt="/conventional-commits:commit Commit the current worktree changes in the requested scope (all of them by default). Follow the skill's guidance for commit partitioning. Do not push. If a git hook modifies files, inspect those changes, re-stage only the fixes that belong to the affected commit, and retry that commit once. If the retry fails, the requested scope cannot be isolated safely, or the diff contains a clear safety issue such as exposed credentials or unresolved conflict markers, stop and report the blocker. Do not edit working-tree files yourself, bypass hooks, weaken checks, or otherwise work around the blocker."
+prompt="/git-workflows:commit Commit the current worktree changes in the requested scope (all of them by default). Follow the skill's guidance for commit partitioning. Do not push. If a git hook modifies files, inspect those changes, re-stage only the fixes that belong to the affected commit, and retry that commit once. If the retry fails, the requested scope cannot be isolated safely, or the diff contains a clear safety issue such as exposed credentials or unresolved conflict markers, stop and report the blocker. Do not edit working-tree files yourself, bypass hooks, weaken checks, or otherwise work around the blocker."
 if [ "$#" -gt 0 ]; then
   prompt="$prompt Additional instructions: $*"
 fi
