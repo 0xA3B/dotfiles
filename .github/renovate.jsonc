@@ -36,6 +36,13 @@
       "matchUpdateTypes": ["lockFileMaintenance"],
       "minimumReleaseAge": null
     },
+    {
+      // mise can select newly published backend artifacts after the tool version passes the
+      // cooldown, so keep its full lock refresh manual.
+      "matchManagers": ["mise"],
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "enabled": false
+    },
     // Runtime versions are managed manually: never update .node-version or
     // .python-version, requires-python in pyproject.toml, package.json
     // engines, or the node/python pins in mise configs (the managed global
