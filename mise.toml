@@ -4,11 +4,11 @@ lockfile = true
 minimum_release_age = "3d"
 
 [tools]
-uv = "0.12.2"
+uv = "0.12.3"
 pnpm = "11"
 shfmt = "3"
 stylua = "2"
-tombi = "1.2.7"
+tombi = "1.4.0"
 yamllint = "1"
 
 [tasks.check]
