@@ -3,13 +3,14 @@ idiomatic_version_file_enable_tools = ["node", "python"]
 lockfile = true
 minimum_release_age = "3d"
 
+# Selectors are bounded at the minor version; mise.lock pins the exact release.
 [tools]
-uv = "0.12.9"
+uv = "0.12"
 pnpm = "11"
-shfmt = "3"
-stylua = "2"
-tombi = "1.5.0"
-yamllint = "1"
+shfmt = "3.13"
+stylua = "2.5"
+tombi = "1.5"
+yamllint = "1.38"
 
 [tasks.check]
 depends = ["format:check", "lint", "typecheck", "test"]

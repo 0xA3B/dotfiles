@@ -34,6 +34,13 @@
     { "matchManagers": ["pre-commit"], "groupName": "pre-commit hooks" },
     { "matchManagers": ["mise"], "groupName": "mise tools" },
     {
+      // The mise manager's GitHub datasources default to coerced semver, which has no range
+      // support and rewrites a selector like "3" to an exact version. npm versioning keeps
+      // in-range releases silent and moves the bound with the same shape ("3.13" -> "3.14").
+      "matchManagers": ["mise"],
+      "versioning": "npm"
+    },
+    {
       // pnpm and uv enforce the cooldown while regenerating their lockfiles.
       "matchManagers": ["npm", "pep621"],
       "matchUpdateTypes": ["lockFileMaintenance"],

@@ -68,7 +68,11 @@ chezmoi. Preserve these outcomes:
   override mechanism. Do not declare it as a direct dependency solely to control its resolved
   version.
 - Specify mise tools and PEP 723 script dependencies with compatibility ranges bounded at the
-  intended breaking-change boundary.
+  intended breaking-change boundary. For formatters, linters, and toolchains, whose minor releases
+  change their output, bound the range at the minor version.
+- Take in-range mise tool releases into `mise.lock` with `mise lock --bump`. Treat a Renovate PR
+  that moves a tool's bound as the signal to adopt the next minor, either by merging it or by
+  bumping manually and closing it.
 - Treat `mise.lock`, `uv.lock`, and `pnpm-lock.yaml` as the exact tested resolutions. Let Renovate
   perform routine lockfile refreshes; regenerate a lockfile locally when a requested dependency
   change requires a new resolution.
