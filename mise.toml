@@ -51,6 +51,15 @@ run = "uv run pre-commit run format-fish-check --hook-stage manual --all-files"
 description = "Run pre-commit hygiene hooks across all files; may modify files"
 run = "uv run pre-commit run --all-files --hook-stage manual"
 
+# .local/ is gitignored, so format:oxfmt skips it; these tasks name its Markdown explicitly.
+[tasks."format:local"]
+description = "Format Markdown files under .local/ with oxfmt"
+run = "pnpm exec oxfmt .local/*.md .local/*/*.md --write --no-error-on-unmatched-pattern"
+
+[tasks."format:local:check"]
+description = "Check Markdown formatting under .local/ with oxfmt"
+run = "pnpm exec oxfmt .local/*.md .local/*/*.md --check --no-error-on-unmatched-pattern"
+
 # eval re-splits $usage_paths (mise shell-quotes each value) so pre-commit can pass
 # staged filenames — including paths with spaces — while defaulting to the whole repo.
 [tasks."format:lua"]
