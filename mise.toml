@@ -15,15 +15,16 @@ yamllint = "1"
 depends = ["format:check", "lint", "typecheck", "test"]
 description = "Run the full local gate"
 
+# Hygiene hooks rewrite the same files the formatters touch, so they run after them.
 [tasks.format]
 depends = [
-    "format:hygiene",
     "format:lua",
     "format:oxfmt",
     "format:python",
     "format:shell",
     "format:toml",
 ]
+depends_post = ["format:hygiene"]
 description = "Run all formatters and hygiene fixers"
 
 [tasks."format:check"]
