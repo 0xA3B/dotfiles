@@ -3,27 +3,31 @@ idiomatic_version_file_enable_tools = ["node", "python"]
 lockfile = true
 minimum_release_age = "3d"
 
+# Formatter, linter, and toolchain selectors are bounded at the minor version because their
+# minor releases change output; mise.lock pins the exact release. pnpm follows
+# package.json#packageManager, so its selector only needs the major.
 [tools]
-uv = "0.12.9"
+uv = "0.12"
 pnpm = "11"
-shfmt = "3"
-stylua = "2"
-tombi = "1.5.0"
-yamllint = "1"
+shfmt = "3.13"
+stylua = "2.5"
+tombi = "1.5"
+yamllint = "1.38"
 
 [tasks.check]
 depends = ["format:check", "lint", "typecheck", "test"]
 description = "Run the full local gate"
 
+# Hygiene hooks rewrite the same files the formatters touch, so they run after them.
 [tasks.format]
 depends = [
-    "format:hygiene",
     "format:lua",
     "format:oxfmt",
     "format:python",
     "format:shell",
     "format:toml",
 ]
+depends_post = ["format:hygiene"]
 description = "Run all formatters and hygiene fixers"
 
 [tasks."format:check"]
@@ -50,6 +54,19 @@ run = "uv run pre-commit run format-fish-check --hook-stage manual --all-files"
 [tasks."format:hygiene"]
 description = "Run pre-commit hygiene hooks across all files; may modify files"
 run = "uv run pre-commit run --all-files --hook-stage manual"
+
+# .local/ is gitignored and oxfmt's own glob expansion honors .gitignore, so these tasks rely on
+# the shell (sh, via mise) expanding the globs. An unmatched glob stays literal under sh, and
+# --no-error-on-unmatched-pattern covers that case for an empty .local/.
+# The globs stop one directory deep on purpose: they target local notes only and must not
+# descend into reference repositories cloned under .local/.
+[tasks."format:local"]
+description = "Format Markdown files under .local/ with oxfmt"
+run = "pnpm exec oxfmt .local/*.md .local/*/*.md --write --no-error-on-unmatched-pattern"
+
+[tasks."format:local:check"]
+description = "Check Markdown formatting under .local/ with oxfmt"
+run = "pnpm exec oxfmt .local/*.md .local/*/*.md --check --no-error-on-unmatched-pattern"
 
 # eval re-splits $usage_paths (mise shell-quotes each value) so pre-commit can pass
 # staged filenames — including paths with spaces — while defaulting to the whole repo.
@@ -105,6 +122,11 @@ run = "tombi format --check"
 [tasks.lint]
 depends = ["lint:python", "lint:yaml"]
 description = "Run all linters"
+
+# Pass a range explicitly, e.g. `mise run lint:commits -- --from origin/main --to HEAD`.
+[tasks."lint:commits"]
+description = "Lint commit messages with commitlint"
+run = "pnpm exec commitlint --verbose"
 
 [tasks."lint:python"]
 description = "Lint Python files with Ruff"

@@ -12,6 +12,33 @@ permissions:
   contents: read
 
 jobs:
+  commits:
+    name: Commit messages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up tools
+        uses: jdx/mise-action@v4.3.0
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate commit messages
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch --no-tags origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          mise run lint:commits -- --from "origin/$BASE_REF" --to "$HEAD_SHA"
+
   checks:
     name: Checks
     runs-on: ubuntu-latest

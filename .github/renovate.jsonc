@@ -8,8 +8,11 @@
   // minimum_release_age, and uv exclude-newer.
   "minimumReleaseAge": "3 days",
   // Direct dependencies are intentionally unbounded (see AGENTS.md Dependency
-  // Policy); in-range updates must land as lockfile-only PRs.
+  // policy); in-range updates must land as lockfile-only PRs.
   "rangeStrategy": "update-lockfile",
+  // Rebase open PRs whenever main moves so every merge candidate carries a
+  // fresh head and complete checks against the current base.
+  "rebaseWhen": "behind-base-branch",
   "labels": ["dependencies"],
   // Full transitive refresh, replacing the old local uv lock --upgrade /
   // pnpm up workflow.
@@ -30,6 +33,13 @@
     { "matchManagers": ["github-actions"], "groupName": "github actions" },
     { "matchManagers": ["pre-commit"], "groupName": "pre-commit hooks" },
     { "matchManagers": ["mise"], "groupName": "mise tools" },
+    {
+      // The mise manager's GitHub datasources default to coerced semver, which has no range
+      // support and rewrites a selector like "3" to an exact version. npm versioning keeps
+      // in-range releases silent and moves the bound with the same shape ("3.13" -> "3.14").
+      "matchManagers": ["mise"],
+      "versioning": "npm"
+    },
     {
       // pnpm and uv enforce the cooldown while regenerating their lockfiles.
       "matchManagers": ["npm", "pep621"],
