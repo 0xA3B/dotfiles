@@ -569,6 +569,9 @@ mise.*.local.lock
 
 .local/
 
+# direnv is not used with this repository, and the managed global Git ignore covers .envrc.*
+# variants on machines that apply these dotfiles.
+
 # Safety rule to prevent accidentally committing files that should not be tracked
 dot_config/fish/fish_variables
 dot_config/fish/completions/*
