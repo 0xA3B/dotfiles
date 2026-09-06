@@ -58,7 +58,8 @@ run = "uv run pre-commit run --all-files --hook-stage manual"
 # .local/ is gitignored and oxfmt's own glob expansion honors .gitignore, so these tasks rely on
 # the shell (sh, via mise) expanding the globs. An unmatched glob stays literal under sh, and
 # --no-error-on-unmatched-pattern covers that case for an empty .local/.
-# TODO: switch to find-based discovery if .local/ gains Markdown nested deeper than one directory.
+# The globs stop one directory deep on purpose: they target local notes only and must not
+# descend into reference repositories cloned under .local/.
 [tasks."format:local"]
 description = "Format Markdown files under .local/ with oxfmt"
 run = "pnpm exec oxfmt .local/*.md .local/*/*.md --write --no-error-on-unmatched-pattern"
