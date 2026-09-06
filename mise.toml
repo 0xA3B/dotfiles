@@ -115,6 +115,11 @@ run = "tombi format --check"
 depends = ["lint:python", "lint:yaml"]
 description = "Run all linters"
 
+# Pass a range explicitly, e.g. `mise run lint:commits -- --from origin/main --to HEAD`.
+[tasks."lint:commits"]
+description = "Lint commit messages with commitlint"
+run = "pnpm exec commitlint --verbose"
+
 [tasks."lint:python"]
 description = "Lint Python files with Ruff"
 run = "uv run ruff check"
