@@ -8,8 +8,11 @@
   // minimum_release_age, and uv exclude-newer.
   "minimumReleaseAge": "3 days",
   // Direct dependencies are intentionally unbounded (see AGENTS.md Dependency
-  // Policy); in-range updates must land as lockfile-only PRs.
+  // policy); in-range updates must land as lockfile-only PRs.
   "rangeStrategy": "update-lockfile",
+  // Rebase open PRs whenever main moves so every merge candidate carries a
+  // fresh head and complete checks against the current base.
+  "rebaseWhen": "behind-base-branch",
   "labels": ["dependencies"],
   // Full transitive refresh, replacing the old local uv lock --upgrade /
   // pnpm up workflow.
