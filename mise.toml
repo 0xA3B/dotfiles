@@ -3,7 +3,9 @@ idiomatic_version_file_enable_tools = ["node", "python"]
 lockfile = true
 minimum_release_age = "3d"
 
-# Selectors are bounded at the minor version; mise.lock pins the exact release.
+# Formatter, linter, and toolchain selectors are bounded at the minor version because their
+# minor releases change output; mise.lock pins the exact release. pnpm follows
+# package.json#packageManager, so its selector only needs the major.
 [tools]
 uv = "0.12"
 pnpm = "11"
