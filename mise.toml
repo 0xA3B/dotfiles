@@ -9,7 +9,7 @@ minimum_release_age = "3d"
 [tools]
 uv = "0.12"
 pnpm = "11"
-shfmt = "3.13"
+shfmt = "3.14"
 stylua = "2.5"
 tombi = "1.5"
 yamllint = "1.38"
