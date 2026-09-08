@@ -43,16 +43,12 @@ conflict.
 
 ## GitHub account routing
 
-- If the repository is under `~/Code/personal/`, is `~/.local/share/chezmoi`, or its remote is owned
-  by `0xA3B`, use `0xA3B` for GitHub API operations. Otherwise, verify repository ownership before
-  choosing or switching accounts.
-- Before an identity-sensitive or mutating `gh` operation, determine the expected account from
-  repository ownership, check the active account with
-  `gh auth status --active --hostname github.com`, switch to that verified account if necessary, and
-  recheck it.
-- Treat GitHub API and Git SSH identities separately. For Git remotes, use the `github-personal` SSH
-  host alias. Use `gh auth switch` only for GitHub API operations.
-- For local-only Git commands, leave the active `gh` account unchanged.
+- Treat repositories under `~/Code/personal/`, the dotfiles repository, and remotes owned by `0xA3B`
+  as personal GitHub scope. If the path and remote ownership disagree, verify ownership before an
+  identity-sensitive or mutating operation.
+- Assume `0xA3B` is the only GitHub account authenticated on this computer. Use each repository's
+  configured remote URL; do not require an SSH host alias or change GitHub accounts unless the user
+  asks.
 
 ## Personal project credentials
 
@@ -70,11 +66,6 @@ conflict.
   `.local/` when appropriate.
 - Place dotenv files at the repository root only when tool compatibility requires it.
 - Keep `.cache/`, `.local/`, and dotenv files untracked.
-
-## Commit messages
-
-- Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) by
-  default.
 
 ## Implementation choices
 

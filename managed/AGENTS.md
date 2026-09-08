@@ -15,6 +15,10 @@ More specific `AGENTS.md` files retain implementation details for their director
 - Use templates to select configuration by machine or environment. Use a default overlay when the
   same key may drift after bootstrap; a work-machine check and a default overlay solve different
   problems.
+- For Codex and Claude, keep marketplace sources and machine-independent enforcement settings
+  managed. Keep environment-specific policy text, model choices, shell integration, plugin
+  enablement, and user-selectable UI preferences as defaults. Leave runtime-generated state out of
+  both overlays.
 - Keep modify scripts executable through PEP 723 metadata, and declare any third-party runtime
   dependencies inline.
 - When a modify script uses the helper library, import it from the repository-root `tools`
