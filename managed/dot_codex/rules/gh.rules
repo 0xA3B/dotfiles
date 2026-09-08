@@ -1,184 +1,106 @@
-# GitHub CLI execution policy rules.
-# Unlisted gh commands will still prompt by default when escalation is requested.
-# Keep `gh api` auto-allows narrow. Endpoint paths are a single argv token, so
-# prefix rules cannot safely express "allow anything under repos/:owner/:repo/...".
-# Prefer first-class `gh pr` / `gh run` / `gh workflow` / `gh repo` commands when possible.
+# GitHub CLI commands may use stored credentials or mutate remote state. Route
+# every invocation to approval review so personal account, repository, and
+# destination context can be evaluated.
 
 prefix_rule(
-    pattern = ["gh", "version"],
-    decision = "allow",
-    justification = "Allowed version checks.",
-    match = [
-        "gh version",
-    ],
-    not_match = [
-        "gh auth status",
-    ],
+    pattern = ["gh"],
+    decision = "prompt",
+    justification = "Review GitHub CLI commands that need credentials, network access, or execution outside the sandbox.",
+    match = ["gh --version", "gh repo view cli/cli", "gh pr create --fill", "gh auth login"],
 )
 
 prefix_rule(
-    pattern = ["gh", "auth", "status"],
-    decision = "allow",
-    justification = "Allowed auth status checks.",
-    match = [
-        "gh auth status",
-    ],
-    not_match = [
-        "gh auth login",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "auth", ["login"]],
+    pattern = ["gh", "auth", "status", ["--show-token", "-t"]],
     decision = "forbidden",
-    justification = "Blocked gh auth login.",
-    match = [
-        "gh auth login",
-    ],
-    not_match = [
-        "gh auth status",
-    ],
+    justification = "Do not display stored GitHub authentication tokens.",
+    match = ["gh auth status --show-token", "gh auth status -t"],
+    not_match = ["gh auth status"],
 )
 
 prefix_rule(
-    pattern = ["gh", "repo", "view"],
-    decision = "allow",
-    justification = "Allowed repo inspection.",
-    match = [
-        "gh repo view",
-        "gh repo view cli/cli",
-        "gh repo view --web",
+    pattern = [
+        "gh",
+        "auth",
+        "status",
+        ["--hostname", "-h"],
+        "github.com",
+        ["--show-token", "-t"],
     ],
-    not_match = [
-        "gh repo create test-repo",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "issue", ["list", "view", "status"]],
-    decision = "allow",
-    justification = "Allowed issue inspection commands.",
-    match = [
-        "gh issue list",
-        "gh issue view 123",
-        "gh issue status",
-    ],
-    not_match = [
-        "gh issue create --title test",
-        "gh issue delete 123",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "pr", ["list", "view", "diff", "status", "checks"]],
-    decision = "allow",
-    justification = "Allowed pull request inspection commands.",
-    match = [
-        "gh pr list",
-        "gh pr view 123",
-        "gh pr diff 123",
-        "gh pr status",
-        "gh pr checks 123",
-    ],
-    not_match = [
-        "gh pr create --fill",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "release", ["list", "view"]],
-    decision = "allow",
-    justification = "Allowed release inspection commands.",
-    match = [
-        "gh release list",
-        "gh release view v1.2.3",
-    ],
-    not_match = [
-        "gh release create v1.2.3",
-        "gh release delete v1.2.3",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "run", ["list", "view", "watch"]],
-    decision = "allow",
-    justification = "Allowed workflow run inspection commands.",
-    match = [
-        "gh run list",
-        "gh run view 123",
-        "gh run watch 123",
-    ],
-    not_match = [
-        "gh run rerun 123",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "workflow", ["list", "view"]],
-    decision = "allow",
-    justification = "Allowed workflow inspection commands.",
-    match = [
-        "gh workflow list",
-        "gh workflow view ci.yml",
-    ],
-    not_match = [
-        "gh workflow run ci.yml",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "config", ["get", "list"]],
-    decision = "allow",
-    justification = "Allowed read-only config inspection.",
-    match = [
-        "gh config get editor",
-        "gh config list",
-    ],
-    not_match = [
-        "gh config set editor vim",
-        "gh config clear-cache",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "status"],
-    decision = "allow",
-    justification = "Allowed GitHub work status inspection.",
-    match = [
-        "gh status",
-        "gh status -o cli",
-    ],
-    not_match = [
-        "gh pr create --fill",
-    ],
-)
-
-prefix_rule(
-    pattern = ["gh", "release", ["create", "delete", "edit", "upload", "delete-asset"]],
     decision = "forbidden",
-    justification = "Blocked gh release mutation commands.",
+    justification = "Do not display stored GitHub authentication tokens.",
     match = [
-        "gh release create v1.2.3",
-        "gh release delete v1.2.3",
-        "gh release edit v1.2.3",
-        "gh release upload v1.2.3 artifact.tar.gz",
-        "gh release delete-asset v1.2.3 artifact.tar.gz",
-    ],
-    not_match = [
-        "gh release list",
-        "gh config list",
+        "gh auth status --hostname github.com --show-token",
+        "gh auth status -h github.com -t",
     ],
 )
 
 prefix_rule(
-    pattern = ["gh", "repo", ["create", "delete"]],
+    pattern = [
+        "gh",
+        "auth",
+        "status",
+        "--hostname=github.com",
+        ["--show-token", "-t"],
+    ],
     decision = "forbidden",
-    justification = "Blocked gh repo creation/deletion.",
-    match = [
-        "gh repo create test-repo",
-        "gh repo delete test-repo",
+    justification = "Do not display stored GitHub authentication tokens.",
+    match = ["gh auth status --hostname=github.com --show-token"],
+)
+
+prefix_rule(
+    pattern = ["gh", "auth", "status", "--active", ["--show-token", "-t"]],
+    decision = "forbidden",
+    justification = "Do not display stored GitHub authentication tokens.",
+    match = ["gh auth status --active --show-token"],
+)
+
+prefix_rule(
+    pattern = [
+        "gh",
+        "auth",
+        "status",
+        "--active",
+        ["--hostname", "-h"],
+        "github.com",
+        ["--show-token", "-t"],
     ],
-    not_match = [
-        "gh repo view",
+    decision = "forbidden",
+    justification = "Do not display stored GitHub authentication tokens.",
+    match = ["gh auth status --active --hostname github.com --show-token"],
+)
+
+prefix_rule(
+    pattern = [
+        "gh",
+        "auth",
+        "status",
+        ["--hostname", "-h"],
+        "github.com",
+        "--active",
+        ["--show-token", "-t"],
     ],
+    decision = "forbidden",
+    justification = "Do not display stored GitHub authentication tokens.",
+    match = ["gh auth status --hostname github.com --active --show-token"],
+)
+
+prefix_rule(
+    pattern = [
+        "gh",
+        "auth",
+        "status",
+        "--active",
+        "--hostname=github.com",
+        ["--show-token", "-t"],
+    ],
+    decision = "forbidden",
+    justification = "Do not display stored GitHub authentication tokens.",
+    match = ["gh auth status --active --hostname=github.com --show-token"],
+)
+
+prefix_rule(
+    pattern = ["gh", "auth", "status", "--json", "hosts", ["--show-token", "-t"]],
+    decision = "forbidden",
+    justification = "Do not display stored GitHub authentication tokens.",
+    match = ["gh auth status --json hosts --show-token"],
 )

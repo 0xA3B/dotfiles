@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "alwaysThinkingEnabled": true,
+  "askUserQuestionTimeout": "never",
+  "autoConnectIde": false,
+  "autoMemoryEnabled": true,
+  "autoUpdatesChannel": "latest",
+  "cleanupPeriodDays": 90,
+  "editorMode": "normal",
+  "enableWorkflows": true,
+  "effortLevel": "high",
+  "externalEditorContext": true,
+  "feedbackSurveyRate": 0,
+  "outputStyle": "default",
+  "respectGitignore": true,
+  "respondToBashCommands": true,
+  "skillListingBudgetFraction": 0.02,
+  "spinnerTipsEnabled": false,
+  "switchModelsOnFlag": false,
+  "theme": "dark",
+  "teammateDefaultModel": "opus",
+  "teammateMode": "in-process",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "500000",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
+    "CLAUDE_CODE_NEW_INIT": "1",
+    "CLAUDE_CODE_SHELL": "/bin/zsh",
+    "DISABLE_PROMPT_CACHING": "0",
+    "ENABLE_TOOL_SEARCH": "true",
+    "NODE_USE_SYSTEM_CA": "1"
+  },
+  "skillOverrides": {
+    "code-review": "user-invocable-only",
+    "simplify": "user-invocable-only"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "codex-in-claude@0xa3b-marketplace": true,
+    "writing@0xa3b-marketplace": true,
+    "meta@0xa3b-marketplace": true,
+    "git@0xa3b-marketplace": true,
+    "engineering@0xa3b-marketplace": true,
+    "engineering-workflows@0xa3b-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "0xa3b-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "0xA3B/skills"
+      },
+      "autoUpdate": true
+    }
+  },
+  "permissions": {
+    "defaultMode": "auto",
+    "allow": [
+      "Read(~/.claude/settings.json)",
+      "Read(~/.claude/statusline-command.sh)",
+      "Read(~/.claude/skills/**)",
+      "Read(~/.claude/rules/**)",
+      "Bash(* --version)",
+      "Bash(* --help)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch)",
+      "Bash(git branch --list *)",
+      "Bash(git remote -v)",
+      "Bash(git fetch *)",
+      "Bash(git stash list *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh issue list *)",
+      "Bash(gh issue view *)",
+      "Bash(gh repo view *)",
+      "Bash(gh run list *)",
+      "Bash(gh run view *)",
+      "Bash(gh release list *)",
+      "Bash(gh release view *)",
+      "Bash(gh auth status)",
+      "Bash(op whoami)",
+      "Bash(op account list *)",
+      "Bash(op account get *)"
+    ],
+    "deny": [
+      "Bash(* --show-token*)",
+      "Bash(codex *--dangerously-bypass-approvals-and-sandbox*)",
+      "Bash(codex *--yolo*)",
+      "Bash(codex *danger-full-access*)",
+      "Bash(claude *--dangerously-skip-permissions*)",
+      "Bash(claude *bypassPermissions*)",
+      "Bash(gh auth status --show-token *)",
+      "Bash(gh auth status -t *)",
+      "Bash(gh auth status * --show-token *)",
+      "Bash(gh auth status * -t *)",
+      "Read(**/.ssh/id_*)",
+      "Read(**/.gnupg/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/.aws/credentials)",
+      "Read(**/.netrc)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/.envrc)",
+      "Read(**/.npmrc)",
+      "Read(**/.pypirc)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/.codex/auth.json)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Edit(**/.envrc)",
+      "Edit(**/.aws/credentials)",
+      "Edit(**/.netrc)",
+      "Edit(**/.npmrc)",
+      "Edit(**/.pypirc)",
+      "Edit(~/.claude/.credentials.json)",
+      "Edit(~/.codex/auth.json)"
+    ],
+    "ask": ["Bash(sudo *)", "Bash(gh auth login *)"]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "credentials": {
+      "files": [
+        {
+          "mode": "deny",
+          "path": "~/.aws"
+        },
+        {
+          "mode": "deny",
+          "path": "~/.ssh"
+        },
+        {
+          "mode": "deny",
+          "path": "~/.gnupg"
+        },
+        {
+          "mode": "deny",
+          "path": "~/.config/gh"
+        },
+        {
+          "mode": "deny",
+          "path": "~/.claude/.credentials.json"
+        },
+        {
+          "mode": "deny",
+          "path": "~/.codex/auth.json"
+        }
+      ]
+    },
+    "excludedCommands": [
+      "git *",
+      "gh *",
+      "op *",
+      "codex *",
+      "claude *",
+      "aws *",
+      "kubectl *",
+      "docker *",
+      "ssh *",
+      "sudo *",
+      "npm publish *",
+      "pnpm publish *",
+      "yarn publish *",
+      "twine *",
+      "uv publish *",
+      "poetry publish *"
+    ],
+    "filesystem": {
+      "allowWrite": ["~/.cache", "~/Library/Caches", "~/.local/share", "~/.local/state"]
+    },
+    "network": {
+      "allowedDomains": [
+        "registry.npmjs.org",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "release-assets.githubusercontent.com",
+        "mise-versions.jdx.dev",
+        "nodejs.org",
+        "dl.google.com",
+        "static.rust-lang.org"
+      ]
+    }
+  }
+}

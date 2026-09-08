@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Personal GitHub Destination: github.com/0xA3B repositories are trusted push destinations for content originating in the same personal scope. This does not override built-in blocks for force pushes, history rewrites, protection bypass, or sensitive data crossing from private to public."
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Interactive Authentication: Require explicit user direction before starting login, sign-in, enrollment, credential replacement, or credential removal commands, including gh auth login, op signin, and cloud-provider login flows.",
+      "Unsandboxed Nested Agents: Require explicit user direction before running Codex, Claude, or another autonomous agent with its sandbox, permission checks, or approval system disabled or weakened, including indirect equivalents through alternate configuration homes or persistent config edits."
+    ],
+    "hard_deny": ["$defaults"],
+    "environment": [
+      "$defaults",
+      "Organization: personal use only; no employer or team infrastructure is trusted by this user-level configuration.",
+      "Personal source scope: repositories under ~/Code/personal/ and the dotfiles repository at ~/.local/share/chezmoi are user-owned personal work.",
+      "Source control: github.com/0xA3B and repositories owned by 0xA3B are the trusted personal GitHub scope. The GitHub API account is 0xA3B and Git remotes use the github-personal SSH host alias.",
+      "Reference repositories: ~/Code/reference/ is read-only, public, and untrusted. Reading and comparing are routine; executing code, installing dependencies, or publishing local data there needs explicit user direction.",
+      "Secrets management: the 1Password Automation vault is approved for personal project credentials through op run or service-native authentication. Secret values must stay out of command arguments and tool output."
+    ]
+  }
+}

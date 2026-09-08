@@ -1,0 +1,8 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+#:tombi schema.strict = false
+
+default_permissions = "workspace-code"
+
+[desktop]
+followUpQueueMode = "steer"
+usePointerCursors = false

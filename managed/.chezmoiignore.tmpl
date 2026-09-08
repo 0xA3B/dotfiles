@@ -3,12 +3,27 @@
 **/AGENTS.md
 **/CLAUDE.md
 
-# Managed-config payloads consumed by adjacent modify_ scripts. These are
-# read from the source dir at apply time and must not be materialized.
+# Existing modify-script inputs are source-only.
 .npmrc.managed
 .config/uv/uv.managed.toml
-Library/Application Support/Code/User/extensions.managed.txt
 Library/Application Support/Code/User/settings.managed.jsonc
+
+# Codex and Claude overlays always remain source-only; future modify scripts read them from here.
+.claude/CLAUDE.default.md
+.claude/settings.managed.jsonc
+.claude/settings.default.jsonc
+.codex/AGENTS.default.md
+.codex/config.managed.toml
+.codex/config.default.toml
+
+# Action inputs are consumed from the source tree instead of materializing.
+Library/Application Support/Code/User/extensions.managed.txt
+
+# Legacy whole-file agent configs remain source-only if reintroduced.
+.claude/CLAUDE.md
+.claude/settings.json
+.codex/AGENTS.md
+.codex/config.toml
 
 # Bytecode caches written by `uv run` next to inline-script modify_ files.
 **/__pycache__
@@ -20,10 +35,6 @@ Library/Application Support/Code/User/settings.managed.jsonc
 # Keep archived shell hooks in the source repo without materializing them into $HOME.
 .config/fish/conf.d/disabled/**
 .config/zsh/conf.d/disabled/**
-
-# Keep Agent configs in source repo for reference but do not materialize them into $HOME.
-.claude/**
-.codex/**
 
 # OS specific ignores
 {{- if ne .chezmoi.os "darwin" }}

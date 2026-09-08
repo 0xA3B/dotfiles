@@ -92,10 +92,13 @@ implementation.
 | Term                      | Definition                                                                                                                                                    | Aliases to Avoid           |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
 | **Managed overlay**       | A repo-owned sidecar file, usually named `*.managed.*`, that authoritatively manages selected keys or settings while preserving unrelated live configuration. | managed file, sidecar      |
+| **Default overlay**       | A repo-owned sidecar file, usually named `*.default.*`, that supplies missing settings or an absent unstructured target without changing existing values.     | default file, fallback     |
 | **Modify script**         | A chezmoi `modify_` script or modify template that transforms existing target-file content instead of replacing the whole file.                               | merge script, transform    |
 | **Modify helper library** | Python helper code under `tools/chezmoi_modify` for use by PEP 723 modify scripts.                                                                            | helper lib, modify helpers |
 
 Relationships:
 
 - A **Modify script** applies one **Managed overlay** to its live target file.
+- A **Modify script** may apply a **Default overlay** before a **Managed overlay**, so managed
+  values win while existing live values win over defaults.
 - A **Modify script** may import the **Modify helper library**.

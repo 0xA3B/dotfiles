@@ -3,10 +3,18 @@
 These instructions define source-state and coordination rules shared across managed configuration.
 More specific `AGENTS.md` files retain implementation details for their directories.
 
-## Modify Scripts and Managed Overlays
+## Modify Scripts and Configuration Overlays
 
 - Treat `*.managed.*` and `*.managed` overlays as authoritative for the keys or settings they
   contain.
+- Treat `*.default.*` and `*.default` overlays as bootstrap values that fill missing keys without
+  changing existing live values. Treat `*.default.md` as a whole-file default: create its target
+  only when absent, and never merge into or rewrite an existing instruction file. Keep a default
+  overlay ignored permanently; its adjacent modify script must read it from source state and
+  implement and test that merge order.
+- Use templates to select configuration by machine or environment. Use a default overlay when the
+  same key may drift after bootstrap; a work-machine check and a default overlay solve different
+  problems.
 - Keep modify scripts executable through PEP 723 metadata, and declare any third-party runtime
   dependencies inline.
 - When a modify script uses the helper library, import it from the repository-root `tools`
@@ -15,10 +23,15 @@ More specific `AGENTS.md` files retain implementation details for their director
 
 ## Reference Agent Configuration
 
-- [`dot_claude`](dot_claude) and [`dot_codex`](dot_codex) contain public-safe reference
-  configuration. `.chezmoiignore.tmpl` excludes them from `chezmoi apply`.
-- Editing these reference files does not change active configuration under `~/.claude` or
-  `~/.codex`. Synchronize changes explicitly only when requested.
+- [`dot_claude`](dot_claude) and [`dot_codex`](dot_codex) contain public-safe agent configuration.
+  Their overlays, including `AGENTS.default.md` and `CLAUDE.default.md`, remain permanently
+  source-only. Future adjacent modify scripts must read those overlays directly from source state.
+- Treat `dot_codex/AGENTS.default.md` as canonical for shared personal guidance. When shared
+  guidance changes, update the matching section in `dot_claude/CLAUDE.default.md` in the same
+  change; keep only harness-specific rules divergent.
+- Codex `.rules` files under `dot_codex/rules/` and `dot_claude/executable_statusline-command.sh`
+  materialize through `chezmoi apply`. Treat edits to those files as active configuration changes;
+  editing an ignored overlay does not change the corresponding live configuration.
 
 ## Shell Conventions
 

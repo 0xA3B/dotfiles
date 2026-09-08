@@ -1,15 +1,9 @@
-# Claude execution policy rules.
-# Unlisted claude subcommands will still prompt by default when escalation is requested.
+# Nested Claude invocations always require contextual approval review when
+# they need to run outside the Codex sandbox.
 
 prefix_rule(
-    pattern = ["claude", "-p"],
-    decision = "allow",
-    justification = "Non-interactive Claude writes logs and diagnostics under ~/.claude and should start outside the sandbox.",
-    match = [
-        "claude -p summarize this repository",
-    ],
-    not_match = [
-        "claude",
-        "claude --print summarize this repository",
-    ],
+    pattern = ["claude"],
+    decision = "prompt",
+    justification = "Nested agents require review because their own sandbox and approval settings are the remaining containment boundary.",
+    match = ["claude -p summarize this repository", "claude --print review this diff"],
 )

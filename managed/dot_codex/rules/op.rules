@@ -1,53 +1,10 @@
-# 1password execution policy rules.
-# Unlisted op subcommands will still prompt by default when escalation is requested.
+# 1Password CLI commands may use stored credentials or expose secret-bearing
+# data. Route every invocation to approval review so account, vault, child
+# command, and output context can be evaluated.
 
 prefix_rule(
-    pattern = ["op", ["run"]],
-    decision = "allow",
-    justification = "Automatically allow `op run` commands without prompting.",
-    match = [
-        "op run -- env",
-        "op run -- printenv",
-    ],
-    not_match = [
-        "op item get Example",
-    ],
-)
-
-prefix_rule(
-    pattern = ["op", "whoami"],
-    decision = "allow",
-    justification = "Allowed account identity inspection.",
-    match = [
-        "op whoami",
-    ],
-    not_match = [
-        "op signin",
-    ],
-)
-
-prefix_rule(
-    pattern = ["op", "account", ["list", "get"]],
-    decision = "allow",
-    justification = "Allowed account metadata inspection.",
-    match = [
-        "op account list",
-        "op account get my",
-    ],
-    not_match = [
-        "op account add",
-    ],
-)
-
-prefix_rule(
-    pattern = ["op", "vault", ["list", "get"]],
-    decision = "allow",
-    justification = "Allowed vault metadata inspection.",
-    match = [
-        "op vault list",
-        "op vault get Private",
-    ],
-    not_match = [
-        "op vault create Test",
-    ],
+    pattern = ["op"],
+    decision = "prompt",
+    justification = "Review 1Password CLI commands that need credentials, secret access, or execution outside the sandbox.",
+    match = ["op --version", "op whoami", "op account list", "op run -- env"],
 )

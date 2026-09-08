@@ -1,0 +1,9 @@
+# Nested Codex invocations always require contextual approval review when
+# they need to run outside the parent Codex sandbox.
+
+prefix_rule(
+    pattern = ["codex"],
+    decision = "prompt",
+    justification = "Nested agents require review because their own sandbox and approval settings are the remaining containment boundary.",
+    match = ["codex exec inspect this repository", "codex review"],
+)

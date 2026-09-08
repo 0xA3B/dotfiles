@@ -1,0 +1,138 @@
+# Map portable command names to common absolute installation paths so an
+# absolute invocation receives the same decision as its basename form.
+
+host_executable(
+    name = "git",
+    paths = ["/usr/bin/git", "/opt/homebrew/bin/git", "/usr/local/bin/git"],
+)
+
+host_executable(
+    name = "mise",
+    paths = [
+        "/opt/homebrew/bin/mise",
+        "/usr/local/bin/mise",
+        "{{ .chezmoi.homeDir }}/.local/bin/mise",
+    ],
+)
+
+host_executable(
+    name = "gh",
+    paths = [
+        "/opt/homebrew/bin/gh",
+        "/usr/local/bin/gh",
+        "{{ .chezmoi.homeDir }}/.local/bin/gh",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/gh",
+    ],
+)
+
+host_executable(
+    name = "op",
+    paths = [
+        "/opt/homebrew/bin/op",
+        "/usr/local/bin/op",
+        "{{ .chezmoi.homeDir }}/.local/bin/op",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/op",
+    ],
+)
+
+host_executable(
+    name = "codex",
+    paths = [
+        "/opt/homebrew/bin/codex",
+        "/usr/local/bin/codex",
+        "{{ .chezmoi.homeDir }}/.local/bin/codex",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/codex",
+    ],
+)
+
+host_executable(
+    name = "claude",
+    paths = [
+        "/opt/homebrew/bin/claude",
+        "/usr/local/bin/claude",
+        "{{ .chezmoi.homeDir }}/.local/bin/claude",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/claude",
+    ],
+)
+
+host_executable(
+    name = "npm",
+    paths = [
+        "/opt/homebrew/bin/npm",
+        "/usr/local/bin/npm",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/node/26/bin/npm",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npm",
+    ],
+)
+
+host_executable(
+    name = "pnpm",
+    paths = [
+        "/opt/homebrew/bin/pnpm",
+        "/usr/local/bin/pnpm",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/pnpm/latest/pnpm",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/pnpm",
+    ],
+)
+
+host_executable(
+    name = "yarn",
+    paths = [
+        "/opt/homebrew/bin/yarn",
+        "/usr/local/bin/yarn",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/yarn",
+    ],
+)
+
+host_executable(
+    name = "uv",
+    paths = [
+        "/opt/homebrew/bin/uv",
+        "/usr/local/bin/uv",
+        "{{ .chezmoi.homeDir }}/.local/bin/uv",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/uv/latest/uv-aarch64-apple-darwin/uv",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/uv/latest/uv-x86_64-apple-darwin/uv",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/uv",
+    ],
+)
+
+host_executable(
+    name = "poetry",
+    paths = [
+        "/opt/homebrew/bin/poetry",
+        "/usr/local/bin/poetry",
+        "{{ .chezmoi.homeDir }}/.local/bin/poetry",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/poetry",
+    ],
+)
+
+host_executable(
+    name = "twine",
+    paths = [
+        "/opt/homebrew/bin/twine",
+        "/usr/local/bin/twine",
+        "{{ .chezmoi.homeDir }}/.local/bin/twine",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/twine",
+    ],
+)
+
+host_executable(
+    name = "python",
+    paths = [
+        "/opt/homebrew/bin/python",
+        "/usr/local/bin/python",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/python/3.14/bin/python",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/python",
+    ],
+)
+
+host_executable(
+    name = "python3",
+    paths = [
+        "/usr/bin/python3",
+        "/opt/homebrew/bin/python3",
+        "/usr/local/bin/python3",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/python/3.14/bin/python3",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/python3",
+    ],
+)
