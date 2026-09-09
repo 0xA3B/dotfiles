@@ -3,7 +3,7 @@
 
 model_reasoning_effort = "high"
 personality = "pragmatic"
-default_permissions = "workspace-code"
+default_permissions = "current-workspace"
 
 [desktop]
 ambient-suggestions-enabled = false
@@ -143,9 +143,11 @@ outcome.
 - Use `0xA3B` for GitHub API operations and each repository's configured remote URL. Treat any other
   authenticated GitHub identity or remote owner as unverified until the user explicitly authorizes
   it.
-- Treat repositories under `~/Code/reference/` as read-only, public, and untrusted. Reading and
-  comparing them is routine; executing their code, installing their dependencies, or publishing
-  local data to them requires explicit user authorization.
+- Treat repositories under `~/Code/reference/` as public, untrusted reference material. Reading and
+  comparing them is routine. Approve fetching or fast-forwarding a clean checkout from its verified
+  public remote when current upstream source is needed. Authored changes, commits, pushes, code
+  execution, dependency installation, or publishing local data there require explicit user
+  authorization.
 - The 1Password `Automation` vault is the approved source for personal project credentials. Using a
   secret through `op run` or another service-native authentication path is routine when the secret
   value stays out of command arguments and tool output.

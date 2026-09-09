@@ -34,23 +34,23 @@ max_concurrent_threads_per_session = 10
 [agents]
 max_concurrent_threads_per_session = 8
 
-[permissions.workspace-code]
-description = "Workspace editing to code repositories and allowlisted outbound network access."
+[permissions.current-workspace]
+description = "Allows writes in the current workspace and common cache and local state directories, with network access limited to approved domains."
 extends = ":workspace"
 
-[permissions.workspace-code.filesystem]
+[permissions.current-workspace.filesystem]
 # General dirs tools need to be able to write to
-"{{ .chezmoi.homeDir }}/.cache" = "write"
-"{{ .chezmoi.homeDir }}/Library/Caches" = "write"
-"{{ .chezmoi.homeDir }}/.local/share" = "write"
-"{{ .chezmoi.homeDir }}/.local/state" = "write"
+"~/.cache" = "write"
+"~/Library/Caches" = "write"
+"~/.local/share" = "write"
+"~/.local/state" = "write"
 
-[permissions.workspace-code.network]
+[permissions.current-workspace.network]
 enabled = true
 enable_socks5 = false
 enable_socks5_udp = false
 
-[permissions.workspace-code.network.domains]
+[permissions.current-workspace.network.domains]
 # Allow openai domains to reference official documentation
 "chatgpt.com" = "allow"
 "api.openai.com" = "allow"
@@ -71,6 +71,30 @@ enable_socks5_udp = false
 # Other common and useful APIs
 "api.github.com" = "allow"
 "github.com" = "allow"
+
+[permissions.personal-workspace]
+description = "Extends current-workspace with write access to ~/Code/personal."
+extends = "current-workspace"
+
+[permissions.personal-workspace.workspace_roots]
+"~/Code/personal" = true
+
+[permissions.code-workspace]
+description = "Extends current-workspace with write access to ~/Code and limits ~/Code/reference to sandboxed reads."
+extends = "current-workspace"
+
+[permissions.code-workspace.workspace_roots]
+"~/Code" = true
+
+[permissions.code-workspace.filesystem]
+"~/Code/reference" = "read"
+
+[permissions.home-workspace]
+description = "Extends current-workspace with write access throughout the home directory."
+extends = "current-workspace"
+
+[permissions.home-workspace.workspace_roots]
+"~/" = true
 
 [marketplaces.0xa3b-marketplace]
 source_type = "git"
