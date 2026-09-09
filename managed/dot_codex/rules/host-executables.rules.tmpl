@@ -66,6 +66,16 @@ host_executable(
 )
 
 host_executable(
+    name = "npx",
+    paths = [
+        "/opt/homebrew/bin/npx",
+        "/usr/local/bin/npx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/node/26/bin/npx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx",
+    ],
+)
+
+host_executable(
     name = "pnpm",
     paths = [
         "/opt/homebrew/bin/pnpm",
@@ -76,11 +86,22 @@ host_executable(
 )
 
 host_executable(
-    name = "yarn",
+    name = "pnpx",
     paths = [
-        "/opt/homebrew/bin/yarn",
-        "/usr/local/bin/yarn",
-        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/yarn",
+        "/opt/homebrew/bin/pnpx",
+        "/usr/local/bin/pnpx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/pnpm/latest/pnpx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/pnpx",
+    ],
+)
+
+host_executable(
+    name = "pnx",
+    paths = [
+        "/opt/homebrew/bin/pnx",
+        "/usr/local/bin/pnx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/pnpm/latest/pnx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/pnx",
     ],
 )
 
@@ -97,42 +118,13 @@ host_executable(
 )
 
 host_executable(
-    name = "poetry",
+    name = "uvx",
     paths = [
-        "/opt/homebrew/bin/poetry",
-        "/usr/local/bin/poetry",
-        "{{ .chezmoi.homeDir }}/.local/bin/poetry",
-        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/poetry",
-    ],
-)
-
-host_executable(
-    name = "twine",
-    paths = [
-        "/opt/homebrew/bin/twine",
-        "/usr/local/bin/twine",
-        "{{ .chezmoi.homeDir }}/.local/bin/twine",
-        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/twine",
-    ],
-)
-
-host_executable(
-    name = "python",
-    paths = [
-        "/opt/homebrew/bin/python",
-        "/usr/local/bin/python",
-        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/python/3.14/bin/python",
-        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/python",
-    ],
-)
-
-host_executable(
-    name = "python3",
-    paths = [
-        "/usr/bin/python3",
-        "/opt/homebrew/bin/python3",
-        "/usr/local/bin/python3",
-        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/python/3.14/bin/python3",
-        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/python3",
+        "/opt/homebrew/bin/uvx",
+        "/usr/local/bin/uvx",
+        "{{ .chezmoi.homeDir }}/.local/bin/uvx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/uv/latest/uv-aarch64-apple-darwin/uvx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/uv/latest/uv-x86_64-apple-darwin/uvx",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/uvx",
     ],
 )

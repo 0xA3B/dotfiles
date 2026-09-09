@@ -33,6 +33,9 @@ conflict.
 
 ## Command execution
 
+- For `npm`, `pnpm`, `uv`, or `mise`, when the CLI accepts either ordering, put the subcommand
+  before optional flags and dependency-selection flags immediately after the subcommand so narrowly
+  scoped Codex execution rules match dependency and publication commands.
 - If a project contains `mise.toml` or `mise.local.toml`, run commands that depend on mise-managed
   tools with `mise exec --` in non-interactive shells.
 - If the user asks to run a command outside the sandbox, request escalation on the first attempt.

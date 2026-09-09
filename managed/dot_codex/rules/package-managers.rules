@@ -1,0 +1,301 @@
+# Package registries are reachable from inside the sandbox. Route commands that
+# resolve, install, update, remove, publish, or fetch and immediately execute
+# packages and tools to approval review. Routine execution remains governed by
+# the sandbox.
+
+prefix_rule(
+    pattern = [
+        ["npm", "pnpm"],
+        ["add", "ci", "install", "remove", "rm", "uninstall", "up", "update", "upgrade"],
+    ],
+    decision = "prompt",
+    justification = (
+        "Review JavaScript dependency changes against the repository dependency policy."
+    ),
+    match = [
+        "npm install",
+        "npm update lodash --workspace pkg",
+        "pnpm add zod",
+        "pnpm install --frozen-lockfile",
+        "pnpm remove lodash --filter pkg",
+    ],
+    not_match = [
+        "npm run test",
+        "npm pack",
+        "pnpm exec oxfmt --check",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", "audit", "fix"],
+    decision = "prompt",
+    justification = "Review npm audit remediations because they can change resolved dependencies.",
+    match = ["npm audit fix", "npm audit fix --force"],
+    not_match = ["npm audit", "npm run audit"],
+)
+
+prefix_rule(
+    pattern = ["pnpm", "audit", "--fix"],
+    decision = "prompt",
+    justification = "Review pnpm audit remediations because they can change resolved dependencies.",
+    match = ["pnpm audit --fix", "pnpm audit --fix --prod"],
+    not_match = ["pnpm audit", "pnpm run audit"],
+)
+
+prefix_rule(
+    pattern = ["npm", ["exec", "x"]],
+    decision = "prompt",
+    justification = "Review npm exec because it can fetch and immediately execute a package.",
+    match = ["npm exec -- prettier --check .", "npm x --package=prettier -- prettier --check ."],
+    not_match = ["npm run test", "pnpm exec prettier --check ."],
+)
+
+prefix_rule(
+    pattern = [["npx", "pnpx", "pnx", "uvx"]],
+    decision = "prompt",
+    justification = "Review commands that can fetch and immediately execute a package.",
+    match = [
+        "npx prettier --check .",
+        "pnpx prettier --check .",
+        "pnx prettier --check .",
+        "uvx ruff check .",
+    ],
+    not_match = ["npm exec prettier --check .", "uv tool list"],
+)
+
+prefix_rule(
+    pattern = ["pnpm", "dlx"],
+    decision = "prompt",
+    justification = "Review pnpm dlx because it can fetch and immediately execute a package.",
+    match = ["pnpm dlx prettier --check .", "pnpm dlx cowsay hello"],
+    not_match = ["pnpm exec prettier --check .", "pnpm run test"],
+)
+
+prefix_rule(
+    pattern = ["uv", ["add", "lock", "remove", "sync"]],
+    decision = "prompt",
+    justification = (
+        "Review uv project dependency changes against the repository dependency policy."
+    ),
+    match = [
+        "uv add requests",
+        "uv lock --upgrade",
+        "uv remove requests",
+        "uv sync --frozen",
+    ],
+    not_match = ["uv run pytest", "uv build"],
+)
+
+prefix_rule(
+    pattern = ["uv", "pip", ["install", "sync"]],
+    decision = "prompt",
+    justification = "Review uv pip installations against the repository dependency policy.",
+    match = ["uv pip install requests", "uv pip sync requirements.txt"],
+    not_match = ["uv pip list", "uv pip show requests"],
+)
+
+prefix_rule(
+    pattern = ["uv", "tool", ["install", "upgrade"]],
+    decision = "prompt",
+    justification = (
+        "Review uv tool installations and upgrades against the repository dependency policy."
+    ),
+    match = ["uv tool install ruff", "uv tool upgrade ruff"],
+    not_match = ["uv tool list", "uv tool run ruff --version"],
+)
+
+prefix_rule(
+    pattern = ["uv", "tool", "run"],
+    decision = "prompt",
+    justification = "Review uv tool run because it can fetch and immediately execute a tool.",
+    match = ["uv tool run ruff check .", "uv tool run --from black black --check ."],
+    not_match = ["uv tool list", "uv run pytest"],
+)
+
+prefix_rule(
+    pattern = ["uv", "run", ["--with", "--with-editable", "--with-requirements"]],
+    decision = "prompt",
+    justification = "Review uv run when it resolves extra dependencies before execution.",
+    match = [
+        "uv run --with requests script.py",
+        "uv run --with-editable ./pkg script.py",
+        "uv run --with-requirements requirements.txt script.py",
+    ],
+    not_match = ["uv run pytest", "uv run --frozen pytest"],
+)
+
+prefix_rule(
+    pattern = ["uv", "python", "install"],
+    decision = "prompt",
+    justification = "Review Python runtime installations performed by uv.",
+    match = ["uv python install 3.14", "uv python install --default 3.14"],
+    not_match = ["uv python list", "uv python find 3.14"],
+)
+
+prefix_rule(
+    pattern = ["uv", "self", "update"],
+    decision = "prompt",
+    justification = "Review uv self-updates against the repository toolchain policy.",
+    match = ["uv self update", "uv self update --preview"],
+    not_match = ["uv --version"],
+)
+
+prefix_rule(
+    pattern = ["mise", ["install", "uninstall", "upgrade", "use"]],
+    decision = "prompt",
+    justification = "Review mise toolchain changes against the repository dependency policy.",
+    match = [
+        "mise install",
+        "mise uninstall node@24",
+        "mise upgrade",
+        "mise use node@24",
+    ],
+    not_match = ["mise exec -- node --version", "mise run check"],
+)
+
+prefix_rule(
+    pattern = ["mise", "plugins", ["install", "update"]],
+    decision = "prompt",
+    justification = (
+        "Review mise plugin installations and updates because they add executable code."
+    ),
+    match = ["mise plugins install node", "mise plugins update"],
+    not_match = ["mise plugins list", "mise plugins ls-remote node"],
+)
+
+prefix_rule(
+    pattern = ["mise", "lock", "--bump"],
+    decision = "prompt",
+    justification = "Review mise lockfile upgrades against the repository dependency policy.",
+    match = ["mise lock --bump", "mise lock --bump node"],
+    not_match = ["mise lock", "mise run check"],
+)
+
+prefix_rule(
+    pattern = ["mise", "x"],
+    decision = "prompt",
+    justification = "Review mise x because it can install a tool before executing a command.",
+    match = ["mise x node@24 -- node --version", "mise x npm:prettier -- prettier --check ."],
+    not_match = ["mise exec -- node --version", "mise run check"],
+)
+
+# Keep package-manager mutations reviewable when user instructions wrap managed
+# tools in `mise exec --`. Ordinary commands through mise remain sandboxed.
+prefix_rule(
+    pattern = [
+        "mise",
+        "exec",
+        "--",
+        ["npm", "pnpm"],
+        ["add", "ci", "install", "remove", "rm", "uninstall", "up", "update", "upgrade"],
+    ],
+    decision = "prompt",
+    justification = "Review JavaScript dependency changes invoked through mise.",
+    match = ["mise exec -- npm install", "mise exec -- pnpm update lodash"],
+    not_match = ["mise exec -- npm run test", "mise exec -- pnpm exec oxfmt --check"],
+)
+
+prefix_rule(
+    pattern = ["mise", "exec", "--", "uv", ["add", "lock", "remove", "sync"]],
+    decision = "prompt",
+    justification = "Review uv project dependency changes invoked through mise.",
+    match = ["mise exec -- uv add requests", "mise exec -- uv sync --frozen"],
+    not_match = ["mise exec -- uv run pytest", "mise exec -- uv build"],
+)
+
+prefix_rule(
+    pattern = ["mise", "exec", "--", "uv", "pip", ["install", "sync"]],
+    decision = "prompt",
+    justification = "Review uv pip installations invoked through mise.",
+    match = [
+        "mise exec -- uv pip install requests",
+        "mise exec -- uv pip sync requirements.txt",
+    ],
+    not_match = ["mise exec -- uv pip list", "mise exec -- uv pip show requests"],
+)
+
+prefix_rule(
+    pattern = ["mise", "exec", "--", "uv", "tool", ["install", "upgrade"]],
+    decision = "prompt",
+    justification = "Review uv tool installations and upgrades invoked through mise.",
+    match = ["mise exec -- uv tool install ruff", "mise exec -- uv tool upgrade ruff"],
+    not_match = ["mise exec -- uv tool list", "mise exec -- uv tool run ruff --version"],
+)
+
+prefix_rule(
+    pattern = ["mise", "exec", "--", "npm", ["exec", "x"]],
+    decision = "prompt",
+    justification = "Review npm exec when invoked through mise.",
+    match = ["mise exec -- npm exec -- prettier --check ."],
+    not_match = ["mise exec -- npm run test", "mise exec -- pnpm exec prettier --check ."],
+)
+
+prefix_rule(
+    pattern = ["mise", "exec", "--", ["npx", "pnpx", "pnx", "uvx"]],
+    decision = "prompt",
+    justification = "Review package fetch-and-execute commands invoked through mise.",
+    match = [
+        "mise exec -- npx prettier --check .",
+        "mise exec -- pnx prettier --check .",
+        "mise exec -- uvx ruff check .",
+    ],
+    not_match = ["mise exec -- npm run test", "mise exec -- uv run pytest"],
+)
+
+prefix_rule(
+    pattern = ["mise", "exec", "--", "pnpm", "dlx"],
+    decision = "prompt",
+    justification = "Review pnpm dlx when invoked through mise.",
+    match = ["mise exec -- pnpm dlx prettier --check ."],
+    not_match = ["mise exec -- pnpm exec prettier --check ."],
+)
+
+prefix_rule(
+    pattern = ["mise", "exec", "--", "uv", "tool", "run"],
+    decision = "prompt",
+    justification = "Review uv tool run when invoked through mise.",
+    match = ["mise exec -- uv tool run ruff check ."],
+    not_match = ["mise exec -- uv tool list", "mise exec -- uv run pytest"],
+)
+
+prefix_rule(
+    pattern = [
+        "mise",
+        "exec",
+        "--",
+        "uv",
+        "run",
+        ["--with", "--with-editable", "--with-requirements"],
+    ],
+    decision = "prompt",
+    justification = "Review uv run with extra dependencies when invoked through mise.",
+    match = [
+        "mise exec -- uv run --with requests script.py",
+        "mise exec -- uv run --with-requirements requirements.txt script.py",
+    ],
+    not_match = ["mise exec -- uv run pytest", "mise exec -- uv run --frozen pytest"],
+)
+
+# Publishing sends artifacts and metadata to an allowlisted registry, so it
+# still requires review even though publication is no longer the file's focus.
+prefix_rule(
+    pattern = [["npm", "pnpm", "uv"], "publish"],
+    decision = "prompt",
+    justification = "Review package publication because it mutates an external registry.",
+    match = [
+        "npm publish --workspace pkg",
+        "pnpm publish --filter pkg --access public",
+        "uv publish --color never",
+    ],
+    not_match = ["npm pack", "pnpm pack", "uv build"],
+)
+
+prefix_rule(
+    pattern = ["mise", "exec", "--", ["npm", "pnpm", "uv"], "publish"],
+    decision = "prompt",
+    justification = (
+        "Review package publication invoked through mise because it mutates an external registry."
+    ),
+    match = ["mise exec -- npm publish", "mise exec -- uv publish"],
+    not_match = ["mise exec -- npm pack", "mise exec -- uv build"],
+)

@@ -129,8 +129,9 @@ policy = """
 ## Personal policy additions
 
 Apply this policy only after sandbox and exec-policy evaluation sends an action to automatic review.
-Keep deterministic command decisions in `~/.codex/rules/`. Decide here only when repository
-ownership, destination, data provenance, or explicit user authorization changes the outcome.
+Keep deterministic command decisions in `~/.codex/rules/`. Decide here only when loaded repository
+policy, ownership, destination, data provenance, or explicit user authorization changes the
+outcome.
 
 ## Personal environment and trusted boundaries
 
@@ -161,6 +162,11 @@ ownership, destination, data provenance, or explicit user authorization changes 
   repository when the command does not expose credentials or bypass repository protections.
 - Approve `gh auth status` when it verifies the configured personal account without displaying or
   extracting a token.
+- Approve dependency and toolchain resolution, installation, update, removal, and lockfile commands
+  when they are within task scope and comply with the loaded repository dependency policy.
+- Approve fetch-and-execute package or tool commands only when the named package or tool and child
+  command are within task scope. Require explicit user authorization when the package or tool source
+  or current repository is unverified.
 - Approve personal project commands under `op run` when their child command is within the task's
   scope and neither the parent nor child command exposes secret values.
 - Approve a non-interactive nested Codex or Claude invocation only when the user explicitly requests

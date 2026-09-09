@@ -5,10 +5,12 @@ These instructions apply to the managed source rules under `managed/dot_codex/ru
 ## Purpose
 
 - These files define Codex execution-policy rules in Starlark using `prefix_rule(...)`.
-- Use `prompt` to route command families that need contextual approval review, `allow` to run narrow
-  commands that genuinely require sandbox-boundary access without review, and `forbidden` for
-  deterministic hard denials. Auto-review handles eligible prompts only when it is configured and
-  the approval policy remains interactive.
+- Treat the active sandbox as the default containment boundary. Leave routine commands unmatched
+  when their effects remain inside its filesystem and network limits.
+- Use `prompt` when material risk remains inside the active sandbox, `allow` for narrow commands
+  that genuinely require sandbox-boundary access without review, and `forbidden` for deterministic
+  hard denials. Auto-review handles eligible prompts only when it is configured and the approval
+  policy remains interactive.
 - Keep rules narrowly scoped, easy to review, and safe to publish.
 
 ## Rule Authoring
@@ -19,6 +21,9 @@ These instructions apply to the managed source rules under `managed/dot_codex/ru
   risk profile.
 - Use `prompt` for commands that should reach approval review even when the active sandbox or
   network profile could otherwise run them.
+- For package managers, use `prompt` for dependency or toolchain changes, publication, and commands
+  that can fetch and immediately execute new code. Leave routine runners such as `npm run`,
+  `pnpm exec`, `uv run` without added dependencies, and `mise run` unmatched.
 - Use `allow` only when every invocation matched by the prefix may run outside the sandbox without
   review. Add narrower overlapping `prompt` or `forbidden` rules for exceptional forms.
 - Use `forbidden` for command prefixes that must never run. Put contextual denials, including unsafe
