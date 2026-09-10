@@ -4,7 +4,7 @@
 model_reasoning_summary = "auto"
 model_verbosity = "low"
 hide_agent_reasoning = false
-suppress_unstable_features_warning = false
+suppress_unstable_features_warning = true
 web_search = "cached"
 approvals_reviewer = "auto_review"
 approval_policy = "on-request"
