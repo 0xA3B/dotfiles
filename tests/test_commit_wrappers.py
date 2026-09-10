@@ -277,6 +277,7 @@ def test_claude_commit_streams_brief_progress_and_final_result(
         [[ " $* " == *" --brief "* ]]
         [[ " $* " == *" --output-format stream-json "* ]]
         [[ " $* " == *" --verbose "* ]]
+        [[ " $* " == *" --allowedTools "*"SendUserMessage"* ]]
         [[ "$*" == *"Progress: "* ]]
         [[ " $* " == *" after determining the commit plan "* ]]
         [[ " $* " == *" after each successful commit. "* ]]

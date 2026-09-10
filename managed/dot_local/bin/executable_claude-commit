@@ -121,7 +121,7 @@ claude -p "$prompt" \
   --brief \
   --output-format stream-json \
   --verbose \
-  --allowedTools "Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git rev-parse:*),Bash(git check-ignore:*),Bash(git add:*),Bash(git restore --staged:*),Bash(git commit:*)" \
+  --allowedTools "SendUserMessage,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git rev-parse:*),Bash(git check-ignore:*),Bash(git add:*),Bash(git restore --staged:*),Bash(git commit:*)" \
   2>"$stderr_file" | render_claude_stream
 pipeline_status=("${PIPESTATUS[@]}")
 set -e
