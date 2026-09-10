@@ -18,7 +18,7 @@ indent_size = 4
 [*.fish]
 indent_size = 4
 
-[*.sh]
+[*.{sh,sh.tmpl}]
 shell_variant = posix
 
 [managed/dot_claude/executable_statusline-command.sh]
@@ -31,13 +31,21 @@ shell_variant = bash
 shell_variant = zsh
 switch_case_indent = true
 
-[managed/dot_zshrc]
-shell_variant = zsh
-switch_case_indent = true
+[*.{md,markdown}]
+trim_trailing_whitespace = false
+
+[managed/dot_codex/rules/*.{rules,rules.tmpl}]
+indent_size = 4
+
+[managed/dot_gitconfig*]
+indent_style = tab
+indent_size = tab
+tab_width = 8
 
 [managed/dot_config/zsh/completions/_*]
 shell_variant = zsh
 switch_case_indent = true
 
-[*.{md,markdown}]
-trim_trailing_whitespace = false
+[managed/dot_zshrc]
+shell_variant = zsh
+switch_case_indent = true

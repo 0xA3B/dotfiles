@@ -49,6 +49,10 @@ chezmoi. Preserve these outcomes:
 - Keep `check`-suffixed tasks non-mutating.
 - Reserve the pre-commit `manual` stage for hooks that do not run at commit time; CI covers them via
   `mise run format:hygiene`.
+- When adding or renaming a source file whose final suffix does not identify its language, including
+  extensionless files and `.tmpl` sources, add an explicit `files.associations` entry in
+  `.vscode/settings.json`. In the same change, review `.editorconfig` and add the narrowest matching
+  section when the applicable rules do not supply the formatter dialect or indentation.
 - Keep repository tooling outside `managed/` unless it must be part of the chezmoi source state.
 - Treat `AGENTS.md` as canonical agent guidance; sibling `CLAUDE.md` files must import `@AGENTS.md`
   and may add Claude-specific guidance only when it doesn't belong in `AGENTS.md`.
