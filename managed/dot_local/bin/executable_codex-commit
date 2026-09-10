@@ -1,15 +1,16 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Commit current changes with generated Conventional Commit messages by running
 # the conventional-commits:commit skill through a non-interactive `codex exec`
 # session, so committing hand-made changes doesn't need a full session. Extra
 # arguments are passed to the skill as instructions, e.g.
 # `codex-commit only the docs changes`.
-set -eu
+set -euo pipefail
 
 # Requires the conventional-commits plugin from
 # https://github.com/0xA3B/skills/tree/main/plugins/git to be
 # installed in the resolved Codex home.
 prompt="\$git:commit Commit the current worktree changes in the requested scope (all of them by default). Follow the skill's guidance for commit partitioning. Do not push. If a git hook modifies files, inspect those changes, re-stage only the fixes that belong to the affected commit, and retry that commit once. If the retry fails, the requested scope cannot be isolated safely, or the diff contains a clear safety issue such as exposed credentials or unresolved conflict markers, stop and report the blocker. Do not edit working-tree files yourself, bypass hooks, weaken checks, or otherwise work around the blocker."
+prompt="$prompt Emit a brief, one-line update beginning exactly 'Progress: ' after determining the commit plan and after each successful commit. Do not narrate routine commands, and do not begin the final response with 'Progress: '."
 if [ "$#" -gt 0 ]; then
   prompt="$prompt Additional instructions: $*"
 fi
@@ -18,22 +19,93 @@ fi
 # git metadata writes still depend on the active Codex execution-policy rules.
 # Disable OTEL exporters so unavailable telemetry endpoints cannot delay this
 # headless command's shutdown.
-# Capture Codex's progress stream and replay it only when the command fails.
+# Capture Codex's diagnostic stream and replay it only when the command fails.
+# JSON output lets the renderer select explicit progress messages without
+# exposing reasoning or routine command output.
 stderr_file=$(mktemp "${TMPDIR:-/tmp}/codex-commit.XXXXXX")
-trap 'rm -f "$stderr_file"' 0
+trap 'rm -f "$stderr_file"' EXIT
+result_file=$(mktemp "${TMPDIR:-/tmp}/codex-commit-result.XXXXXX")
+trap 'rm -f "$stderr_file" "$result_file"' EXIT
 
-if codex exec \
+render_codex_stream() {
+  local pipeline_status
+
+  jq --unbuffered --raw-input --compact-output '
+    try (
+      fromjson as $event
+      | if ($event | type) != "object" then
+          {
+            destination: "renderer_error",
+            text: "codex-commit: expected a JSON object stream event"
+          }
+        elif (
+          $event.type? == "item.completed"
+          and $event.item.type? == "agent_message"
+          and (($event.item.text? // "") | startswith("Progress: "))
+        ) then
+          {destination: "stderr", text: $event.item.text}
+        elif $event.type? == "turn.failed" then
+          {destination: "agent_error", text: "codex: \($event.error.message // "Codex failed")"}
+        elif $event.type? == "error" then
+          {destination: "agent_error", text: "codex: \($event.message // "Codex failed")"}
+        elif $event.type? == "item.completed" and $event.item.type? == "error" then
+          {destination: "stderr", text: "codex: \($event.item.message // "Codex warning")"}
+        else
+          empty
+        end
+    ) catch {
+      destination: "renderer_error",
+      text: "codex-commit: invalid JSON stream event: \(.)"
+    }
+  ' | (
+    renderer_status=0
+    while IFS= read -r output; do
+      if ! destination=$(jq --raw-output '.destination' <<<"$output"); then
+        renderer_status=1
+        continue
+      fi
+      if ! message=$(jq --raw-output '.text' <<<"$output"); then
+        renderer_status=1
+        continue
+      fi
+      if [[ $destination == "agent_error" || $destination == "renderer_error" ]]; then
+        renderer_status=1
+      fi
+      printf '%s\n' "$message" >&2
+    done
+    exit "$renderer_status"
+  )
+  pipeline_status=("${PIPESTATUS[@]}")
+
+  if ((pipeline_status[0] != 0)); then
+    return "${pipeline_status[0]}"
+  fi
+  return "${pipeline_status[1]}"
+}
+
+set +e
+codex exec \
   --model gpt-5.6-luna \
   --config 'model_reasoning_effort="medium"' \
   --config 'otel.exporter="none"' \
   --config 'otel.metrics_exporter="none"' \
   --config 'otel.trace_exporter="none"' \
   --sandbox workspace-write \
-  --ephemeral \
-  "$prompt" 2>"$stderr_file"; then
-  exit 0
-else
-  status=$?
+  --json \
+  --output-last-message "$result_file" \
+  "$prompt" </dev/null 2>"$stderr_file" | render_codex_stream
+pipeline_status=("${PIPESTATUS[@]}")
+set -e
+
+codex_status=${pipeline_status[0]}
+renderer_status=${pipeline_status[1]}
+if ((codex_status != 0)); then
   cat "$stderr_file" >&2
-  exit "$status"
+  exit "$codex_status"
 fi
+if ((renderer_status != 0)); then
+  cat "$stderr_file" >&2
+  exit "$renderer_status"
+fi
+
+cat "$result_file"

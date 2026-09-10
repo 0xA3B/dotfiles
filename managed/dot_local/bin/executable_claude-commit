@@ -1,15 +1,16 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Commit current changes with generated Conventional Commit messages by running
 # the conventional-commits:commit skill through a non-interactive `claude -p`
 # session, so committing hand-made changes doesn't need a full session. Extra
 # arguments are passed to the skill as instructions, e.g.
 # `claude-commit only the docs changes`.
-set -eu
+set -euo pipefail
 
 # Requires the conventional-commits plugin from
 # https://github.com/0xA3B/skills/tree/main/plugins/git to be
 # installed in the resolved Claude account.
 prompt="/git:commit Commit the current worktree changes in the requested scope (all of them by default). Follow the skill's guidance for commit partitioning. Do not push. If a git hook modifies files, inspect those changes, re-stage only the fixes that belong to the affected commit, and retry that commit once. If the retry fails, the requested scope cannot be isolated safely, or the diff contains a clear safety issue such as exposed credentials or unresolved conflict markers, stop and report the blocker. Do not edit working-tree files yourself, bypass hooks, weaken checks, or otherwise work around the blocker."
+prompt="$prompt Send a brief, one-line update beginning exactly 'Progress: ' after determining the commit plan and after each successful commit. Do not narrate routine commands, and do not begin the final response with 'Progress: '."
 if [ "$#" -gt 0 ]; then
   prompt="$prompt Additional instructions: $*"
 fi
@@ -18,8 +19,122 @@ fi
 # the skill needs: state inspection, staging (including unstage via
 # `restore --staged`, but not working-tree restore), and commit. The prompt
 # must precede --allowedTools: that option is variadic and would swallow a
-# trailing positional argument.
-exec claude -p "$prompt" \
+# trailing positional argument. Brief mode routes user-facing messages through
+# SendUserMessage, so the JSON renderer can separate progress from the result.
+stderr_file=$(mktemp "${TMPDIR:-/tmp}/claude-commit.XXXXXX")
+trap 'rm -f "$stderr_file"' EXIT
+result_file=$(mktemp "${TMPDIR:-/tmp}/claude-commit-result.XXXXXX")
+trap 'rm -f "$stderr_file" "$result_file"' EXIT
+
+render_claude_stream() {
+  local pipeline_status
+
+  jq --unbuffered --raw-input --compact-output --null-input '
+    foreach inputs as $line (
+      {final_message: null, output: null};
+      . as $state
+      | try (
+        ($line | fromjson) as $event
+        | if ($event | type) != "object" then
+          .output = {
+            destination: "renderer_error",
+            text: "claude-commit: expected a JSON object stream event"
+          }
+        elif $event.type? == "assistant" then
+          [
+            ($event.message.content? // [])[]?
+            | select(.type == "tool_use" and .name == "SendUserMessage")
+            | .input.message?
+            | strings
+          ] as $messages
+          | if ($messages | length) == 0 then
+              .output = null
+            else
+              $messages[-1] as $message
+              | if ($message | startswith("Progress: ")) then
+                  .output = {destination: "stderr", text: $message}
+                else
+                  .final_message = $message
+                  | .output = null
+                end
+            end
+        elif $event.type? == "result" and $event.is_error then
+          .output = {destination: "agent_error", text: ($event.result // "Claude failed")}
+        elif $event.type? == "result" then
+          .output = {
+            destination: "result",
+            text: (.final_message // $event.result // "")
+          }
+        else
+          .output = null
+        end
+      ) catch (
+        . as $renderer_error
+        | $state
+        | .output = {
+          destination: "renderer_error",
+          text: "claude-commit: invalid JSON stream event: \($renderer_error)"
+        }
+      );
+      .output | select(. != null and .text != "")
+    )
+  ' | (
+    renderer_status=0
+    while IFS= read -r output; do
+      if ! destination=$(jq --raw-output '.destination' <<<"$output"); then
+        renderer_status=1
+        continue
+      fi
+      if ! message=$(jq --raw-output '.text' <<<"$output"); then
+        renderer_status=1
+        continue
+      fi
+      case $destination in
+      agent_error | renderer_error)
+        renderer_status=1
+        printf '%s\n' "$message" >&2
+        ;;
+      stderr)
+        printf '%s\n' "$message" >&2
+        ;;
+      result)
+        if ((renderer_status == 0)); then
+          printf '%s\n' "$message" >"$result_file"
+        fi
+        ;;
+      esac
+    done
+    exit "$renderer_status"
+  )
+  pipeline_status=("${PIPESTATUS[@]}")
+
+  if ((pipeline_status[0] != 0)); then
+    return "${pipeline_status[0]}"
+  fi
+  return "${pipeline_status[1]}"
+}
+
+set +e
+claude -p "$prompt" \
   --model sonnet \
   --effort medium \
-  --allowedTools "Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git rev-parse:*),Bash(git check-ignore:*),Bash(git add:*),Bash(git restore --staged:*),Bash(git commit:*)"
+  --brief \
+  --output-format stream-json \
+  --verbose \
+  --allowedTools "Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git rev-parse:*),Bash(git check-ignore:*),Bash(git add:*),Bash(git restore --staged:*),Bash(git commit:*)" \
+  2>"$stderr_file" | render_claude_stream
+pipeline_status=("${PIPESTATUS[@]}")
+set -e
+
+claude_status=${pipeline_status[0]}
+renderer_status=${pipeline_status[1]}
+if ((claude_status != 0)); then
+  cat "$stderr_file" >&2
+  exit "$claude_status"
+fi
+if ((renderer_status != 0)); then
+  cat "$stderr_file" >&2
+  exit "$renderer_status"
+fi
+
+cat "$result_file"

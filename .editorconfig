@@ -24,6 +24,9 @@ shell_variant = posix
 [managed/dot_claude/executable_statusline-command.sh]
 shell_variant = bash
 
+[managed/dot_local/bin/{executable_claude-commit,executable_codex-commit}]
+shell_variant = bash
+
 [*.bash]
 shell_variant = bash
 
