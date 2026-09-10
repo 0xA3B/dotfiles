@@ -110,10 +110,23 @@ tags
 .envrc.private
 .direnv/
 
-# Claude local settings files
-**/.claude/settings.local.json
+# Claude local settings and files
+CLAUDE.local.md
+**/.claude/*.local.json
+**/.claude/**/*.log
 **/.claude/.cc-writes/
 
-# mise
-mise.local.toml
+# Mise
+# https://mise.jdx.dev/configuration.html
+# https://mise.jdx.dev/configuration/environments.html
+.mise.*.local.toml
+.mise.local.toml
 mise.*.local.toml
+mise.local.toml
+**/.mise/*.local.toml
+**/mise/*.local.toml
+
+# https://mise.jdx.dev/dev-tools/mise-lock.html#local-lockfiles
+# https://mise.jdx.dev/dev-tools/mise-lock.html#environment-specific-lockfiles
+mise.local.lock
+mise.*.local.lock
