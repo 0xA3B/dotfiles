@@ -1,6 +1,7 @@
 # Dotfiles
 
-Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/).
+This is my set of personal dotfiles managed with [chezmoi](https://www.chezmoi.io/). Feel free to
+explore them for inspiration.
 
 ## Install chezmoi
 
@@ -49,3 +50,7 @@ brew bundle install --global
 
 The Brewfile is intentionally limited to machine bootstrap tools, shell/editor utilities, desktop
 apps, and fonts. Developer runtimes are managed by mise.
+
+## License
+
+This repository is available under the [MIT License](LICENSE).
