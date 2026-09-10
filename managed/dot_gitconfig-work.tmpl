@@ -1,0 +1,5 @@
+{{- if .work_machine -}}
+[user]
+	name = {{ .git_work_name | quote }}
+	email = {{ .git_work_email | quote }}
+{{ end -}}

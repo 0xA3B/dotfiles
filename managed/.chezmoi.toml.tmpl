@@ -4,3 +4,9 @@ mode = "file"
 [data]
 {{ $workMachine := promptBoolOnce . "work_machine" "Is this a work machine?" }}
 work_machine = {{ $workMachine }}
+{{- if $workMachine }}
+{{ $gitWorkName := promptStringOnce . "git_work_name" "Work Git name" }}
+{{ $gitWorkEmail := promptStringOnce . "git_work_email" "Work Git email" }}
+git_work_name = {{ $gitWorkName | quote }}
+git_work_email = {{ $gitWorkEmail | quote }}
+{{- end }}
