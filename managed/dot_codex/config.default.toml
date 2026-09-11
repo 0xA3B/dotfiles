@@ -52,9 +52,6 @@ enabled = true
 [plugins."engineering@0xa3b-marketplace"]
 enabled = true
 
-[plugins."engineering-workflows@0xa3b-marketplace"]
-enabled = true
-
 # A local policy replaces Codex's bundled reviewer policy instead of extending it. Keep this base
 # synchronized with codex-rs/core/assets/guardian/policy.md from openai/codex. The version below is
 # copied from commit 6fee98cc85a69ee44a856121cac0f64505cf48d0; personal additions follow it.
