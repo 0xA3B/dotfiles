@@ -33,6 +33,11 @@ More specific `AGENTS.md` files retain implementation details for their director
 - Treat `dot_codex/AGENTS.default.md` as canonical for shared personal guidance. When shared
   guidance changes, update the matching section in `dot_claude/CLAUDE.default.md` in the same
   change; keep only harness-specific rules divergent.
+- The two harnesses review package-manager commands differently on purpose. Codex routes them to
+  approval through `dot_codex/rules/package-managers.rules`. Claude keeps them sandboxed and relies
+  on the sandbox's first-use host review, so `sandbox.excludedCommands` in
+  `dot_claude/settings.managed.jsonc` lists only credentialed or sandbox-incompatible tools. Keep
+  package registries out of the Claude sandbox `allowedDomains` so that review still fires.
 - Codex `.rules` files under `dot_codex/rules/` and `dot_claude/executable_statusline-command.sh`
   materialize through `chezmoi apply`. Treat edits to those files as active configuration changes;
   editing an ignored overlay does not change the corresponding live configuration.

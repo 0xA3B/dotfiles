@@ -1,17 +1,66 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  // Model choices.
+  "model": "fable",
+  "effortLevel": "high",
+  "alwaysThinkingEnabled": true,
+  "switchModelsOnFlag": false,
+  "teammateDefaultModel": "opus",
+  "teammateMode": "in-process",
+  // Session behavior and UI preferences.
+  "askUserQuestionTimeout": "never",
+  "autoCompactEnabled": true,
+  "autoConnectIde": false,
+  "autoMemoryEnabled": true,
+  "autoUpdatesChannel": "latest",
+  "cleanupPeriodDays": 90,
+  "editorMode": "normal",
+  "enableWorkflows": true,
+  "externalEditorContext": true,
+  "feedbackSurveyRate": 0,
+  "outputStyle": "default",
+  "respectGitignore": true,
+  "respondToBashCommands": true,
+  "skillListingBudgetFraction": 0.02,
+  "spinnerTipsEnabled": false,
+  "theme": "dark",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
   },
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "500000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
+    "CLAUDE_CODE_NEW_INIT": "1",
+    // Fallback subagent model; a dispatch-time `model` argument or agent frontmatter overrides it.
+    "CLAUDE_CODE_SUBAGENT_MODEL": "opus",
+    "DISABLE_PROMPT_CACHING": "0"
+  },
+  "enabledPlugins": {
+    "codex-in-claude@0xa3b-marketplace": true,
+    "writing@0xa3b-marketplace": true,
+    "meta@0xa3b-marketplace": true,
+    "git@0xa3b-marketplace": true,
+    "engineering@0xa3b-marketplace": true
+  },
+  // The classifier reviews commands that run outside the sandbox and the first sandboxed connection
+  // to each host in a session. It reads loaded CLAUDE.md content, so a repository dependency policy
+  // applies to dependency commands automatically.
   "autoMode": {
     "allow": [
       "$defaults",
-      "Personal GitHub Destination: github.com/0xA3B repositories are trusted push destinations for content originating in the same personal scope. This does not override built-in blocks for force pushes, history rewrites, protection bypass, or sensitive data crossing from private to public."
+      "Personal GitHub Destination: github.com/0xA3B repositories are trusted push destinations for content originating in the same personal scope. This does not override built-in blocks for force pushes, history rewrites, protection bypass, or sensitive data crossing from private to public.",
+      "Dependency and Toolchain Changes: when a package-manager or toolchain command (npm, pnpm, uv, mise) reaches this review, whether through a registry connection or an unsandboxed retry, approve it when the command is within the task's scope and the resulting change complies with the loaded repository dependency policy, including version constraints, cooldowns, and lockfile handling.",
+      "Fetch-and-Execute Package Commands: npx, pnpx, pnx, pnpm dlx, npm exec, uvx, uv tool run, uv run --with, and mise x can download and immediately run code. Approve when the named package and its child command are within the task's scope and come from a public registry or mise backend. Require explicit user direction when the package source or the current repository is unverified."
     ],
     "soft_deny": [
       "$defaults",
       "Interactive Authentication: Require explicit user direction before starting login, sign-in, enrollment, credential replacement, or credential removal commands, including gh auth login, op signin, and cloud-provider login flows.",
-      "Unsandboxed Nested Agents: Require explicit user direction before running Codex, Claude, or another autonomous agent with its sandbox, permission checks, or approval system disabled or weakened, including indirect equivalents through alternate configuration homes or persistent config edits."
+      "Unsandboxed Nested Agents: Require explicit user direction before running Codex, Claude, or another autonomous agent with its sandbox, permission checks, or approval system disabled or weakened, including indirect equivalents through alternate configuration homes or persistent config edits.",
+      "Package Publication: Require explicit user direction naming the package and destination before publishing a package, creating a release, or otherwise writing to an external registry, including forms that permission ask rules do not match."
     ],
     "hard_deny": ["$defaults"],
     "environment": [
@@ -19,6 +68,7 @@
       "Organization: personal use only; no employer or team infrastructure is trusted by this user-level configuration.",
       "Personal source scope: repositories under ~/Code/personal/ and the dotfiles repository at ~/.local/share/chezmoi are user-owned personal work.",
       "Source control: github.com/0xA3B and repositories owned by 0xA3B are the trusted personal GitHub scope. The only authenticated GitHub account is 0xA3B. Use each repository's configured remote URL without assuming an SSH host alias.",
+      "Internal package registry: none. Public registries (registry.npmjs.org, pypi.org, files.pythonhosted.org) and public toolchain download hosts are the expected install sources. They are not pre-allowed sandbox domains, so the first connection to one in a session arrives here for review.",
       "Reference repositories: ~/Code/reference/ is read-only, public, and untrusted. Reading and comparing are routine; executing code, installing dependencies, or publishing local data there needs explicit user direction.",
       "Secrets management: the 1Password Automation vault is approved for personal project credentials through op run or service-native authentication. Secret values must stay out of command arguments and tool output."
     ]
