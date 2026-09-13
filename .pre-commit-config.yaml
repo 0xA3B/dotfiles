@@ -24,6 +24,7 @@ repos:
         stages: [pre-commit, manual]
 
       - id: check-yaml
+        exclude: ^pnpm-lock\.yaml$
         stages: [pre-commit, manual]
 
   - repo: local
