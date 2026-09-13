@@ -1,0 +1,34 @@
+# Review Notion operations by workspace, destination, and payload. Keep service
+# hosts off the network allowlist so nested scripts also encounter network review.
+prefix_rule(
+    pattern = ["ntn"],
+    decision = "prompt",
+    justification = "Review Notion commands for authorized workspace, destination, and operation.",
+    match = ["ntn whoami", "ntn api v1/search -X POST", "ntn auth token"],
+    not_match = ["git status"],
+)
+
+prefix_rule(
+    pattern = ["ntn", "auth", "token"],
+    decision = "forbidden",
+    justification = "Do not print authentication tokens; use ntn whoami or ntn doctor.",
+    match = ["ntn auth token", "ntn auth token --verbose"],
+    not_match = ["ntn whoami", "ntn auth --help"],
+)
+
+# Other flag placements and wrappers remain subject to contextual credential denial.
+prefix_rule(
+    pattern = ["ntn", ["-v", "--verbose"], "auth", "token"],
+    decision = "forbidden",
+    justification = "Do not print authentication tokens; use ntn whoami or ntn doctor.",
+    match = ["ntn -v auth token", "ntn --verbose auth token"],
+    not_match = ["ntn --verbose whoami"],
+)
+
+prefix_rule(
+    pattern = ["ntn", "auth", ["-v", "--verbose"], "token"],
+    decision = "forbidden",
+    justification = "Do not print authentication tokens; use ntn whoami or ntn doctor.",
+    match = ["ntn auth -v token", "ntn auth --verbose token"],
+    not_match = ["ntn auth --help"],
+)

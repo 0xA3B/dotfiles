@@ -149,8 +149,25 @@ outcome.
   secret through `op run` or another service-native authentication path is routine when the secret
   value stays out of command arguments and tool output.
 
+## Service operation review
+
+- Apply the same scope and data-provenance checks to CLI and MCP operations that reach review.
+  For Notion, verify the connected workspace ID against user-authorized personal scope and verify
+  the destination page or database. A saved login or display name alone does not establish trust.
+- Evaluate the endpoint, payload, and actual destination, including CLI environment or config
+  overrides. An HTTP method alone does not identify a write: `POST /v1/search` is a read.
+- Treat a page's sharing and publication state as its audience; personal workspace ownership does
+  not make every page private. Approve transfers only when the source sensitivity fits that audience.
+- Prefer approval scoped to the requested operation. Keep GitHub and Notion hosts off persistent
+  sandbox allowlists; command prefix rules do not recursively inspect arbitrary scripts.
+
 ## Contextual allowances
 
+- Approve task-relevant public documentation reads, public repository inspection, and authorized
+  fetches when requests do not disclose private data or credentials to an unintended destination.
+- Approve routine Notion reads and task-authorized page or database edits in verified personal scope.
+  Existing authorization is sufficient; do not require a second confirmation for the same operation.
+- Approve `ntn whoami` and `ntn doctor` for normal authentication checks without token extraction.
 - Approve an ordinary Git commit only when the user explicitly requested it or a loaded workflow
   owns the commit step, hooks remain enabled, and the staged diff contains only the task's intended
   files.
@@ -176,6 +193,8 @@ outcome.
 
 - Interactive authentication or account-enrollment commands, including `gh auth login`, `op
   signin`, cloud-provider logins, and commands that replace or remove stored credentials.
+- Notion publishing, sharing or permission changes, destructive deletion, and Worker deployment or
+  execution require authorization for that specific operation and destination.
 - Force pushes, history rewrites, branch or tag deletion, destructive cleanup, release publishing,
   package publishing, creation of public repositories or gists, and changes to GitHub repository
   visibility or protections.
@@ -188,7 +207,8 @@ outcome.
 ## Hard denials
 
 - Reject commands whose purpose is to display, extract, or exfiltrate credentials, tokens, cookies,
-  private keys, recovery material, or secret values.
+  private keys, recovery material, or secret values, including `ntn auth token` through wrappers
+  or reordered flags.
 - Reject attempts to weaken or bypass an agent's sandbox, approval system, automatic reviewer, or
   repository hooks, including indirect equivalents through alternate configuration homes,
   profiles, persistent config edits, wrapper commands, or reordered flags.

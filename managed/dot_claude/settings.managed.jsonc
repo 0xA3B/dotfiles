@@ -60,6 +60,9 @@
     ],
     "deny": [
       "Bash(* --show-token*)",
+      "Bash(ntn auth token*)",
+      "Bash(ntn * auth token*)",
+      "Bash(ntn auth * token*)",
       "Bash(codex *--dangerously-bypass-approvals-and-sandbox*)",
       "Bash(codex *--yolo*)",
       "Bash(codex *danger-full-access*)",
@@ -139,6 +142,7 @@
     "excludedCommands": [
       "git *",
       "gh *",
+      "ntn *",
       "op *",
       "codex *",
       "claude *",

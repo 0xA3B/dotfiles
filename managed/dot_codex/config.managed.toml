@@ -68,9 +68,8 @@ enable_socks5_udp = false
 "dl.google.com" = "allow"
 "static.rust-lang.org" = "allow"
 
-# Other common and useful APIs
-"api.github.com" = "allow"
-"github.com" = "allow"
+# Keep GitHub and Notion service hosts unlisted: scripts and subprocesses must encounter
+# network review even when their invocation does not match a CLI prefix rule.
 
 [permissions.personal-workspace]
 description = "Extends current-workspace with write access to ~/Code/personal."

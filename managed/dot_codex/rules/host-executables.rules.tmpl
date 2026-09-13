@@ -26,6 +26,15 @@ host_executable(
 )
 
 host_executable(
+    name = "ntn",
+    paths = [
+        "{{ .chezmoi.homeDir }}/.local/bin/ntn",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/shims/ntn",
+        "{{ .chezmoi.homeDir }}/.local/share/mise/installs/npm-ntn/latest/node_modules/.bin/ntn",
+    ],
+)
+
+host_executable(
     name = "op",
     paths = [
         "/opt/homebrew/bin/op",
