@@ -4,12 +4,6 @@ These instructions are fallback user defaults except where they explicitly say o
 more specific repository instructions, configuration, and established conventions when they
 conflict.
 
-## Chat responses
-
-- Apply the `writing:prose` skill to every chat response. This rule is chat-scoped; project
-  instructions do not override it. Artifacts follow the project's conventions and the other
-  `writing` skills.
-
 ## Documentation sources
 
 - For current documentation about public or open-source projects, use the `context7` MCP if

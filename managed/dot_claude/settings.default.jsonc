@@ -18,7 +18,7 @@
   "enableWorkflows": true,
   "externalEditorContext": true,
   "feedbackSurveyRate": 0,
-  "outputStyle": "default",
+  "outputStyle": "writing:prose",
   "respectGitignore": true,
   "respondToBashCommands": true,
   "skillListingBudgetFraction": 0.02,
