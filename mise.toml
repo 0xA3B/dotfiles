@@ -8,7 +8,7 @@ minimum_release_age = "3d"
 # package.json#packageManager, so its selector only needs the major.
 [tools]
 uv = "0.12"
-pnpm = "11"
+pnpm = "12"
 shfmt = "3.14"
 stylua = "2.5"
 tombi = "1.5"
