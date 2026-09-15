@@ -1,37 +1,42 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 #:tombi schema.strict = false
 
-model_reasoning_effort = "high"
+model_reasoning_summary = "auto"
 personality = "pragmatic"
 default_permissions = "current-workspace"
 
+[features]
+memories = false
+default_mode_request_user_input = true  # Allow the ask user question tools outside of plan mode
+
+[agents]
+default_subagent_model = "gpt-5.6-sol"
+
+[memories]
+generate_memories = false
+use_memories = false
+
 [desktop]
 ambient-suggestions-enabled = false
-appearanceLightCodeThemeId = "codex"
-appearanceDarkCodeThemeId = "codex"
+appearanceLightCodeThemeId = "catppuccin"
+appearanceDarkCodeThemeId = "catppuccin"
 codeFontSize = 12
 composerEnterBehavior = "cmdAlways"
 reviewDelivery = "inline"
 preventSleepWhileRunning = true
 keepRemoteControlAwakeWhilePluggedIn = true
-git-show-sidebar-pr-icons = true
 show-context-window-usage = true
 dock-icon-preference = "codex-system"
 conversationDetailMode = "STEPS_COMMANDS"
 git-branch-prefix = ""
-git-create-pull-request-as-draft = false
 composerPlainTextMode = true
 followUpQueueMode = "steer"
-usePointerCursors = false
 
 [desktop.appearanceLightChromeTheme.fonts]
 code = "FiraCode Nerd Font Mono"
 
 [desktop.appearanceDarkChromeTheme.fonts]
 code = "FiraCode Nerd Font Mono"
-
-[agents]
-default_subagent_model = "gpt-5.6-sol"
 
 [shell_environment_policy]
 inherit = "all"
