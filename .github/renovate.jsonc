@@ -1,74 +1,134 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":enablePreCommit"],
+  "extends": ["config:recommended", ":semanticCommits", ":enablePreCommit"],
   "timezone": "America/New_York",
-  // Weekly cadence matching the previous Dependabot schedule (Friday mornings).
+  // Fridays, midnight–9:59 AM Eastern.
   "schedule": ["* 0-9 * * 5"],
-  // Three-day cooldown, consistent with pnpm minimumReleaseAge, mise
-  // minimum_release_age, and uv exclude-newer.
+  // Match the pnpm, mise, and uv cooldowns.
   "minimumReleaseAge": "3 days",
-  // Direct dependencies are intentionally unbounded (see AGENTS.md Dependency
-  // policy); in-range updates must land as lockfile-only PRs.
+  // Preserve unbounded dependencies; update in-range versions only in lockfiles.
   "rangeStrategy": "update-lockfile",
-  // Rebase open PRs whenever main moves so every merge candidate carries a
-  // fresh head and complete checks against the current base.
+  // Keep PR checks current with main.
   "rebaseWhen": "behind-base-branch",
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
   "labels": ["dependencies"],
-  // Full transitive refresh, replacing the old local uv lock --upgrade /
-  // pnpm up workflow.
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["* 0-9 * * 5"]
+    // First Saturday each month, midnight–9:59 AM Eastern.
+    "schedule": ["* 0-9 1-7 * 6"]
   },
-  // PEP 723 inline deps in chezmoi modify scripts (which are not *.py, so the
-  // manager's opt-in file matching needs this pattern). Scripts declare
-  // major-bounded ranges with no lockfile, so in-range releases produce no
-  // PRs; only an out-of-range release (a new major) proposes a range bump.
+  // Bypass Renovate cooldowns for security fixes.
+  "vulnerabilityAlerts": {
+    "minimumReleaseAge": null,
+    "labels": ["dependencies", "security"]
+  },
+  // Match extensionless modify scripts. Inline dependencies have no lockfile;
+  // only releases outside their major-bounded ranges trigger PRs.
   "pep723": {
     "managerFilePatterns": ["/(^|/)modify_[^/]+$/"]
   },
   "packageRules": [
-    { "matchManagers": ["npm"], "groupName": "npm dependencies" },
-    { "matchManagers": ["pep621", "pep723"], "groupName": "python dependencies" },
-    { "matchManagers": ["github-actions"], "groupName": "github actions" },
-    { "matchManagers": ["pre-commit"], "groupName": "pre-commit hooks" },
-    { "matchManagers": ["mise"], "groupName": "mise tools" },
     {
-      // The mise manager's GitHub datasources default to coerced semver, which has no range
-      // support and rewrites a selector like "3" to an exact version. npm versioning keeps
-      // in-range releases silent and moves the bound with the same shape ("3.13" -> "3.14").
+      "description": "Group npm updates",
+      "matchManagers": ["npm"],
+      "groupName": "npm dependencies"
+    },
+    {
+      "description": "Automerge stable npm patches",
+      "matchManagers": ["npm"],
+      "matchCurrentVersion": "!/^0/",
+      "matchUpdateTypes": ["patch"],
+      "groupName": "npm stable patch dependencies",
+      // Longer cooldown for automerge; Friday runs mean a 7–14-day delay.
+      "minimumReleaseAge": "7 days",
+      "automerge": true
+    },
+    {
+      "description": "Separate npm majors",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "npm major dependencies"
+    },
+    {
+      "description": "Group Python updates",
+      "matchManagers": ["pep621", "pep723"],
+      "groupName": "python dependencies"
+    },
+    {
+      "description": "Automerge stable locked Python patches",
+      // Keep inline dependency range changes subject to review.
+      "matchManagers": ["pep621"],
+      "matchCurrentVersion": "!/^0/",
+      "matchUpdateTypes": ["patch"],
+      "groupName": "python stable patch dependencies",
+      "minimumReleaseAge": "7 days",
+      "automerge": true
+    },
+    {
+      "description": "Separate Python majors",
+      "matchManagers": ["pep621", "pep723"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "python major dependencies"
+    },
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    },
+    {
+      "description": "Group pre-commit updates",
+      "matchManagers": ["pre-commit"],
+      "groupName": "pre-commit hooks"
+    },
+    {
+      "description": "Group mise tool updates",
+      "matchManagers": ["mise"],
+      "groupName": "mise tools"
+    },
+    {
+      "description": "Preserve mise ranges with npm versioning",
+      // Default coerced semver replaces ranges with exact versions.
       "matchManagers": ["mise"],
       "versioning": "npm"
     },
     {
-      // pnpm and uv enforce the cooldown while regenerating their lockfiles.
+      "description": "Separate lockfile maintenance; let pnpm and uv enforce cooldowns",
       "matchManagers": ["npm", "pep621"],
       "matchUpdateTypes": ["lockFileMaintenance"],
+      "groupName": null,
       "minimumReleaseAge": null
     },
     {
-      // mise can select newly published backend artifacts after the tool version passes the
-      // cooldown, so keep its full lock refresh manual.
+      "description": "Keep mise lockfile refreshes manual",
+      // Backend artifacts can bypass the tool cooldown.
       "matchManagers": ["mise"],
       "matchUpdateTypes": ["lockFileMaintenance"],
       "enabled": false
     },
-    // Runtime versions are managed manually: never update .node-version or
-    // .python-version, requires-python in pyproject.toml, package.json
-    // engines, or the node/python pins in mise configs (the managed global
-    // mise config pins both). These disable rules are last so they win over
-    // the groups.
-    { "matchManagers": ["nodenv", "pyenv"], "enabled": false },
+    // Keep runtime exclusions last so they take precedence.
     {
+      "description": "Keep Node.js and Python version files manual",
+      "matchManagers": ["nodenv", "pyenv"],
+      "enabled": false
+    },
+    {
+      "description": "Keep mise runtime versions manual",
       "matchManagers": ["mise"],
       "matchPackageNames": ["node", "python"],
       "enabled": false
     },
     {
+      "description": "Keep the Python requirement manual",
       "matchManagers": ["pep621"],
       "matchDepTypes": ["requires-python"],
       "enabled": false
     },
-    { "matchManagers": ["npm"], "matchDepTypes": ["engines"], "enabled": false }
+    {
+      "description": "Keep npm engine constraints manual",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["engines"],
+      "enabled": false
+    }
   ]
 }
