@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Create, attach to, or switch to the tmux session for a directory.
+
+Lives on PATH so fish, zsh, and other callers share one implementation. Uses
+Python's standard library for path normalization and session-name encoding.
+Requires tmux on PATH and a terminal when attaching from outside tmux.
+
+Usage:
+
+    tmx              # Use the current directory.
+    tmx ~/x/y/z      # Use another directory without changing the caller's cwd.
+    tmx -- -project  # Use a relative directory whose name starts with a dash.
+
+Paths must name existing directories. Relative paths, home-directory prefixes,
+and symlinks resolve to a canonical absolute path. Each directory has its own
+session; tmx does not search for a Git root.
+
+Session names start with "tmx" followed by the full canonical path. Percent
+encoding preserves distinct names while escaping spaces, Unicode, percent signs,
+and tmux's special characters. For example, /tmp/a.b becomes tmx/tmp/a%2Eb,
+while /tmp/a%2Eb becomes tmx/tmp/a%252Eb. Slashes remain readable.
+
+If the session does not exist, tmx creates it with its first pane in that
+directory. Outside tmux, tmx attaches to the session; inside tmux, it switches
+the current client, using TMUX to select the behavior. Existing windows,
+processes, pane directories, and other clients are left in place.
+
+Sessions use the current tmux server and configuration. Renaming or moving a
+directory gives it a new session name; tmx does not rename or remove old sessions.
+"""
+
+import argparse
+import os
+import subprocess
+import sys
+from pathlib import Path
+from urllib.parse import quote_from_bytes
+
+
+def session_exists(target: str) -> bool:
+    """Check an exact session target without printing missing-server errors."""
+    return (
+        subprocess.run(  # noqa: S603
+            ["tmux", "has-session", "-t", target],  # noqa: S607
+            capture_output=True,
+        ).returncode
+        == 0
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Resolve the requested directory and connect to its tmux session."""
+    parser = argparse.ArgumentParser(
+        prog="tmx", description="Create, attach to, or switch to a directory's tmux session."
+    )
+    parser.add_argument("directory", nargs="?", default=".", help="directory (default: current)")
+    args = parser.parse_args(argv)
+    try:
+        directory = Path(args.directory).expanduser().resolve(strict=True)
+        if not directory.is_dir():
+            parser.error(f"not a directory: {args.directory}")
+    except (OSError, RuntimeError) as error:
+        parser.error(f"cannot open directory {args.directory!r}: {error}")
+
+    # quote leaves dots unescaped, but tmux replaces them in session names.
+    name = "tmx" + quote_from_bytes(os.fsencode(directory), safe="/").replace(".", "%2E")
+    target = "=" + name
+    try:
+        if not session_exists(target):
+            result = subprocess.run(  # noqa: S603
+                ["tmux", "new-session", "-d", "-s", name, "-c", str(directory).replace("#", "##")],  # noqa: S607
+                capture_output=True,
+                text=True,
+            )
+            # Another invocation may have created this session after our check.
+            if result.returncode and not session_exists(target):
+                print(
+                    f"tmx: {result.stderr.strip() or 'could not create session'}", file=sys.stderr
+                )
+                return result.returncode
+        command = "switch-client" if os.environ.get("TMUX") else "attach-session"
+        os.execvp("tmux", ["tmux", command, "-t", target])  # noqa: S606, S607
+    except FileNotFoundError:
+        print("tmx: tmux was not found on PATH", file=sys.stderr)
+        return 127
+    except OSError as error:
+        print(f"tmx: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -52,3 +52,6 @@ switch_case_indent = true
 [managed/dot_zshrc]
 shell_variant = zsh
 switch_case_indent = true
+
+[managed/dot_local/bin/executable_tmx]
+indent_size = 4
