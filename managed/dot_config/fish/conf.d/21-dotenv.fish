@@ -154,11 +154,13 @@ function _dotenv_apply
     # Find common prefix length between current stack and target
     set -l common 0
     set -l max_common (math "min("(count $_dotenv_stack)","(count $target)")")
-    for i in (seq 1 $max_common)
-        if test "$_dotenv_stack[$i]" = "$target[$i]"
-            set common $i
-        else
-            break
+    if test $max_common -gt 0
+        for i in (seq 1 $max_common)
+            if test "$_dotenv_stack[$i]" = "$target[$i]"
+                set common $i
+            else
+                break
+            end
         end
     end
 
