@@ -2,12 +2,6 @@
 # Based on zen tmux configuration
 # https://dreamsofcode.io/blog/zen-tmux-configuration
 
-# List of plugins
-set -g @plugin "tmux-plugins/tpm"
-set -g @plugin "tmux-plugins/tmux-sensible"
-set -g @plugin "tmux-plugins/tmux-yank"
-set -g @plugin "catppuccin/tmux"
-
 # Set catppuccin theme to either latte, frappe, macchiato or mocha
 set -g @catppuccin_flavor "mocha"
 
@@ -15,8 +9,23 @@ set -g @catppuccin_flavor "mocha"
 set-option -sa terminal-overrides ",xterm*:Tc"
 set-option -gw xterm-keys on
 
-# Set default shell
+{{ if eq .chezmoi.os "darwin" -}}
+# macOS Options
+
+## Set default shell
 set-option -g default-shell "/opt/homebrew/bin/fish"
+
+## Copy selections to the macOS clipboard, including mouse selections
+set -s copy-command "pbcopy"
+
+{{ end -}}
+# General options
+set -g history-limit 50000
+set -g display-time 4000
+set -g status-interval 5
+set -g status-keys emacs
+set -g focus-events on
+setw -g aggressive-resize on
 
 # Enable mouse control
 set -g mouse on
@@ -34,6 +43,10 @@ unbind '"'
 unbind %
 bind | split-window -h
 bind - split-window -v
+
+# switch windows using prefix C-p and C-n
+bind C-p previous-window
+bind C-n next-window
 
 # switch panes using Alt arrow without prefix
 unbind M-h
@@ -66,12 +79,12 @@ setw -g pane-base-index 1
 # Vim-style copy mode bindings
 bind-key -T copy-mode-vi v send-keys -X begin-selection
 bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
-bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel
 
 # Other key bindings
 
-# Reload tmux config
+## Reload tmux config
 bind R source-file ~/.config/tmux/tmux.conf \; display-message "Tmux config reloaded!"
 
-# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
-run '~/.config/tmux/plugins/tpm/tpm'
+# Load the catppuccin theme, installed by .chezmoiexternal.toml (keep this line at the very bottom of tmux.conf)
+run '~/.config/tmux/plugins/catppuccin/tmux/catppuccin.tmux'

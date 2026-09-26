@@ -81,6 +81,9 @@ chezmoi. Preserve these outcomes:
   perform routine lockfile refreshes; regenerate a lockfile locally when a requested dependency
   change requires a new resolution.
 - Update major Node.js and Python runtime versions manually; Renovate must not update them.
+- Pin each external in `managed/.chezmoiexternal.toml` to a release tag and its `checksum.sha256`.
+  Renovate does not track these externals; review and update them manually during routine dependency
+  maintenance, selecting only releases that meet the cooldown.
 - Require a three-day cooldown before selecting releases from public registries and tool sources.
   Enforce it in every resolver and updater that can select those releases: Renovate, pnpm, mise, and
   uv.

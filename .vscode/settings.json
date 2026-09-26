@@ -14,7 +14,7 @@
     "**/dot_config/fish/themes/*.theme": "shellscript",
     "**/dot_config/ghostty/config": "properties",
     "**/dot_config/git/ignore": "ignore",
-    "**/dot_config/tmux/tmux.conf": "shellscript",
+    "**/dot_config/tmux/tmux.conf.tmpl": "shellscript",
     "**/dot_config/uv/modify_uv.toml": "python",
     "**/dot_config/yamllint/config": "yaml",
     "**/dot_config/zsh/completions/_*": "shellscript",

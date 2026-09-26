@@ -1,0 +1,7 @@
+# Update the version in the URL and the checksum together.
+[".config/tmux/plugins/catppuccin/tmux"]
+type = "archive"
+url = "https://github.com/catppuccin/tmux/archive/refs/tags/v2.3.1.tar.gz"
+checksum.sha256 = "104c794a99336c75a1c4d52e03a1316732ddee3c615aa3bd2e80bb30f77183df"
+exact = true
+stripComponents = 1
