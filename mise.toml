@@ -1,14 +1,14 @@
 [settings]
-idiomatic_version_file_enable_tools = ["node", "python"]
+# Read node, python, and pnpm versions from .node-version, .python-version, and
+# package.json#packageManager, so each has one canonical version source outside [tools].
+idiomatic_version_file_enable_tools = ["node", "python", "pnpm"]
 lockfile = true
 minimum_release_age = "3d"
 
 # Formatter, linter, and toolchain selectors are bounded at the minor version because their
-# minor releases change output; mise.lock pins the exact release. pnpm follows
-# package.json#packageManager, so its selector only needs the major.
+# minor releases change output; mise.lock pins the exact release.
 [tools]
 uv = "0.12"
-pnpm = "12"
 shfmt = "3.14"
 stylua = "2.5"
 tombi = "1.5"
