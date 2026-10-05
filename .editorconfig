@@ -49,6 +49,9 @@ tab_width = 8
 shell_variant = zsh
 switch_case_indent = true
 
+[managed/dot_bashrc]
+shell_variant = bash
+
 [managed/dot_zshrc]
 shell_variant = zsh
 switch_case_indent = true

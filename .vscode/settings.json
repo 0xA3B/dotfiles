@@ -31,6 +31,7 @@
     "**/dot_gitconfig-work.tmpl": "properties",
     "**/dot_npmrc.managed": "properties",
     "**/modify_private_dot_npmrc": "python",
+    "**/dot_bashrc": "shellscript",
     "**/dot_vimrc": "Vimscript",
     "**/dot_zshrc": "shellscript",
     "**/run_onchange_generate-completions.sh.tmpl": "shellscript",

@@ -2,6 +2,7 @@
 
 ## Claude Code shell environment
 
-- The Bash tool runs in a snapshot of the user's interactive shell taken at session start, so mise
-  is already activated and `mise exec --` is not needed. A `mise.toml` change to `[tools]` or
-  `[env]` reaches the Bash tool only after a new session starts.
+- Before each Bash command, a SessionStart hook applies mise's environment for the command's
+  starting directory, so run mise-managed tools directly. After a `cd` inside the same command line,
+  run tools with `mise exec --`. Changes to shell configuration or the launching environment reach
+  the Bash tool only in a new session.
