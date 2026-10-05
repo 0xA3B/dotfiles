@@ -28,10 +28,12 @@ conflict.
 
 ## Command execution
 
-- The Bash tool runs in a snapshot of the user's interactive shell taken at session start, with mise
-  already activated. Run mise-managed tools directly; `mise exec --` is unnecessary. Edits to shell
-  configuration, `mise.toml`, or other activation-time state reach the Bash tool only after a new
-  session starts.
+- Before each Bash command, a SessionStart hook applies mise's environment for the command's
+  starting directory, so run mise-managed tools directly. Edits to mise config take effect on the
+  next command. After a `cd` inside the same command line, run tools with `mise exec --`. The hook
+  skips untrusted mise configs without a warning. If a tool resolves to an unexpected version, check
+  `mise trust --show`, and ask the user before trusting a config. Changes to shell configuration or
+  the launching environment reach the Bash tool only in a new session.
 - Commands excluded from the sandbox, such as `git`, `gh`, and `op`, resolve `$TMPDIR` to a
   different directory than sandboxed commands. To hand a file from a sandboxed command to an
   excluded one, write it under the working directory in a Git-ignored location instead of `$TMPDIR`.

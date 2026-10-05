@@ -5,9 +5,25 @@
     "pr": ""
   },
   "env": {
-    "CLAUDE_CODE_SHELL": "/bin/zsh",
+    "CLAUDE_CODE_SHELL": "/opt/homebrew/bin/bash",
     "ENABLE_TOOL_SEARCH": "true",
     "NODE_USE_SYSTEM_CA": "1"
+  },
+  // Claude Code runs CLAUDE_ENV_FILE text before every Bash command, so mise applies the
+  // environment of each command's starting directory. The shell snapshot keeps no exports, so this
+  // cannot live in ~/.bashrc. `-s bash` must match CLAUDE_CODE_SHELL. The hook reruns on
+  // compaction and appends to the same file, so the grep guard keeps the line from repeating.
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "grep -qsF 'mise hook-env' \"$CLAUDE_ENV_FILE\" || echo 'eval \"$(mise hook-env -s bash 2>/dev/null)\"' >> \"$CLAUDE_ENV_FILE\""
+          }
+        ]
+      }
+    ]
   },
   // The marketplace plugins replace these bundled skills; keep them reachable only by name.
   "skillOverrides": {
