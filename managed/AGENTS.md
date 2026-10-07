@@ -28,11 +28,20 @@ More specific `AGENTS.md` files retain implementation details for their director
 ## Reference Agent Configuration
 
 - [`dot_claude`](dot_claude) and [`dot_codex`](dot_codex) contain public-safe agent configuration.
-  Their overlays, including `AGENTS.default.md` and `CLAUDE.default.md`, remain permanently
-  source-only. Future adjacent modify scripts must read those overlays directly from source state.
-- Treat `dot_codex/AGENTS.default.md` as canonical for shared personal guidance. When shared
-  guidance changes, update the matching section in `dot_claude/CLAUDE.default.md` in the same
-  change; keep only harness-specific rules divergent.
+  Their overlays, including `AGENTS.default.md`, remain permanently source-only. Future adjacent
+  modify scripts must read those overlays directly from source state.
+- Claude user instructions materialize as whole files through `chezmoi apply`.
+  [`claude/user.md`](.chezmoitemplates/claude/user.md) renders to `CLAUDE.md` for every Claude
+  account, and [`claude/personal-services.md`](.chezmoitemplates/claude/personal-services.md)
+  renders to `rules/personal-services.md` for the personal account only. The personal account's
+  config directory is `~/.claude-personal` on work machines and `~/.claude` elsewhere;
+  `.chezmoiignore.tmpl` selects targets by `work_machine`. Edit the templates; the one-line `.tmpl`
+  targets under `dot_claude` and `dot_claude-personal` only render them.
+- Keep `claude/user.md` true for both accounts on every machine, and `claude/personal-services.md`
+  true for the personal account on every machine. Keep machine- and account-specific guidance in
+  rule files outside this repository.
+- Edit `dot_codex/AGENTS.default.md` and the Claude templates independently. Their overlapping
+  sections may drift until the user asks to reconcile them.
 - The two harnesses review package-manager commands differently on purpose. Codex routes them to
   approval through `dot_codex/rules/package-managers.rules`. Claude keeps them sandboxed and relies
   on the sandbox's first-use host review, so `sandbox.excludedCommands` in

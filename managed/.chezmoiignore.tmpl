@@ -2,6 +2,17 @@
 # Source-state guidance should not be materialized in $HOME.
 **/AGENTS.md
 **/CLAUDE.md
+# Claude user instructions render from .chezmoitemplates and do materialize.
+!.claude/CLAUDE.md
+!.claude-personal/CLAUDE.md
+
+# The personal Claude account uses ~/.claude-personal on work machines and ~/.claude elsewhere.
+{{- if .work_machine }}
+.claude/rules/personal-services.md
+{{- else }}
+.claude-personal
+.claude-personal/**
+{{- end }}
 
 # Existing modify-script inputs are source-only.
 .npmrc.managed
@@ -9,7 +20,6 @@
 Library/Application Support/Code/User/settings.managed.jsonc
 
 # Codex and Claude overlays always remain source-only; future modify scripts read them from here.
-.claude/CLAUDE.default.md
 .claude/settings.managed.jsonc
 .claude/settings.default.jsonc
 .codex/AGENTS.default.md
@@ -20,7 +30,6 @@ Library/Application Support/Code/User/settings.managed.jsonc
 Library/Application Support/Code/User/extensions.managed.txt
 
 # Legacy whole-file agent configs remain source-only if reintroduced.
-.claude/CLAUDE.md
 .claude/settings.json
 .claude/statusline-command.sh
 .codex/AGENTS.md
