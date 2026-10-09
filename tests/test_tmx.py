@@ -1,9 +1,12 @@
 import importlib.machinery
 import importlib.util
+import os
 import shutil
+import socket
 import subprocess
 import tempfile
 from pathlib import Path
+from typing import NoReturn
 
 import pytest
 
@@ -15,17 +18,34 @@ tmx = importlib.util.module_from_spec(_spec)
 _loader.exec_module(tmx)
 
 
+def _skip_unless_ci(reason: str) -> NoReturn:
+    """Skip locally, but fail in CI, which must run the tmux integration tests."""
+    if os.environ.get("CI"):
+        pytest.fail(reason)
+    pytest.skip(reason)
+
+
 @pytest.fixture
 def tmux_server(monkeypatch):
     binary = shutil.which("tmux")
     if binary is None:
-        pytest.skip("tmux is required for session integration tests")
+        _skip_unless_ci("tmux is required for session integration tests")
     run = subprocess.run
-    # Keep the Unix socket path short and isolate the server from personal sessions.
-    with tempfile.TemporaryDirectory(prefix="tmx-", dir="/tmp") as scratch:
+    # tmp_path is too long for a Unix socket path. A private socket and config also
+    # isolate the server from personal sessions.
+    with tempfile.TemporaryDirectory(prefix="tmx-") as scratch:
+        server_socket = Path(scratch) / "socket"
+        # tmux exits 0 even when it cannot create its socket, so probe the bind directly.
+        # Sandboxes such as Claude Code's deny Unix socket binds.
+        try:
+            with socket.socket(socket.AF_UNIX) as probe:
+                probe.bind(str(server_socket))
+        except PermissionError as error:
+            _skip_unless_ci(f"cannot create tmux socket {server_socket}: {error}")
+        server_socket.unlink()
         config = Path(scratch) / "tmux.conf"
         config.write_text("set -g default-shell /bin/sh\nset -g default-command 'sleep 60'\n")
-        prefix = [binary, "-S", str(Path(scratch) / "socket"), "-f", str(config)]
+        prefix = [binary, "-S", str(server_socket), "-f", str(config)]
 
         def command(*args, **kwargs):
             return run([*prefix, *args], **kwargs)
