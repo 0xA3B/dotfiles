@@ -5,7 +5,10 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
+      # end-of-file-fixer opens every file for writing, even ones it leaves unchanged, and the
+      # Claude Code sandbox denies writes to .vscode/. oxfmt enforces the final newline there.
       - id: end-of-file-fixer
+        exclude: ^\.vscode/
         stages: [pre-commit, manual]
 
       - id: trailing-whitespace
