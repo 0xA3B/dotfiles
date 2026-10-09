@@ -16,6 +16,13 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 
+# macOS sets no runtime directory, so pnpm would keep its store locks in /tmp, which the Claude Code
+# sandbox cannot write. This one survives reboots, unlike the XDG spec's per-login directory.
+if [[ -z ${XDG_RUNTIME_DIR+x} ]]; then
+  export XDG_RUNTIME_DIR="$XDG_STATE_HOME/run"
+  [[ -d $XDG_RUNTIME_DIR ]] || mkdir -p -m 700 "$XDG_RUNTIME_DIR"
+fi
+
 # Move-to-front keeps ~/.local/bin ahead of Homebrew in inherited PATHs so
 # shims there (e.g. the op service-account shim) shadow the real binaries.
 if [[ -d $HOME/.local/bin ]]; then

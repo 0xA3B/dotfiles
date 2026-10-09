@@ -168,16 +168,8 @@
       "ssh *",
       "sudo *"
     ],
-    // pnpm keeps its store operation locks in a /tmp directory named for the user id instead of
-    // $TMPDIR. 501 is the uid of the first account on macOS.
     "filesystem": {
-      "allowWrite": [
-        "~/.cache",
-        "~/Library/Caches",
-        "~/.local/share",
-        "~/.local/state",
-        "/private/tmp/pnpm-store-operation-locks-501"
-      ]
+      "allowWrite": ["~/.cache", "~/Library/Caches", "~/.local/share", "~/.local/state"]
     },
     // No host is pre-allowed: the first sandboxed connection to any host in a session is reviewed
     // together with the command that opened it. Credentialed tools such as git and gh are excluded
