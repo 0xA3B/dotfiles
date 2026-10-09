@@ -51,6 +51,16 @@
       "groupName": "npm major dependencies"
     },
     {
+      "description": "Update pnpm in its own PR; mise.lock needs a manual refresh",
+      // mise reads pnpm from package.json#packageManager, so a bump also needs a mise.lock
+      // entry, which Renovate's npm manager cannot write. An ungrouped PR keeps that failure
+      // from blocking other npm updates.
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["packageManager"],
+      "groupName": null,
+      "automerge": false
+    },
+    {
       "description": "Group Python updates",
       "matchManagers": ["pep621", "pep723"],
       "groupName": "python dependencies"
