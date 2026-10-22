@@ -37,6 +37,10 @@ More specific `AGENTS.md` files retain implementation details for their director
   config directory is `~/.claude-personal` on work machines and `~/.claude` elsewhere;
   `.chezmoiignore.tmpl` selects targets by `work_machine`. Edit the templates; the one-line `.tmpl`
   targets under `dot_claude` and `dot_claude-personal` only render them.
+- Claude keybindings materialize the same way:
+  [`claude/keybindings.json`](.chezmoitemplates/claude/keybindings.json) renders to
+  `keybindings.json` for every Claude account. Its `meta+enter` binding depends on the `cmd+enter`
+  keybind in [`dot_config/ghostty/config`](dot_config/ghostty/config); change them together.
 - Keep `claude/user.md` true for both accounts on every machine, and `claude/personal-services.md`
   true for the personal account on every machine. Keep machine- and account-specific guidance in
   rule files outside this repository.

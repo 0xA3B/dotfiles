@@ -11,6 +11,7 @@
     "**/.chezmoiignore.tmpl": "ignore",
     "**/.chezmoiremove": "ignore",
     "**/dot_claude*/CLAUDE.md.tmpl": "markdown",
+    "**/dot_claude*/keybindings.json.tmpl": "json",
     "**/dot_claude*/rules/*.md.tmpl": "markdown",
     "**/dot_codex/rules/host-executables.rules.tmpl": "codex-rules",
     "**/dot_config/fish/themes/*.theme": "shellscript",
