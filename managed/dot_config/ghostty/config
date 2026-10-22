@@ -10,5 +10,6 @@ clipboard-trim-trailing-spaces = true
 # SSH fix for terminfo
 shell-integration-features = ssh-env
 
-# Claude Code compatibility
-keybind = shift+enter=text:\x1b\r
+# Claude Code: Cmd+Enter submits. tmux drops the Cmd modifier, so send Meta+Enter, which the
+# managed Claude keybindings bind to chat:submit; plain Enter inserts a newline there.
+keybind = cmd+enter=text:\x1b\r
