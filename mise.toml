@@ -1,18 +1,19 @@
 [settings]
-# Read node, python, and pnpm versions from .node-version, .python-version, and
-# package.json#packageManager, so each has one canonical version source outside [tools].
-idiomatic_version_file_enable_tools = ["node", "python", "pnpm"]
+# Read node and python versions from package.json#devEngines.runtime and .python-version, so
+# each has one canonical version source outside [tools].
+idiomatic_version_file_enable_tools = ["node", "python"]
 lockfile = true
 minimum_release_age = "3d"
 
-# Formatter, linter, and toolchain selectors are bounded at the minor version because their
-# minor releases change output; mise.lock pins the exact release.
+# Track the latest release and let CI catch breaking changes; mise.lock pins the exact release.
+# Bound a selector only to defer a specific incompatibility.
 [tools]
-uv = "0.12"
-shfmt = "3.14"
-stylua = "2.5"
-tombi = "1.5"
-yamllint = "1.38"
+pnpm = "latest"
+uv = "latest"
+shfmt = "latest"
+stylua = "latest"
+tombi = "latest"
+yamllint = "latest"
 
 [tasks.check]
 depends = ["format:check", "lint", "typecheck", "test"]

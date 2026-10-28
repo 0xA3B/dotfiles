@@ -34,7 +34,7 @@ These instructions apply to the managed source rules under `managed/dot_codex/ru
   flags like `-C`, add explicit rules for those forms instead of assuming they match.
 - Define common absolute installation paths in `host-executables.rules.tmpl`, and test basename and
   absolute forms together with `--resolve-host-executables`.
-- Keep mise installation paths in that template synchronized with `.node-version`,
+- Keep mise installation paths in that template synchronized with `package.json#devEngines.runtime`,
   `.python-version`, and the tool definitions in `mise.toml`.
 - Keep `justification` short, specific, and public-safe.
 
