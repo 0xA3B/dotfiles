@@ -47,10 +47,12 @@ More specific `AGENTS.md` files retain implementation details for their director
 - Edit `dot_codex/AGENTS.default.md` and the Claude templates independently. Their overlapping
   sections may drift until the user asks to reconcile them.
 - The two harnesses review package-manager commands differently on purpose. Codex routes them to
-  approval through `dot_codex/rules/package-managers.rules`. Claude keeps them sandboxed and relies
-  on the sandbox's first-use host review, so `sandbox.excludedCommands` in
-  `dot_claude/settings.managed.jsonc` lists only credentialed or sandbox-incompatible tools. Keep
-  package registries out of the Claude sandbox `allowedDomains` so that review still fires.
+  approval through `dot_codex/rules/package-managers.rules`. Claude keeps them sandboxed, where
+  server-side auto-mode review covers every sandboxed command. `sandbox.excludedCommands` in
+  `dot_claude/settings.managed.jsonc` lists only commands that need what the sandbox withholds:
+  commit signing, SSH remotes, or credentials outside it. The package registries and GitHub hosts in
+  its `allowedDomains` rely on that server-side review; where review runs locally, remove them so
+  the per-command host review fires.
 - Codex `.rules` files under `dot_codex/rules/` and `dot_claude/executable_statusline-command.sh`
   materialize through `chezmoi apply`. Treat edits to those files as active configuration changes;
   editing an ignored overlay does not change the corresponding live configuration.
