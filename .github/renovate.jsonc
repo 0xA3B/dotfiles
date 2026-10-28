@@ -88,9 +88,11 @@
       "automerge": true
     },
     {
-      "description": "Let pnpm, uv, and mise enforce lockfile maintenance cooldowns",
+      "description": "Combine lockfile maintenance; let pnpm, uv, and mise enforce cooldowns",
+      // Clear the ecosystem group names, which otherwise split maintenance into one PR per group.
       "matchManagers": ["npm", "pep621", "mise"],
       "matchUpdateTypes": ["lockFileMaintenance"],
+      "groupName": null,
       "minimumReleaseAge": null
     },
     {
