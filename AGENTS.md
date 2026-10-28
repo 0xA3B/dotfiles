@@ -38,8 +38,8 @@ chezmoi. Preserve these outcomes:
 
 - Use Conventional Commits.
 - Use mise for runtime management and project tasks.
-- `.node-version` and `.python-version` are the canonical runtime versions;
-  `package.json#packageManager` is the canonical pnpm version.
+- `package.json#devEngines.runtime` and `.python-version` are the canonical runtime versions;
+  `mise.toml` is the canonical pnpm version.
 - When a command relies on a runtime tool managed by mise, run it with `mise exec --` in
   non-interactive shells.
 - Use the `mise.toml` task surface (`mise run`) for validation and formatting instead of raw tool
@@ -71,15 +71,18 @@ chezmoi. Preserve these outcomes:
 - When a transitive dependency must be constrained, use the owning package manager's constraint or
   override mechanism. Do not declare it as a direct dependency solely to control its resolved
   version.
-- Specify mise tools and PEP 723 script dependencies with compatibility ranges bounded at the
-  intended breaking-change boundary. For formatters, linters, and toolchains, whose minor releases
-  change their output, bound the range at the minor version.
-- Refresh the `mise.lock` pnpm entry with `mise lock pnpm` whenever `package.json#packageManager`
-  changes. Renovate's pnpm PR updates only `package.json` and `pnpm-lock.yaml`, so its
-  `mise install --locked` CI step fails until the lock entry is added.
-- Take in-range mise tool releases into `mise.lock` with `mise lock --bump`. Treat a Renovate PR
-  that moves a tool's bound as the signal to adopt the next minor, either by merging it or by
-  bumping manually and closing it.
+- Set `mise.toml` tools to `latest` and let CI catch breaking releases; add a bound only to defer a
+  specific incompatibility. Renovate updates `latest` selectors through `mise.lock` but does not
+  widen a range in a file that `mise.lock` covers.
+- Specify PEP 723 script dependencies with compatibility ranges bounded at the intended
+  breaking-change boundary.
+- Keep pnpm out of `package.json`. A `packageManager` or `devEngines.packageManager` field makes
+  pnpm lock its own version in `pnpm-lock.yaml`, which then drifts from `mise.lock`.
+- Write mise-read version ranges as prefixes such as `26`, not caret ranges. In locked mode, mise
+  cannot match a caret range such as `^26.0.0` against `mise.lock`.
+- To take in-range mise tool releases before Renovate's lockfile maintenance, run
+  `mise lock --bump`. Treat a Renovate PR that moves a tool's bound as the signal to adopt the next
+  minor, either by merging it or by bumping manually and closing it.
 - Treat `mise.lock`, `uv.lock`, and `pnpm-lock.yaml` as the exact tested resolutions. Let Renovate
   perform routine lockfile refreshes; regenerate a lockfile locally when a requested dependency
   change requires a new resolution.
