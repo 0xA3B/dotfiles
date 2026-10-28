@@ -1,23 +1,43 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   // Model choices.
-  "model": "fable",
+  "advisorModel": "fable",
+  "autoCompactWindow": 400000,
   "effortLevel": "high",
   "alwaysThinkingEnabled": true,
   "switchModelsOnFlag": false,
   "teammateDefaultModel": "opus",
   "teammateMode": "in-process",
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "medium",
+      "autoCompactWindow": 400000
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "high",
+      "autoCompactWindow": 400000
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "xhigh",
+      "autoCompactWindow": 400000
+    },
+    "claude-haiku-5-5": {
+      "effortLevel": "xhigh",
+      "autoCompactWindow": 100000
+    }
+  },
   // Session behavior and UI preferences.
   "askUserQuestionTimeout": "never",
   "autoCompactEnabled": true,
   "autoConnectIde": false,
-  "autoMemoryEnabled": true,
+  "autoMemoryEnabled": false,
   "autoUpdatesChannel": "latest",
   "cleanupPeriodDays": 90,
   "editorMode": "normal",
   "enableWorkflows": true,
   "externalEditorContext": true,
   "feedbackSurveyRate": 0,
+  "idleCompaction": true,
   "outputStyle": "writing:prose",
   "respectGitignore": true,
   "respondToBashCommands": true,
@@ -25,6 +45,7 @@
   "spinnerTipsEnabled": false,
   "theme": "dark",
   "tui": "fullscreen",
+  "timeFormat": "24-hour",
   "voice": {
     "enabled": true,
     "mode": "hold"
@@ -33,11 +54,8 @@
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
     "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "500000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
-    "CLAUDE_CODE_NEW_INIT": "1",
     // Fallback subagent model; a dispatch-time `model` argument or agent frontmatter overrides it.
-    "CLAUDE_CODE_SUBAGENT_MODEL": "opus",
-    "DISABLE_PROMPT_CACHING": "0"
+    "CLAUDE_CODE_SUBAGENT_MODEL": "opus"
   },
   "enabledPlugins": {
     "codex-in-claude@0xa3b-marketplace": true,
