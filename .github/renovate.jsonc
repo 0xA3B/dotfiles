@@ -29,57 +29,16 @@
     "managerFilePatterns": ["/(^|/)modify_[^/]+$/"]
   },
   "packageRules": [
+    // Group updates by ecosystem.
     {
       "description": "Group npm updates",
       "matchManagers": ["npm"],
       "groupName": "npm dependencies"
     },
     {
-      "description": "Automerge stable npm patches",
-      "matchManagers": ["npm"],
-      "matchCurrentVersion": "!/^0/",
-      "matchUpdateTypes": ["patch"],
-      "groupName": "npm stable patch dependencies",
-      // Longer cooldown for automerge; Friday runs mean a 7–14-day delay.
-      "minimumReleaseAge": "7 days",
-      "automerge": true
-    },
-    {
-      "description": "Separate npm majors",
-      "matchManagers": ["npm"],
-      "matchUpdateTypes": ["major"],
-      "groupName": "npm major dependencies"
-    },
-    {
-      "description": "Update pnpm in its own PR; mise.lock needs a manual refresh",
-      // mise reads pnpm from package.json#packageManager, so a bump also needs a mise.lock
-      // entry, which Renovate's npm manager cannot write. An ungrouped PR keeps that failure
-      // from blocking other npm updates.
-      "matchManagers": ["npm"],
-      "matchDepTypes": ["packageManager"],
-      "groupName": null,
-      "automerge": false
-    },
-    {
       "description": "Group Python updates",
       "matchManagers": ["pep621", "pep723"],
       "groupName": "python dependencies"
-    },
-    {
-      "description": "Automerge stable locked Python patches",
-      // Keep inline dependency range changes subject to review.
-      "matchManagers": ["pep621"],
-      "matchCurrentVersion": "!/^0/",
-      "matchUpdateTypes": ["patch"],
-      "groupName": "python stable patch dependencies",
-      "minimumReleaseAge": "7 days",
-      "automerge": true
-    },
-    {
-      "description": "Separate Python majors",
-      "matchManagers": ["pep621", "pep723"],
-      "matchUpdateTypes": ["major"],
-      "groupName": "python major dependencies"
     },
     {
       "description": "Group GitHub Actions updates",
@@ -97,35 +56,60 @@
       "groupName": "mise tools"
     },
     {
+      "description": "Separate npm majors",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "npm major dependencies"
+    },
+    {
+      "description": "Separate Python majors",
+      "matchManagers": ["pep621", "pep723"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "python major dependencies"
+    },
+    // Automerge patches and stable minors in one group after a longer cooldown; Friday runs mean a
+    // 7–14-day delay. A 0.x minor can break like a major, so it waits for review. pep723 is
+    // excluded to keep inline dependency range changes subject to review.
+    {
+      "description": "Automerge patches",
+      "matchManagers": ["npm", "pep621", "github-actions", "pre-commit"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "automerged dependencies",
+      "minimumReleaseAge": "7 days",
+      "automerge": true
+    },
+    {
+      "description": "Automerge stable minors",
+      "matchManagers": ["npm", "pep621", "github-actions", "pre-commit"],
+      "matchCurrentVersion": "!/^v?0\\./",
+      "matchUpdateTypes": ["minor"],
+      "groupName": "automerged dependencies",
+      "minimumReleaseAge": "7 days",
+      "automerge": true
+    },
+    {
+      "description": "Let pnpm, uv, and mise enforce lockfile maintenance cooldowns",
+      "matchManagers": ["npm", "pep621", "mise"],
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "minimumReleaseAge": null
+    },
+    {
       "description": "Preserve mise ranges with npm versioning",
       // Default coerced semver replaces ranges with exact versions.
       "matchManagers": ["mise"],
       "versioning": "npm"
     },
-    {
-      "description": "Separate lockfile maintenance; let pnpm and uv enforce cooldowns",
-      "matchManagers": ["npm", "pep621"],
-      "matchUpdateTypes": ["lockFileMaintenance"],
-      "groupName": null,
-      "minimumReleaseAge": null
-    },
-    {
-      "description": "Keep mise lockfile refreshes manual",
-      // Backend artifacts can bypass the tool cooldown.
-      "matchManagers": ["mise"],
-      "matchUpdateTypes": ["lockFileMaintenance"],
-      "enabled": false
-    },
     // Keep runtime exclusions last so they take precedence.
     {
-      "description": "Keep Node.js and Python version files manual",
-      "matchManagers": ["nodenv", "pyenv"],
+      "description": "Keep the Python version file manual",
+      "matchManagers": ["pyenv"],
       "enabled": false
     },
     {
       "description": "Keep mise runtime versions manual",
+      // Mise runtimes resolve to package names such as python/cpython, so match dependency names.
       "matchManagers": ["mise"],
-      "matchPackageNames": ["node", "python"],
+      "matchDepNames": ["node", "python"],
       "enabled": false
     },
     {
@@ -137,7 +121,7 @@
     {
       "description": "Keep npm engine constraints manual",
       "matchManagers": ["npm"],
-      "matchDepTypes": ["engines"],
+      "matchDepTypes": ["engines", "devEngines.runtime"],
       "enabled": false
     }
   ]
