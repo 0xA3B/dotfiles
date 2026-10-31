@@ -6,7 +6,8 @@
   "schedule": ["* 0-9 * * 5"],
   // Match the pnpm, mise, and uv cooldowns.
   "minimumReleaseAge": "3 days",
-  // Preserve unbounded dependencies; update in-range versions only in lockfiles.
+  // Update in-range versions only in lockfiles. A release outside a bound moves the bound; the
+  // reviewed exceptions below hold those PRs for release-note review.
   "rangeStrategy": "update-lockfile",
   // Keep PR checks current with main.
   "rebaseWhen": "behind-base-branch",
@@ -19,6 +20,8 @@
     "enabled": true,
     // Saturdays, midnight–9:59 AM Eastern.
     "schedule": ["* 0-9 * * 6"],
+    // pnpm, uv, and mise enforce the cooldown on every resolution they select.
+    "minimumReleaseAge": null,
     "automerge": true
   },
   // Bypass Renovate cooldowns for security fixes.
@@ -26,96 +29,73 @@
     "minimumReleaseAge": null,
     "labels": ["dependencies", "security"]
   },
-  // Match extensionless modify scripts. Inline dependencies have no lockfile;
-  // only releases outside their major-bounded ranges trigger PRs.
+  // Match modify scripts, which have no `.py` extension. Inline dependencies have no lockfile, so
+  // only releases outside their bounds open PRs.
   "pep723": {
     "managerFilePatterns": ["/(^|/)modify_[^/]+$/"]
   },
   "packageRules": [
-    // Group updates by ecosystem.
+    // Manager behavior.
     {
-      "description": "Group npm updates",
-      "matchManagers": ["npm"],
-      "groupName": "npm dependencies"
-    },
-    {
-      "description": "Group Python updates",
-      "matchManagers": ["pep621", "pep723"],
-      "groupName": "python dependencies"
-    },
-    {
-      "description": "Group GitHub Actions updates",
-      "matchManagers": ["github-actions"],
-      "groupName": "github actions"
-    },
-    {
-      "description": "Group pre-commit updates",
-      "matchManagers": ["pre-commit"],
-      "groupName": "pre-commit hooks"
-    },
-    {
-      "description": "Group mise tool updates",
+      "description": "Preserve mise ranges with npm versioning",
+      // Default coerced semver would replace global config prefixes such as `go = "1.27"` with
+      // exact versions.
       "matchManagers": ["mise"],
-      "groupName": "mise tools"
+      "versioning": "npm"
     },
+    // Automerge by default, since CI catches breaking releases. The reviewed exceptions below hold
+    // updates that rewrite a version in a manifest.
     {
-      "description": "Separate npm majors",
-      "matchManagers": ["npm"],
-      "matchUpdateTypes": ["major"],
-      "groupName": "npm major dependencies"
-    },
-    {
-      "description": "Separate Python majors",
-      "matchManagers": ["pep621", "pep723"],
-      "matchUpdateTypes": ["major"],
-      "groupName": "python major dependencies"
-    },
-    // Automerge patches and stable minors in one group after a longer cooldown; Friday runs mean a
-    // 7–14-day delay. A 0.x minor can break like a major, so it waits for review. pep723 is
-    // excluded to keep inline dependency range changes subject to review.
-    {
-      "description": "Automerge patches",
+      "description": "Automerge in-range and tooling updates",
+      // Leave out pep723: its dependencies have no lockfile, so every pep723 update rewrites a
+      // bound.
       "matchManagers": ["npm", "pep621", "github-actions", "pre-commit", "mise"],
-      "matchUpdateTypes": ["patch"],
       "groupName": "automerged dependencies",
-      "minimumReleaseAge": "7 days",
       "automerge": true
     },
     {
-      "description": "Automerge stable minors",
-      "matchManagers": ["npm", "pep621", "github-actions", "pre-commit", "mise"],
-      "matchCurrentVersion": "!/^v?0\\./",
-      "matchUpdateTypes": ["minor"],
-      "groupName": "automerged dependencies",
-      "minimumReleaseAge": "7 days",
-      "automerge": true
+      "description": "Give each major its own PR",
+      // A breaking major then cannot hold back the rest of the automerged group.
+      "matchUpdateTypes": ["major"],
+      "groupName": null
     },
+    // Reviewed exceptions.
     {
-      "description": "Review global mise tools separately",
-      // The chezmoi-managed global mise config sets every machine's baseline, and CI never
-      // installs it, so its updates skip automerge and the longer automerge cooldown. Renovate
-      // creates a lockfile maintenance update for every mise file, even one without a lockfile,
-      // so match only version updates to keep the combined maintenance branch automerging.
-      "matchManagers": ["mise"],
-      "matchFileNames": ["managed/**"],
-      "matchUpdateTypes": ["major", "minor", "patch"],
-      "groupName": "global mise tools",
-      "minimumReleaseAge": "3 days",
+      "description": "Review updates that rewrite a manifest version",
+      // An in-range update changes only a lockfile and keeps the manifest value. An update that
+      // moves a bound, an exact pin, or a global mise config prefix, or that replaces a package,
+      // waits for review and is the release-note review for that release. GitHub Actions and
+      // pre-commit pin exact versions that every update rewrites, so this rule leaves them out and
+      // they stay automerged. Clear the group so a reviewed PR cannot hold back the automerged
+      // group.
+      "matchManagers": ["npm", "pep621", "pep723", "mise"],
+      "matchJsonata": ["newValue != currentValue or updateType = 'replacement'"],
+      "groupName": null,
       "automerge": false
     },
     {
-      "description": "Combine lockfile maintenance; let pnpm, uv, and mise enforce cooldowns",
-      // Clear the ecosystem group names, which otherwise split maintenance into one PR per group.
-      "matchManagers": ["npm", "pep621", "mise"],
-      "matchUpdateTypes": ["lockFileMaintenance"],
-      "groupName": null,
-      "minimumReleaseAge": null
+      "description": "Keep commitlint majors in one PR",
+      // The CLI and its config release together, and the rules above clear the monorepo group.
+      "matchPackageNames": ["@commitlint/**"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "commitlint"
     },
     {
-      "description": "Preserve mise ranges with npm versioning",
-      // Default coerced semver replaces ranges with exact versions.
+      "description": "Group global mise tools",
+      // The chezmoi-managed global mise config has no lockfile, so every update rewrites a prefix
+      // and waits for review under the rule above. That review matters because CI never installs
+      // this config.
       "matchManagers": ["mise"],
-      "versioning": "npm"
+      "matchFileNames": ["managed/**"],
+      "groupName": "global mise tools"
+    },
+    // Lockfile maintenance.
+    {
+      "description": "Keep lockfile maintenance in one PR",
+      // Clear the group names set above. Renovate otherwise opens one
+      // `lock-file-maintenance-<group>` PR per group.
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "groupName": null
     },
     // Keep runtime exclusions last so they take precedence.
     {

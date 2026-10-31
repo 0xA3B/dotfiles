@@ -2,9 +2,9 @@
   "name": "dotfiles",
   "private": true,
   "devDependencies": {
-    "@commitlint/cli": "*",
-    "@commitlint/config-conventional": "*",
-    "oxfmt": "*"
+    "@commitlint/cli": "<22",
+    "@commitlint/config-conventional": "<22",
+    "oxfmt": "<1"
   },
   "commitlint": {
     "extends": [

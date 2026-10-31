@@ -6,7 +6,7 @@ lockfile = true
 minimum_release_age = "3d"
 
 # Track the latest release and let CI catch breaking changes; mise.lock pins the exact release.
-# Bound a selector only to defer a specific incompatibility.
+# Pin an exact version only to defer a specific incompatibility; a prefix bound never moves.
 [tools]
 pnpm = "latest"
 uv = "latest"
