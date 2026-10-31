@@ -72,7 +72,7 @@
     // excluded to keep inline dependency range changes subject to review.
     {
       "description": "Automerge patches",
-      "matchManagers": ["npm", "pep621", "github-actions", "pre-commit"],
+      "matchManagers": ["npm", "pep621", "github-actions", "pre-commit", "mise"],
       "matchUpdateTypes": ["patch"],
       "groupName": "automerged dependencies",
       "minimumReleaseAge": "7 days",
@@ -80,12 +80,22 @@
     },
     {
       "description": "Automerge stable minors",
-      "matchManagers": ["npm", "pep621", "github-actions", "pre-commit"],
+      "matchManagers": ["npm", "pep621", "github-actions", "pre-commit", "mise"],
       "matchCurrentVersion": "!/^v?0\\./",
       "matchUpdateTypes": ["minor"],
       "groupName": "automerged dependencies",
       "minimumReleaseAge": "7 days",
       "automerge": true
+    },
+    {
+      "description": "Review global mise tools separately",
+      // The chezmoi-managed global mise config sets every machine's baseline, and CI never
+      // installs it, so its updates skip automerge and the longer automerge cooldown.
+      "matchManagers": ["mise"],
+      "matchFileNames": ["managed/**"],
+      "groupName": "global mise tools",
+      "minimumReleaseAge": "3 days",
+      "automerge": false
     },
     {
       "description": "Combine lockfile maintenance; let pnpm, uv, and mise enforce cooldowns",
