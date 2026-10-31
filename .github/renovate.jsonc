@@ -13,10 +13,13 @@
   "automergeType": "pr",
   "automergeStrategy": "squash",
   "labels": ["dependencies"],
+  // Lockfile maintenance is the only automated path for in-range runtime fixes, which GitHub
+  // advisories do not cover, so it runs weekly and automerges once CI passes.
   "lockFileMaintenance": {
     "enabled": true,
-    // First Saturday each month, midnight–9:59 AM Eastern.
-    "schedule": ["* 0-9 1-7 * 6"]
+    // Saturdays, midnight–9:59 AM Eastern.
+    "schedule": ["* 0-9 * * 6"],
+    "automerge": true
   },
   // Bypass Renovate cooldowns for security fixes.
   "vulnerabilityAlerts": {
