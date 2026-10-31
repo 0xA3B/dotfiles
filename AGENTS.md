@@ -61,32 +61,42 @@ chezmoi. Preserve these outcomes:
 
 - Prefer built-in or standard-library capabilities when they fit the problem; otherwise prefer
   widely adopted, well-maintained ecosystem-standard packages over custom implementations.
-- Treat `pyproject.toml` and `package.json` as compatibility manifests. Leave direct dependencies
-  without version constraints by default; add constraints only for documented compatibility or
-  security requirements.
-- Use lower bounds for required features or to exclude vulnerable older releases, upper bounds for
-  intentionally deferred incompatibilities, exclusions for known-bad releases, and exact pins only
-  when no version range is acceptable. Use the least restrictive constraint that expresses the
-  requirement, and remove it when the requirement ends.
+- Treat `pyproject.toml` and `package.json` as compatibility manifests. Bound each direct dependency
+  below its next major release, such as `<22`, and a 0.x dependency below 1, such as `<1`, except
+  the modify-script runtime dependencies in the next rule.
+- Mirror every PEP 723 dependency of a modify script in `pyproject.toml`'s `[project].dependencies`
+  with the same bound, so CI tests a version from the range that machines resolve. Modify scripts
+  resolve these dependencies on every machine without a lockfile, so bound a 0.x one below its next
+  minor release, such as `<0.16`.
+- Write an upper bound with only the version segments that define its boundary, such as `<1` or
+  `<0.16`, not `<1.0.0`. Renovate keeps a bound's precision when it moves the bound, so `<1.0.0` in
+  `pyproject.toml` becomes `<1.0.1` rather than `<2`.
+- Beyond those bounds, use lower bounds for required features or to exclude vulnerable older
+  releases, tighter upper bounds for intentionally deferred incompatibilities, exclusions for
+  known-bad releases, and exact pins only when no version range is acceptable. Use the least
+  restrictive constraint that expresses the requirement, and remove it when the requirement ends.
 - When a transitive dependency must be constrained, use the owning package manager's constraint or
   override mechanism. Do not declare it as a direct dependency solely to control its resolved
   version.
-- Set `mise.toml` tools to `latest` and let CI catch breaking releases; add a bound only to defer a
-  specific incompatibility. Renovate updates `latest` selectors through `mise.lock` but does not
-  widen a range in a file that `mise.lock` covers.
-- Specify PEP 723 script dependencies with compatibility ranges bounded at the intended
-  breaking-change boundary.
-- Keep pnpm out of `package.json`. A `packageManager` or `devEngines.packageManager` field makes
-  pnpm lock its own version in `pnpm-lock.yaml`, which then drifts from `mise.lock`.
-- Write mise-read version ranges as prefixes such as `26`, not caret ranges. In locked mode, mise
-  cannot match a caret range such as `^26.0.0` against `mise.lock`.
-- To take in-range mise tool releases before Renovate's lockfile maintenance, run
-  `mise lock --bump`. Treat a Renovate PR that moves a tool's bound as the signal to adopt the next
-  minor, either by merging it or by bumping manually and closing it.
 - Treat `mise.lock`, `uv.lock`, and `pnpm-lock.yaml` as the exact tested resolutions. Let Renovate
   perform routine lockfile refreshes; regenerate a lockfile locally when a requested dependency
   change requires a new resolution.
-- Update major Node.js and Python runtime versions manually; Renovate must not update them.
+- Renovate automerges, once CI passes, every update that changes only a lockfile and every GitHub
+  Actions and pre-commit update. A Renovate PR that rewrites a version in `package.json`,
+  `pyproject.toml`, PEP 723 metadata, `mise.toml`, or `managed/dot_config/mise/config.toml` waits
+  for review; read its release notes before merging it.
+- Update Node.js and Python runtime majors manually. Renovate updates in-range runtime versions only
+  through lockfile maintenance.
+- Set `mise.toml` tools to `latest` and let CI catch breaking releases. To take in-range releases
+  before Renovate's lockfile maintenance, run `mise lock --bump`.
+- Write mise-read version ranges as prefixes such as `26`, not caret or comparison ranges such as
+  `^26.12.1` or `>=26.12.1 <27`; mise ignores `mise.lock` for those ranges, and
+  `MISE_LOCKED=1 mise install` fails. For a tool that `mise.lock` locks, Renovate and
+  `mise lock --bump` resolve a prefix only within it, and Renovate never opens a PR to move it, so
+  use a prefix there only for a runtime version. To defer a specific tool incompatibility, pin the
+  tool to an exact version; Renovate holds each PR that moves the pin for review.
+- Keep pnpm out of `package.json`. A `packageManager` or `devEngines.packageManager` field makes
+  pnpm lock its own version in `pnpm-lock.yaml`, which then drifts from `mise.lock`.
 - Pin each external in `managed/.chezmoiexternal.toml` to a release tag and its `checksum.sha256`.
   Renovate does not track these externals; review and update them manually during routine dependency
   maintenance, selecting only releases that meet the cooldown.
