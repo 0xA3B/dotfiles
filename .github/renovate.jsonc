@@ -93,9 +93,12 @@
     {
       "description": "Review global mise tools separately",
       // The chezmoi-managed global mise config sets every machine's baseline, and CI never
-      // installs it, so its updates skip automerge and the longer automerge cooldown.
+      // installs it, so its updates skip automerge and the longer automerge cooldown. Renovate
+      // creates a lockfile maintenance update for every mise file, even one without a lockfile,
+      // so match only version updates to keep the combined maintenance branch automerging.
       "matchManagers": ["mise"],
       "matchFileNames": ["managed/**"],
+      "matchUpdateTypes": ["major", "minor", "patch"],
       "groupName": "global mise tools",
       "minimumReleaseAge": "3 days",
       "automerge": false
