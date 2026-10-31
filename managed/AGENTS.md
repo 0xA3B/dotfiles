@@ -49,7 +49,7 @@ More specific `AGENTS.md` files retain implementation details for their director
 - The two harnesses review package-manager commands differently on purpose. Codex routes them to
   approval through `dot_codex/rules/package-managers.rules`. Claude keeps them sandboxed, where
   server-side auto-mode review covers every sandboxed command. `sandbox.excludedCommands` in
-  `dot_claude/settings.managed.jsonc` lists only commands that need what the sandbox withholds:
+  `dot_claude/settings.managed.jsonc.tmpl` lists only commands that need what the sandbox withholds:
   commit signing, SSH remotes, or credentials outside it. The package registries and GitHub hosts in
   its `allowedDomains` rely on that server-side review; where review runs locally, remove them so
   the per-command host review fires.

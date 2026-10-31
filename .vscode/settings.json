@@ -13,6 +13,7 @@
     "**/dot_claude*/CLAUDE.md.tmpl": "markdown",
     "**/dot_claude*/keybindings.json.tmpl": "json",
     "**/dot_claude*/rules/*.md.tmpl": "markdown",
+    "**/dot_claude/settings.managed.jsonc.tmpl": "jsonc",
     "**/dot_codex/rules/host-executables.rules.tmpl": "codex-rules",
     "**/dot_config/fish/themes/*.theme": "shellscript",
     "**/dot_config/ghostty/config": "properties",
