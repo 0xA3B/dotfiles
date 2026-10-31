@@ -151,8 +151,29 @@
       "docker *",
       "ssh *"
     ],
+    // Allow writes only to the data and state directories that sandboxed tools use, so a sandboxed
+    // command cannot change other programs' state.
     "filesystem": {
-      "allowWrite": ["~/.cache", "~/Library/Caches", "~/.local/share", "~/.local/state"]
+      "allowWrite": [
+        "~/.cache",
+        "~/Library/Caches",
+        "~/.local/share/mise",
+        "~/.local/share/uv",
+        "~/.local/share/pnpm",
+        "~/.local/share/go",
+        "~/.local/state/mise",
+        "~/.local/state/gh",
+        "~/.local/state/pnpm",
+        // pnpm keeps its install and store locks in $XDG_RUNTIME_DIR, which the shells default to
+        // ~/.local/state/run, under names that end in the user id. Other programs keep sockets in
+        // that directory, so allow only the pnpm lock directories.
+        "~/.local/state/run/pnpm-dir-locks-{{ .chezmoi.uid }}",
+        "~/.local/state/run/pnpm-store-operation-locks-{{ .chezmoi.uid }}",
+        "~/.local/state/run/pnpm-verify-deps-install-locks-{{ .chezmoi.uid }}"
+      ],
+      // The mise hook applies trusted configs before every Bash command, including unsandboxed
+      // ones, so only the user can trust a mise config.
+      "denyWrite": ["~/.local/state/mise/trusted-configs"]
     },
     // With server-side auto-mode review, the classifier reviews every sandboxed command, so these
     // hosts skip only the per-command host list, not review. Where review runs locally, sandboxed
