@@ -12,11 +12,13 @@ dbaeumer.vscode-eslint
 esbenp.prettier-vscode
 golang.go
 johnnymorganz.stylua
+mkhl.shfmt
 ms-python.debugpy
 ms-python.python
 ms-python.vscode-pylance
 ms-python.vscode-python-envs
 oxc.oxc-vscode
+timonwong.shellcheck
 tombi-toml.tombi
 vitest.explorer
 
