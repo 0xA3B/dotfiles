@@ -2,8 +2,10 @@
 default_install_hook_types: [commit-msg, pre-commit, pre-push]
 
 repos:
+  # Freeze revs to commits, so a moved tag cannot change the hook code. Renovate cannot convert a
+  # tag rev to this format, but it keeps a frozen rev frozen when it updates it.
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
     hooks:
       # end-of-file-fixer opens every file for writing, even ones it leaves unchanged, and the
       # Claude Code sandbox denies writes to .vscode/. oxfmt enforces the final newline there.
