@@ -81,6 +81,10 @@
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true
   },
+  "[shellscript]": {
+    "editor.defaultFormatter": "mkhl.shfmt",
+    "editor.formatOnSave": false
+  },
   "[toml]": {
     "editor.defaultFormatter": "tombi-toml.tombi",
     "editor.formatOnSave": false
@@ -125,6 +129,8 @@
   "ruff.configurationPreference": "filesystemFirst",
   "ruff.organizeImports": true,
   "ruff.format.backend": "uv",
+  "shellcheck.executablePath": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/shellcheck",
+  "shfmt.executablePath": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/shfmt",
   "stylua.searchBinaryInPATH": false,
   "stylua.styluaPath": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/stylua",
 
