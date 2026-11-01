@@ -62,7 +62,7 @@ jobs:
       - name: Install shell tooling
         run: |
           sudo apt-get update
-          sudo apt-get install --yes fish tmux
+          sudo apt-get install --yes fish tmux zsh
 
       - name: Install Node dependencies
         run: pnpm install --frozen-lockfile

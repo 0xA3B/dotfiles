@@ -40,6 +40,7 @@
     "**/dot_zshrc": "shellscript",
     "**/run_onchange_generate-completions.sh.tmpl": "shellscript",
     "**/run_onchange_install-vscode-extensions.sh.tmpl": "shellscript",
+    ".shellcheckrc": "properties",
     "mise.lock": "toml",
     "uv.lock": "toml"
   },
@@ -47,6 +48,14 @@
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   "oxc.fmt.configPath": ".oxfmtrc.json",
+  "shellcheck.executablePath": "shellcheck",
+  "shellcheck.ignorePatterns": {
+    "**/*.zsh": true,
+    "**/dot_config/tmux/tmux.conf.tmpl": true,
+    "**/dot_config/zsh/completions/_*": true,
+    "**/dot_zshrc": true
+  },
+  "shfmt.executablePath": "shfmt",
   "python.analysis.extraPaths": ["./tools"],
   "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": ["tests"],
@@ -56,6 +65,13 @@
   "stylua.searchBinaryInPATH": false,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "[shellscript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.shellcheck": "explicit"
+    },
+    "editor.defaultFormatter": "mkhl.shfmt",
     "editor.formatOnSave": true
   },
   "[lua]": {

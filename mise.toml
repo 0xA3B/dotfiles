@@ -10,6 +10,7 @@ minimum_release_age = "3d"
 [tools]
 pnpm = "latest"
 uv = "latest"
+shellcheck = "latest"
 shfmt = "latest"
 stylua = "latest"
 tombi = "latest"
@@ -41,8 +42,8 @@ depends = [
 ]
 description = "Check all formatting without mutating"
 
-# The fish and sh tasks wrap their pre-commit hooks instead of delegation running the
-# other way: chezmoi source names (dot_zshrc, completions/_*) defeat type-based
+# The fish, sh, and zsh tasks wrap their pre-commit hooks instead of delegation running
+# the other way: chezmoi source names (dot_zshrc, completions/_*) defeat type-based
 # filtering, so file discovery lives in the hook filters.
 [tasks."format:fish"]
 description = "Format fish files with fish_indent"
@@ -121,7 +122,7 @@ description = "Check TOML formatting with Tombi"
 run = "tombi format --check"
 
 [tasks.lint]
-depends = ["lint:python", "lint:yaml"]
+depends = ["lint:python", "lint:shell", "lint:yaml"]
 description = "Run all linters"
 
 # Pass a range explicitly, e.g. `mise run lint:commits -- --from origin/main --to HEAD`.
@@ -136,6 +137,22 @@ run = "uv run ruff check"
 [tasks."lint:python:fix"]
 description = "Apply safe Ruff fixes to Python files"
 run = "uv run ruff check --fix"
+
+[tasks."lint:fish"]
+description = "Check fish syntax with fish --no-execute"
+run = "uv run pre-commit run lint-fish --all-files"
+
+[tasks."lint:sh"]
+description = "Lint sh and bash files with ShellCheck"
+run = "uv run pre-commit run lint-sh --all-files"
+
+[tasks."lint:shell"]
+depends = ["lint:fish", "lint:sh", "lint:zsh"]
+description = "Lint all shell files"
+
+[tasks."lint:zsh"]
+description = "Check zsh syntax with zsh --no-exec"
+run = "uv run pre-commit run lint-zsh --all-files"
 
 # eval + usage: see the format:lua comment.
 [tasks."lint:yaml"]
