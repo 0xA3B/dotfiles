@@ -72,7 +72,8 @@ repos:
 
       # fish and shell hooks own their commands: chezmoi source names (dot_zshrc,
       # completions/_*) defeat type-based filtering, so file discovery lives here
-      # and the mise format:fish/format:sh tasks wrap these hooks.
+      # and the mise format:fish, format:sh, lint:fish, lint:sh, and lint:zsh tasks wrap
+      # these hooks.
       - id: format-fish
         name: format-fish
         entry: fish_indent --write
@@ -87,11 +88,22 @@ repos:
         types_or: [fish]
         stages: [manual]
 
+      # fish and zsh read only their first file argument as a script, so these hooks loop.
+      - id: lint-fish
+        name: lint-fish
+        entry: sh -c
+        args:
+          - 'status=0; for file do fish --no-execute "$file" || status=1; done; exit "$status"'
+          - --
+        language: system
+        types_or: [fish]
+        stages: [pre-commit]
+
       - id: format-sh
         name: format-sh
         entry: mise exec -- shfmt -w
         language: system
-        files: ^(.*\.(sh|bash|zsh)|managed/dot_(bash|zsh)rc|managed/dot_config/zsh/completions/_.*|managed/dot_local/bin/executable_.*)$
+        files: ^(.*\.(sh|sh\.tmpl|bash|zsh)|managed/dot_(bash|zsh)rc|managed/dot_config/tmux/tmux\.conf\.tmpl|managed/dot_config/zsh/completions/_.*|managed/dot_local/bin/executable_.*)$
         exclude: ^managed/dot_local/bin/executable_(generate-completions|tmx)$
         stages: [pre-commit]
 
@@ -99,9 +111,28 @@ repos:
         name: format-sh-check
         entry: mise exec -- shfmt -d
         language: system
-        files: ^(.*\.(sh|bash|zsh)|managed/dot_(bash|zsh)rc|managed/dot_config/zsh/completions/_.*|managed/dot_local/bin/executable_.*)$
+        files: ^(.*\.(sh|sh\.tmpl|bash|zsh)|managed/dot_(bash|zsh)rc|managed/dot_config/tmux/tmux\.conf\.tmpl|managed/dot_config/zsh/completions/_.*|managed/dot_local/bin/executable_.*)$
         exclude: ^managed/dot_local/bin/executable_(generate-completions|tmx)$
         stages: [manual]
+
+      # ShellCheck does not support zsh, so this hook covers only sh and bash files.
+      - id: lint-sh
+        name: lint-sh
+        entry: mise exec -- shellcheck
+        language: system
+        files: ^(.*\.(sh|sh\.tmpl|bash)|managed/dot_bashrc|managed/dot_local/bin/executable_.*)$
+        exclude: ^managed/dot_local/bin/executable_(generate-completions|tmx)$
+        stages: [pre-commit]
+
+      - id: lint-zsh
+        name: lint-zsh
+        entry: sh -c
+        args:
+          - 'status=0; for file do zsh --no-exec "$file" || status=1; done; exit "$status"'
+          - --
+        language: system
+        files: ^(.*\.zsh|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
+        stages: [pre-commit]
 
       - id: lint-python-fix
         name: lint-python-fix

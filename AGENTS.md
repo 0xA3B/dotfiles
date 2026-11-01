@@ -45,6 +45,8 @@ chezmoi. Preserve these outcomes:
 - Use the `mise.toml` task surface (`mise run`) for validation and formatting instead of raw tool
   commands.
 - Use `mise run check` as the default full local gate.
+- Configure shfmt through `.editorconfig` only. shfmt ignores `.editorconfig` when it receives any
+  parser or printer flag, such as `-i`, `-ci`, or `-s`, so pass none.
 - Use the smallest relevant targeted task when narrowing validation.
 - Keep `check`-suffixed tasks non-mutating.
 - Reserve the pre-commit `manual` stage for hooks that do not run at commit time; CI covers them via

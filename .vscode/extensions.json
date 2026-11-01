@@ -4,6 +4,8 @@
     "charliermarsh.ruff",
     "johnnymorganz.stylua",
     "tombi-toml.tombi",
-    "editorconfig.editorconfig"
+    "editorconfig.editorconfig",
+    "timonwong.shellcheck",
+    "mkhl.shfmt"
   ]
 }
