@@ -10,9 +10,9 @@ set -euo pipefail
 # https://github.com/0xA3B/skills/tree/main/plugins/git to be
 # installed in the resolved Claude account.
 prompt="/git:commit Commit the current worktree changes in the requested scope (all of them by default). Follow the skill's guidance for commit partitioning. Do not push. If a git hook modifies files, inspect those changes, re-stage only the fixes that belong to the affected commit, and retry that commit once. If the retry fails, the requested scope cannot be isolated safely, or the diff contains a clear safety issue such as exposed credentials or unresolved conflict markers, stop and report the blocker. Do not edit working-tree files yourself, bypass hooks, weaken checks, or otherwise work around the blocker."
-prompt="$prompt Send a brief, one-line update beginning exactly 'Progress: ' after determining the commit plan and after each successful commit. Do not narrate routine commands, and do not begin the final response with 'Progress: '."
-if [ "$#" -gt 0 ]; then
-  prompt="$prompt Additional instructions: $*"
+prompt="${prompt} Send a brief, one-line update beginning exactly 'Progress: ' after determining the commit plan and after each successful commit. Do not narrate routine commands, and do not begin the final response with 'Progress: '."
+if [[ "$#" -gt 0 ]]; then
+  prompt="${prompt} Additional instructions: $*"
 fi
 
 # Print mode cannot answer permission prompts, so pre-allow the git commands
@@ -81,30 +81,31 @@ render_claude_stream() {
   ' | (
     renderer_status=0
     while IFS= read -r output; do
-      if ! destination=$(jq --raw-output '.destination' <<<"$output"); then
+      if ! destination=$(jq --raw-output '.destination' <<<"${output}"); then
         renderer_status=1
         continue
       fi
-      if ! message=$(jq --raw-output '.text' <<<"$output"); then
+      if ! message=$(jq --raw-output '.text' <<<"${output}"); then
         renderer_status=1
         continue
       fi
-      case $destination in
-      agent_error | renderer_error)
-        renderer_status=1
-        printf '%s\n' "$message" >&2
-        ;;
-      stderr)
-        printf '%s\n' "$message" >&2
-        ;;
-      result)
-        if ((renderer_status == 0)); then
-          printf '%s\n' "$message" >"$result_file"
-        fi
-        ;;
+      case ${destination} in
+        agent_error | renderer_error)
+          renderer_status=1
+          printf '%s\n' "${message}" >&2
+          ;;
+        stderr)
+          printf '%s\n' "${message}" >&2
+          ;;
+        result)
+          if ((renderer_status == 0)); then
+            printf '%s\n' "${message}" >"${result_file}"
+          fi
+          ;;
+        *) ;;
       esac
     done
-    exit "$renderer_status"
+    exit "${renderer_status}"
   )
   pipeline_status=("${PIPESTATUS[@]}")
 
@@ -115,26 +116,26 @@ render_claude_stream() {
 }
 
 set +e
-claude -p "$prompt" \
+claude -p "${prompt}" \
   --model sonnet \
   --effort medium \
   --brief \
   --output-format stream-json \
   --verbose \
   --allowedTools "SendUserMessage,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git rev-parse:*),Bash(git check-ignore:*),Bash(git add:*),Bash(git restore --staged:*),Bash(git commit:*)" \
-  2>"$stderr_file" | render_claude_stream
+  2>"${stderr_file}" | render_claude_stream
 pipeline_status=("${PIPESTATUS[@]}")
 set -e
 
 claude_status=${pipeline_status[0]}
 renderer_status=${pipeline_status[1]}
 if ((claude_status != 0)); then
-  cat "$stderr_file" >&2
-  exit "$claude_status"
+  cat "${stderr_file}" >&2
+  exit "${claude_status}"
 fi
 if ((renderer_status != 0)); then
-  cat "$stderr_file" >&2
-  exit "$renderer_status"
+  cat "${stderr_file}" >&2
+  exit "${renderer_status}"
 fi
 
-cat "$result_file"
+cat "${result_file}"

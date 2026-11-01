@@ -1,0 +1,5 @@
+# Enable every optional check except two that flag deliberate `set -e` patterns:
+# SC2310 reports functions called in conditions, where `set -e` is disabled, and
+# SC2312 reports command substitutions that mask the command's exit status.
+enable=all
+disable=SC2310,SC2312

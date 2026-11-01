@@ -1,4 +1,5 @@
 # vim: set filetype=bash :
+# shellcheck shell=bash
 # Agent-only startup file: fish is the interactive shell, and agents run bash through
 # CLAUDE_CODE_SHELL. Claude Code sources this file once per session and keeps only its functions,
 # aliases, and shell options, so exports and PATH changes here never reach agent commands. Keep

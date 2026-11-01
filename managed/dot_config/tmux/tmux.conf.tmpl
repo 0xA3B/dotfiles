@@ -57,19 +57,19 @@ unbind M-Left
 unbind M-Right
 unbind M-Up
 unbind M-Down
-bind -n M-h     select-pane -L \; resize-pane -L -x "60%"
-bind -n M-Left  select-pane -L \; resize-pane -L -x "60%"
-bind -n M-l     select-pane -R \; resize-pane -R -x "60%"
+bind -n M-h select-pane -L \; resize-pane -L -x "60%"
+bind -n M-Left select-pane -L \; resize-pane -L -x "60%"
+bind -n M-l select-pane -R \; resize-pane -R -x "60%"
 bind -n M-Right select-pane -R \; resize-pane -R -x "60%"
-bind -n M-k     select-pane -U \; resize-pane -U -y "70%"
-bind -n M-Up    select-pane -U \; resize-pane -U -y "70%"
-bind -n M-j     select-pane -D \; resize-pane -D -y "70%"
-bind -n M-Down  select-pane -D \; resize-pane -D -y "70%"
+bind -n M-k select-pane -U \; resize-pane -U -y "70%"
+bind -n M-Up select-pane -U \; resize-pane -U -y "70%"
+bind -n M-j select-pane -D \; resize-pane -D -y "70%"
+bind -n M-Down select-pane -D \; resize-pane -D -y "70%"
 
 # pass through keys to vim
 unbind M-TAB
 unbind M-C-TAB
-bind -n M-TAB   if-shell "$is_vim" "send-keys M-TAB"   "next-window"
+bind -n M-TAB if-shell "$is_vim" "send-keys M-TAB" "next-window"
 bind -n M-C-TAB if-shell "$is_vim" "send-keys M-C-TAB" "previous-window"
 
 # Start windows and panes at 1, not 0
