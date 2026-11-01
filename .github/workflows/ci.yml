@@ -20,13 +20,17 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up tools
-        uses: jdx/mise-action@v5.2.2
+        uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
+        with:
+          # Without a version, the action installs the newest mise release with no three-day
+          # cooldown; Renovate updates this input.
+          version: 2026.10.22
 
       - name: Install Node dependencies
         run: pnpm install --frozen-lockfile
@@ -46,10 +50,14 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up tools
-        uses: jdx/mise-action@v5.2.2
+        uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
+        with:
+          # Without a version, the action installs the newest mise release with no three-day
+          # cooldown; Renovate updates this input.
+          version: 2026.10.22
 
       - name: Install shell tooling
         run: |

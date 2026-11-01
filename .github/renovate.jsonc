@@ -1,6 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommits", ":enablePreCommit"],
+  // Pin GitHub Actions to digests, so an automerged update runs the code its CI run tested even if
+  // the release tag later moves.
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":enablePreCommit",
+    "helpers:pinGitHubActionDigests"
+  ],
   "timezone": "America/New_York",
   // Fridays, midnight–9:59 AM Eastern.
   "schedule": ["* 0-9 * * 5"],
