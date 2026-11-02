@@ -26,7 +26,8 @@ python_version = "3.14"
 files = [
     "tools",
     "managed/dot_local/bin/executable_generate-completions",
-    "managed/dot_local/bin/executable_tmx"
+    "managed/dot_local/bin/executable_tmx",
+    "managed/dot_local/bin/executable_vscode-extensions-update"
 ]
 strict = false
 
@@ -61,7 +62,8 @@ extend-exclude = [".venv/", ".cache/", ".local/", "node_modules/"]
 # Extensionless Python shims are not matched by the default *.py include
 extend-include = [
     "managed/dot_local/bin/executable_generate-completions",
-    "managed/dot_local/bin/executable_tmx"
+    "managed/dot_local/bin/executable_tmx",
+    "managed/dot_local/bin/executable_vscode-extensions-update"
 ]
 
 [tool.ruff.lint]

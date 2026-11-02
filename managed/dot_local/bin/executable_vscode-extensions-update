@@ -1,0 +1,466 @@
+#!/usr/bin/env python3
+"""Update VS Code extensions to the newest versions past a 72-hour release-age cooldown.
+
+Lives on PATH so a daily update routine can run it next to brew-update. Python
+(stdlib only) rather than sh because of the Marketplace queries and version
+selection.
+
+Keep extensions.autoUpdate off and run this command instead. VS Code's own
+extensions.autoUpdateDelay setting cannot enforce the cooldown: publishers listed
+in product.json's trustedExtensionPublishers skip the delay, and the delay
+measures only the latest version's age, so an extension that releases more often
+than the delay never updates. This command checks every
+installed extension against the Marketplace and installs, for each one, the
+newest version that:
+
+- is a stable release, not a pre-release;
+- is built for VS Code's platform (OS and VS Code's architecture) or for every
+  platform;
+- supports the installed VS Code version (its engines.vscode minimum); and
+- has been published for at least 72 hours, measured by this platform's build.
+
+It never downgrades. A version installed by hand inside the cooldown stays
+installed. Installing with publisher.name@version also pins the extension, which
+matches VS Code's behavior when automatic updates are off.
+
+Usage:
+
+    vscode-extensions-update                       # Install eligible updates.
+    vscode-extensions-update --dry-run             # Report without installing.
+    vscode-extensions-update --skip-cooldown pub.x # Security fix: skip the age check.
+
+An extension whose Marketplace query fails after retries, or whose version data
+cannot be parsed, is skipped. The others still update, and the command exits 1.
+"""
+
+import argparse
+import gzip
+import http.client
+import json
+import platform
+import re
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+import zlib
+from collections.abc import Callable, Iterable
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
+from typing import Any, Protocol
+
+PROG = "vscode-extensions-update"
+COOLDOWN = timedelta(hours=72)
+QUERY_URL = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery"
+QUERY_TIMEOUT_SECONDS = 30
+# Marketplace query flags: IncludeVersions | IncludeVersionProperties.
+QUERY_FLAGS = 0x1 | 0x10
+FILTER_BY_EXTENSION_NAME = 7
+# Seconds to wait before the second and third attempts.
+RETRY_DELAYS = (1.0, 2.0)
+MAX_CONCURRENT_QUERIES = 8
+PRERELEASE_PROPERTY = "Microsoft.VisualStudio.Code.PreRelease"
+ENGINE_PROPERTY = "Microsoft.VisualStudio.Code.Engine"
+UNIVERSAL_PLATFORMS = (None, "universal")
+VERSION_PATTERN = re.compile(r"(\d+)\.(\d+)\.(\d+)")
+# VS Code's engines.vscode grammar: optional ^ or >=, x in any part, optional -suffix.
+ENGINE_PATTERN = re.compile(r"(?:\^|>=)?(\d+|x)\.(\d+|x)\.(\d+|x)(?:-.*)?")
+SUPPORTED_ARCHITECTURES = {"darwin": ("x64", "arm64"), "linux": ("x64", "arm64")}
+
+Opener = Callable[..., Any]
+VersionKey = tuple[int, int, int]
+
+
+class MarketplaceError(Exception):
+    """Raised when the Marketplace data for an extension cannot be used."""
+
+
+class TransientError(Exception):
+    """Raised for a Marketplace response that is worth retrying."""
+
+
+class Code(Protocol):
+    """The VS Code CLI operations this command needs."""
+
+    def version(self) -> str:
+        """Return the installed VS Code version."""
+        ...
+
+    def architecture(self) -> str:
+        """Return VS Code's architecture, such as arm64 or x64."""
+        ...
+
+    def installed(self) -> dict[str, str]:
+        """Return installed extension IDs, lowercased, mapped to their versions."""
+        ...
+
+    def install(self, ext_id: str, version: str) -> bool:
+        """Install one extension version, returning success."""
+        ...
+
+
+class CodeCLI:
+    """Run VS Code CLI commands."""
+
+    def __init__(self) -> None:
+        """Start without cached `code --version` output."""
+        self._version_lines: list[str] | None = None
+
+    def version(self) -> str:
+        """Return the installed VS Code version."""
+        lines = self._about()
+        if not lines:
+            raise ValueError("code --version printed nothing")
+        return lines[0]
+
+    def architecture(self) -> str:
+        """Return VS Code's architecture, the third line of `code --version`."""
+        lines = self._about()
+        if len(lines) < 3:
+            raise ValueError("code --version did not report an architecture")
+        return lines[2]
+
+    def _about(self) -> list[str]:
+        if self._version_lines is None:
+            self._version_lines = self._run("--version").splitlines()
+        return self._version_lines
+
+    def installed(self) -> dict[str, str]:
+        """Return installed extension IDs, lowercased, mapped to their versions."""
+        installed = {}
+        for line in self._run("--list-extensions", "--show-versions").splitlines():
+            ext_id, _, version = line.strip().rpartition("@")
+            if ext_id:
+                installed[ext_id.lower()] = version
+        return installed
+
+    def install(self, ext_id: str, version: str) -> bool:
+        """Install one extension version, returning success."""
+        result = subprocess.run(  # noqa: S603
+            ["code", "--install-extension", f"{ext_id}@{version}"],  # noqa: S607
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            print(result.stdout + result.stderr, end="", file=sys.stderr)
+        return result.returncode == 0
+
+    def _run(self, *args: str) -> str:
+        return subprocess.run(  # noqa: S603
+            ["code", *args],  # noqa: S607
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+
+
+@dataclass(frozen=True)
+class Release:
+    """One version of an extension, as built for this platform."""
+
+    version: str
+    key: VersionKey
+    published: datetime
+    min_engine: VersionKey | None
+    prerelease: bool
+
+    @property
+    def eligible_at(self) -> datetime:
+        """Return when this release leaves the cooldown."""
+        return self.published + COOLDOWN
+
+
+def detect_target_platform(architecture: str) -> str:
+    """Return the Marketplace target platform for this OS and VS Code's architecture.
+
+    The architecture comes from VS Code, not from the Python interpreter, which
+    can differ, such as an x64 python3 under Rosetta on Apple silicon.
+    """
+    system = platform.system().lower()
+    if architecture not in SUPPORTED_ARCHITECTURES.get(system, ()):
+        raise MarketplaceError(f"unsupported VS Code platform {system}-{architecture}")
+    return f"{system}-{architecture}"
+
+
+def leading_version(text: str) -> VersionKey:
+    """Return the version key at the start of text, such as VS Code's --version output."""
+    match = VERSION_PATTERN.match(text)
+    if match is None:
+        raise ValueError(f"unparseable version {text!r}")
+    return parse_version(match.group(0))
+
+
+def parse_version(text: str) -> VersionKey:
+    """Return the major.minor.patch key of a version string."""
+    match = VERSION_PATTERN.fullmatch(text)
+    if match is None:
+        raise ValueError(f"unparseable version {text!r}")
+    major, minor, patch = (int(part) for part in match.groups())
+    return major, minor, patch
+
+
+def parse_engine(spec: str) -> VersionKey | None:
+    """Return the minimum VS Code version an engines.vscode spec requires.
+
+    An x part counts as 0, so ^1.x.x requires 1.0.0. A * spec accepts any version
+    and returns None.
+    """
+    spec = spec.strip()
+    if spec == "*":
+        return None
+    match = ENGINE_PATTERN.fullmatch(spec)
+    if match is None:
+        raise ValueError(f"unparseable engine {spec!r}")
+    major, minor, patch = (0 if part == "x" else int(part) for part in match.groups())
+    return major, minor, patch
+
+
+def query_once(opener: Opener, ext_id: str) -> list[dict[str, Any]] | None:
+    """Return one extension's Marketplace version entries, or None if it is not listed."""
+    body = {
+        "filters": [
+            {
+                "criteria": [{"filterType": FILTER_BY_EXTENSION_NAME, "value": ext_id}],
+                "pageSize": 1,
+            }
+        ],
+        "flags": QUERY_FLAGS,
+    }
+    request = urllib.request.Request(
+        QUERY_URL,
+        data=json.dumps(body).encode(),
+        headers={
+            "Accept": "application/json;api-version=7.2-preview.1",
+            "Accept-Encoding": "gzip",
+            "Content-Type": "application/json",
+        },
+    )
+    with opener(request, timeout=QUERY_TIMEOUT_SECONDS) as response:
+        payload = response.read()
+        if response.headers.get("Content-Encoding") == "gzip":
+            try:
+                payload = gzip.decompress(payload)
+            except (EOFError, zlib.error) as error:
+                raise TransientError(f"corrupt gzip response: {error}") from error
+    try:
+        extensions = json.loads(payload)["results"][0]["extensions"]
+        if not extensions:
+            return None
+        return list(extensions[0]["versions"])
+    except (ValueError, LookupError, TypeError) as error:
+        raise MarketplaceError(f"unexpected Marketplace response: {error}") from error
+
+
+def query_versions(
+    opener: Opener, ext_id: str, sleep: Callable[[float], None]
+) -> list[dict[str, Any]] | None:
+    """Query one extension, retrying connection failures, timeouts, 429s, and 5xx responses."""
+    last_error: Exception | None = None
+    for delay in (0.0, *RETRY_DELAYS):
+        if delay:
+            sleep(delay)
+        try:
+            return query_once(opener, ext_id)
+        except urllib.error.HTTPError as error:
+            # An HTTPError holds the open response; release it before retrying.
+            error.close()
+            if error.code != 429 and error.code < 500:
+                raise MarketplaceError(f"Marketplace returned HTTP {error.code}") from error
+            last_error = error
+        except (http.client.HTTPException, OSError, TransientError) as error:
+            # OSError covers URLError, TimeoutError, and dropped connections.
+            last_error = error
+    attempts = len(RETRY_DELAYS) + 1
+    raise MarketplaceError(f"Marketplace query failed after {attempts} attempts: {last_error}")
+
+
+def parse_releases(
+    entries: Iterable[dict[str, Any]], platform_name: str, floor: VersionKey
+) -> list[Release]:
+    """Return releases for this platform at or above a floor version.
+
+    A platform-specific build wins over a universal build of the same version.
+    Entries for other platforms are ignored without parsing.
+    """
+    chosen: dict[str, dict[str, Any]] = {}
+    for entry in entries:
+        entry_platform = entry.get("targetPlatform")
+        if entry_platform == platform_name:
+            chosen[entry["version"]] = entry
+        elif entry_platform in UNIVERSAL_PLATFORMS:
+            chosen.setdefault(entry["version"], entry)
+
+    releases = []
+    for version, entry in chosen.items():
+        if VERSION_PATTERN.fullmatch(version) is None:
+            # The Marketplace accepts only major.minor.patch versions, so another
+            # string is a legacy entry that is never a candidate. Skipping it keeps
+            # one old entry from blocking every later update.
+            continue
+        key = parse_version(version)
+        if key < floor:
+            continue
+        properties = {prop["key"]: prop["value"] for prop in entry.get("properties", [])}
+        published = datetime.fromisoformat(entry["lastUpdated"])
+        if published.tzinfo is None:
+            raise ValueError(f"{version}: lastUpdated has no time zone")
+        releases.append(
+            Release(
+                version=version,
+                key=key,
+                published=published.astimezone(UTC),
+                min_engine=parse_engine(properties[ENGINE_PROPERTY]),
+                prerelease=properties.get(PRERELEASE_PROPERTY) == "true",
+            )
+        )
+    return releases
+
+
+@dataclass(frozen=True)
+class Plan:
+    """What to do with one installed extension."""
+
+    # The newest release to install now, if any.
+    update: Release | None
+    # A newer release still inside the cooldown, if any.
+    held: Release | None
+    # The installed release, when it is itself still inside the cooldown.
+    kept: Release | None
+
+
+def plan(
+    releases: list[Release],
+    current: VersionKey,
+    engine: VersionKey,
+    now: datetime,
+    *,
+    skip_cooldown: bool,
+) -> Plan:
+    """Choose the update for one extension without ever downgrading it."""
+    newer = [
+        release
+        for release in releases
+        if release.key > current
+        and not release.prerelease
+        and (release.min_engine is None or release.min_engine <= engine)
+    ]
+    allowed = [release for release in newer if skip_cooldown or now >= release.eligible_at]
+    update = max(allowed, key=lambda release: release.key, default=None)
+    newest = max(newer, key=lambda release: release.key, default=None)
+    kept = next(
+        (
+            release
+            for release in releases
+            if release.key == current and update is None and now < release.eligible_at
+        ),
+        None,
+    )
+    return Plan(update=update, held=newest if newest is not update else None, kept=kept)
+
+
+def local_time(moment: datetime) -> str:
+    """Format a moment in the local time zone."""
+    return moment.astimezone().strftime("%Y-%m-%d %H:%M %Z")
+
+
+def error(message: str) -> None:
+    """Print a diagnostic to stderr."""
+    print(f"{PROG}: {message}", file=sys.stderr)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Return the command-line parser."""
+    parser = argparse.ArgumentParser(
+        prog=PROG,
+        description="Update VS Code extensions to the newest versions past a 72-hour cooldown.",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="report updates without installing them"
+    )
+    parser.add_argument(
+        "--skip-cooldown",
+        action="append",
+        default=[],
+        metavar="PUBLISHER.NAME",
+        help="skip the age check for one extension, such as for a security fix; repeatable",
+    )
+    return parser
+
+
+def main(
+    argv: list[str] | None = None,
+    *,
+    code: Code | None = None,
+    opener: Opener = urllib.request.urlopen,
+    now: datetime | None = None,
+    target_platform: str | None = None,
+    sleep: Callable[[float], None] = time.sleep,
+) -> int:
+    """Run the command-line interface."""
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    code = code or CodeCLI()
+    now = now or datetime.now(UTC)
+
+    try:
+        engine = leading_version(code.version())
+        platform_name = target_platform or detect_target_platform(code.architecture())
+        installed = code.installed()
+    except (MarketplaceError, ValueError, OSError, subprocess.CalledProcessError) as exc:
+        error(f"cannot read the VS Code installation: {exc}")
+        return 1
+
+    skip_cooldown = {ext_id.lower() for ext_id in args.skip_cooldown}
+    missing = sorted(skip_cooldown - installed.keys())
+    if missing:
+        parser.error(f"--skip-cooldown: {', '.join(missing)} is not installed")
+
+    with ThreadPoolExecutor(max_workers=MAX_CONCURRENT_QUERIES) as pool:
+        futures = {
+            ext_id: pool.submit(query_versions, opener, ext_id, sleep) for ext_id in installed
+        }
+
+    status = 0
+    updated = False
+    for ext_id, current in sorted(installed.items()):
+        try:
+            entries = futures[ext_id].result()
+            if entries is None:
+                print(f"Skipped {ext_id}: not found on the Marketplace")
+                continue
+            current_key = parse_version(current)
+            releases = parse_releases(entries, platform_name, current_key)
+        except (MarketplaceError, ValueError, LookupError, TypeError) as exc:
+            error(f"{ext_id}: {exc}; skipped")
+            status = 1
+            continue
+
+        result = plan(releases, current_key, engine, now, skip_cooldown=ext_id in skip_cooldown)
+        if result.update is not None:
+            if args.dry_run:
+                print(f"Would update {ext_id} {current} -> {result.update.version}")
+            elif code.install(ext_id, result.update.version):
+                print(f"Updated {ext_id} {current} -> {result.update.version}")
+                updated = True
+            else:
+                error(f"{ext_id}: installing {result.update.version} failed")
+                status = 1
+        if result.held is not None:
+            held = result.held
+            print(f"Held {ext_id} {held.version} until {local_time(held.eligible_at)}")
+        if result.kept is not None:
+            print(
+                f"Kept {ext_id} {current}, which is inside the cooldown until"
+                f" {local_time(result.kept.eligible_at)}"
+            )
+
+    if updated:
+        print("Reload VS Code windows to load the updated extensions.")
+    return status
+
+
+if __name__ == "__main__":
+    sys.exit(main())
