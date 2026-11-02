@@ -8,6 +8,9 @@
   keys it contains and preserves unrelated live settings.
 - `extensions.managed.txt` lists extensions installed by
   `managed/run_onchange_install-vscode-extensions.sh.tmpl`.
+- `managed/dot_local/bin/executable_vscode-extensions-update` updates every installed extension
+  under a 72-hour release-age cooldown. Its docstring explains why `extensions.autoUpdate` stays
+  `off` instead of relying on `extensions.autoUpdateDelay`.
 
 ## Managed Settings Rules
 
