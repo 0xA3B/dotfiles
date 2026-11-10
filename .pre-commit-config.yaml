@@ -103,16 +103,16 @@ repos:
         name: format-sh
         entry: mise exec -- shfmt -w
         language: system
-        files: ^(.*\.(sh|sh\.tmpl|bash|zsh)|managed/dot_(bash|zsh)rc|managed/dot_config/tmux/tmux\.conf\.tmpl|managed/dot_config/zsh/completions/_.*|managed/dot_local/bin/executable_.*)$
-        exclude: ^managed/dot_local/bin/executable_(generate-completions|tmx|vscode-extensions-update)$
+        files: ^(.*\.(sh|sh\.tmpl|bash|zsh)|(managed/)?dot_(bash|zsh)rc|(managed/)?dot_config/tmux/tmux\.conf\.tmpl|(managed/)?dot_config/zsh/completions/_.*|(managed/)?dot_local/bin/executable_.*)$
+        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|vscode-extensions-update)$
         stages: [pre-commit]
 
       - id: format-sh-check
         name: format-sh-check
         entry: mise exec -- shfmt -d
         language: system
-        files: ^(.*\.(sh|sh\.tmpl|bash|zsh)|managed/dot_(bash|zsh)rc|managed/dot_config/tmux/tmux\.conf\.tmpl|managed/dot_config/zsh/completions/_.*|managed/dot_local/bin/executable_.*)$
-        exclude: ^managed/dot_local/bin/executable_(generate-completions|tmx|vscode-extensions-update)$
+        files: ^(.*\.(sh|sh\.tmpl|bash|zsh)|(managed/)?dot_(bash|zsh)rc|(managed/)?dot_config/tmux/tmux\.conf\.tmpl|(managed/)?dot_config/zsh/completions/_.*|(managed/)?dot_local/bin/executable_.*)$
+        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|vscode-extensions-update)$
         stages: [manual]
 
       # ShellCheck does not support zsh, so this hook covers only sh and bash files.
@@ -120,8 +120,8 @@ repos:
         name: lint-sh
         entry: mise exec -- shellcheck
         language: system
-        files: ^(.*\.(sh|sh\.tmpl|bash)|managed/dot_bashrc|managed/dot_local/bin/executable_.*)$
-        exclude: ^managed/dot_local/bin/executable_(generate-completions|tmx|vscode-extensions-update)$
+        files: ^(.*\.(sh|sh\.tmpl|bash)|(managed/)?dot_bashrc|(managed/)?dot_local/bin/executable_.*)$
+        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|vscode-extensions-update)$
         stages: [pre-commit]
 
       - id: lint-zsh
@@ -131,7 +131,7 @@ repos:
           - 'status=0; for file do zsh --no-exec "$file" || status=1; done; exit "$status"'
           - --
         language: system
-        files: ^(.*\.zsh|managed/dot_zshrc|managed/dot_config/zsh/completions/_.*)$
+        files: ^(.*\.zsh|(managed/)?dot_zshrc|(managed/)?dot_config/zsh/completions/_.*)$
         stages: [pre-commit]
 
       - id: lint-python-fix
