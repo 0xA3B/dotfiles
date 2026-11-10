@@ -32,7 +32,7 @@ established conventions conflict with them, follow the repository.
   `gh repo clone`, or any `op`, `aws`, or `codex` command, set `dangerouslyDisableSandbox: true` on
   the call. For other Git and `gh` commands, leave `dangerouslyDisableSandbox` unset.
 - If Git fails with `Permission denied (publickey)`, `Host key verification failed`,
-  `1Password: Operation not permitted`, or a `sandbox proxy` error, or `gh` fails with
+  `1Password: Operation not permitted`, or a `sandbox proxy` error, or any tool fails with
   `x509: OSStatus -26276`, the call ran inside the sandbox. Rerun it with
   `dangerouslyDisableSandbox: true` instead of diagnosing the tool.
 - Inside the sandbox, `diff` fails with `Operation not permitted` when an input is a process

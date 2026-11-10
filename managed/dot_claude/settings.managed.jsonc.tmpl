@@ -121,10 +121,13 @@
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
+    // Allow the macOS trust service, com.apple.trustd.agent. Without it, every client that verifies
+    // TLS through Security.framework, such as Go tools, mise, and Terraform, fails with
+    // "x509: OSStatus -26276". The trust service is an exfiltration path outside the proxy.
+    "enableWeakerNetworkIsolation": true,
     // Exclude only commands that need what the sandbox withholds: the commit-signing agent, SSH
-    // remotes, or credentials outside the sandbox. Sandboxed gh needs SSL_CERT_FILE, because the
-    // sandbox blocks the macOS trust service Go uses to verify TLS. A sudo entry has no effect:
-    // calls that start with sudo always stay sandboxed.
+    // remotes, or credentials outside the sandbox. A sudo entry has no effect: calls that start
+    // with sudo always stay sandboxed.
     "excludedCommands": [
       "git commit *",
       "git rebase *",
