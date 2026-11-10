@@ -9,4 +9,9 @@ work_machine = {{ $workMachine }}
 {{- $gitWorkEmail := promptStringOnce . "git_work_email" "Work Git email" }}
 git_work_name = {{ $gitWorkName | quote }}
 git_work_email = {{ $gitWorkEmail | quote }}
+{{- /* Secondary sources that dotfiles applies; an empty URL is inactive. */}}
+{{- $workSource := promptStringOnce . "dotfiles_sources.work" "Work dotfiles source Git URL (empty for none)" }}
+
+[data.dotfiles_sources]
+work = {{ $workSource | quote }}
 {{- end }}

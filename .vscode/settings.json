@@ -23,6 +23,7 @@
     "**/dot_local/bin/executable_brew-update": "shellscript",
     "**/dot_local/bin/executable_claude-commit": "shellscript",
     "**/dot_local/bin/executable_codex-commit": "shellscript",
+    "**/dot_local/bin/executable_dotfiles": "python",
     "**/dot_local/bin/executable_generate-completions": "python",
     "**/dot_local/bin/executable_op": "shellscript",
     "**/dot_local/bin/executable_tmx": "python",

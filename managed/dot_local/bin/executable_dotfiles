@@ -1,0 +1,264 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.14,<3.15"
+# ///
+"""Apply the primary chezmoi source and every secondary source.
+
+Design and rejected alternatives: docs/adr/0001-secondary-sources-as-nested-repositories.md in the
+dotfiles repository.
+
+chezmoi applies one source per invocation. The primary source is the dotfiles
+repository's managed/ directory, applied by plain chezmoi. A secondary source is a
+separate Git repository checked out at managed-<name>/ in the dotfiles repository.
+Each secondary runs with the shared chezmoi config and its own persistent state file,
+~/.config/chezmoi/chezmoistate-<name>.boltdb:
+
+    chezmoi <args> --persistent-state=<state file> --source=<checkout>
+
+The config's dotfiles_sources table lists the secondary sources by name and clone
+URL. A source is active when its URL is non-empty.
+
+Usage:
+
+    dotfiles init              # chezmoi init, then clone and apply new secondary sources.
+    dotfiles update            # Update each source, cloning a new secondary source first.
+    dotfiles apply             # Apply every source; diff and status work the same way.
+    dotfiles <source> <args>   # Run chezmoi with <args> against one secondary source.
+
+The aggregate verbs (init, update, apply, diff, status) run the primary source
+first, then secondary sources alphabetically. They accept only the flags -n,
+--dry-run, -v, --verbose, and --force. For other arguments, use plain chezmoi for
+the primary source or dotfiles <source> for a secondary source.
+
+init and update clone each active secondary source that has no checkout; apply,
+diff, and status report it as not cloned. A dry run clones nothing.
+
+If the primary source fails during init, update, or apply, no secondary source
+runs, because secondary sources depend on its targets. Otherwise a failing source
+does not stop the others. A run with failures ends with one summary line per failed
+source, naming the primary source "personal", and exits 1.
+
+dotfiles <source> appends --persistent-state and --source after <args>, so they
+outvote any in <args>. A flag that takes a value must not end <args>, because it
+would take --persistent-state as its value; write it as --flag=value instead. The
+form refuses any argument equal to init (use dotfiles init), purge (it deletes the
+shared config and every source's state), --init (it renders the source's config
+template over the shared config), or -- (arguments after it are not flags, so the
+appended flags would not apply).
+
+A secondary source must not ship a chezmoi config template (.chezmoi.<format>.tmpl):
+chezmoi init would render it over the shared config. dotfiles refuses to run
+against a source that has one, at its root or in the directory that .chezmoiroot
+names, including right after cloning it.
+"""
+
+import json
+import os
+import re
+import subprocess
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+USAGE = """\
+usage: dotfiles {init|update|apply|diff|status} [-n|--dry-run] [-v|--verbose] [--force]
+       dotfiles <source> <chezmoi arguments ...>"""
+AGGREGATE_VERBS = ("init", "update", "apply", "diff", "status")
+# Global chezmoi flags that take no value, so every verb and source accepts them.
+AGGREGATE_FLAGS = ("-n", "--dry-run", "-v", "--verbose", "--force")
+# Secondary sources depend on primary targets, such as the fish config that loads work/.
+STOP_ON_PERSONAL_FAILURE = ("init", "update", "apply")
+CLONING_VERBS = ("init", "update")
+CONFIG_TEMPLATES = tuple(f".chezmoi.{fmt}.tmpl" for fmt in ("toml", "yaml", "json", "jsonc"))
+SOURCE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*")
+PREFIX = "managed-"
+
+
+@dataclass(frozen=True)
+class Source:
+    """A secondary source checkout and its chezmoi state file."""
+
+    name: str
+    checkout: Path
+    state: Path
+    url: str = ""
+
+    @classmethod
+    def at(cls, root: Path, name: str, url: str = "") -> Source:
+        """Locate the named source under the dotfiles repository root."""
+        config_home = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
+        return cls(
+            name,
+            root / f"{PREFIX}{name}",
+            config_home / "chezmoi" / f"chezmoistate-{name}.boltdb",
+            url,
+        )
+
+    def is_cloned(self) -> bool:
+        """Report whether the checkout holds a repository, not a failed clone's empty directory."""
+        return (self.checkout / ".git").exists()
+
+    def chezmoi(self, *args: str) -> list[str]:
+        """Build a chezmoi command that targets this source.
+
+        The source and state flags come last because chezmoi takes the last value of a
+        repeated flag, so they outvote any override in args.
+        """
+        return ["chezmoi", *args, f"--persistent-state={self.state}", f"--source={self.checkout}"]
+
+    def shipped_config_template(self) -> str | None:
+        """Return a config template's name, after printing why the source is refused."""
+        # chezmoi reads the config template from the directory that .chezmoiroot names.
+        root_file = self.checkout / ".chezmoiroot"
+        root = (
+            self.checkout / root_file.read_text().strip() if root_file.exists() else self.checkout
+        )
+        for name in CONFIG_TEMPLATES:
+            if (root / name).exists():
+                print(
+                    f"dotfiles: {self.name}: refusing {root / name}: a secondary source"
+                    " must not ship a config template, which would replace the shared config",
+                    file=sys.stderr,
+                )
+                return name
+        return None
+
+
+def run(command: list[str]) -> int:
+    """Run a command with inherited standard streams, which carry prompts and errors."""
+    return subprocess.run(command, check=False).returncode  # noqa: S603
+
+
+def chezmoi_output(*args: str) -> str:
+    """Run a read-only chezmoi query and return its standard output."""
+    return subprocess.run(  # noqa: S603
+        ["chezmoi", *args],  # noqa: S607
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+
+
+def repo_root() -> Path:
+    """Return the dotfiles repository root, the parent of the primary source."""
+    return Path(chezmoi_output("source-path").strip()).parent
+
+
+def active_sources(root: Path) -> list[Source]:
+    """List active registry entries, warning about checkouts that have none."""
+    registry = json.loads(chezmoi_output("data", "--format", "json")).get("dotfiles_sources", {})
+    active = {name: url for name, url in registry.items() if url}
+    for path in sorted(root.glob(f"{PREFIX}*/")):
+        if path.name.removeprefix(PREFIX) not in active:
+            print(
+                f"dotfiles: skipping {path.name}: no active dotfiles_sources entry", file=sys.stderr
+            )
+    return [Source.at(root, name, url) for name, url in sorted(active.items())]
+
+
+def run_secondary(source: Source, verb: str, flags: list[str]) -> str | None:
+    """Run one aggregate verb against a secondary source; return why it failed, if it did."""
+    if not SOURCE_NAME.fullmatch(source.name):
+        return "invalid source name"
+    if source.is_cloned():
+        if verb == "init":
+            return None
+    elif verb in CLONING_VERBS:
+        if "-n" in flags or "--dry-run" in flags:
+            print(
+                f"dotfiles: {source.name}: dry run skips cloning {source.checkout.name}",
+                file=sys.stderr,
+            )
+            return None
+        if code := run(["git", "clone", source.url, str(source.checkout)]):
+            return f"clone exit {code}"
+    else:
+        return "not cloned; run dotfiles init"
+    if template := source.shipped_config_template():
+        return f"ships {template}"
+    # init applies a fresh clone; a dry run never gets here because it clones nothing.
+    if code := run(source.chezmoi("apply" if verb == "init" else verb, *flags)):
+        # A rerun of init skips the existing checkout, so only apply recovers it.
+        return (
+            f"apply exit {code}; fix it, then run dotfiles apply"
+            if verb == "init"
+            else f"exit {code}"
+        )
+    return None
+
+
+def aggregate(verb: str, flags: list[str]) -> int:
+    """Run a verb against personal, then each active secondary source."""
+    failures = []
+    if code := run(["chezmoi", verb, *flags]):
+        failures.append(f"personal: {verb} failed (exit {code})")
+    # Read the registry only after personal init or update, which may add entries.
+    if not (failures and verb in STOP_ON_PERSONAL_FAILURE):
+        failures.extend(
+            f"{source.name}: {verb} failed ({reason})"
+            for source in active_sources(repo_root())
+            if (reason := run_secondary(source, verb, flags))
+        )
+    for failure in failures:
+        print(f"dotfiles: {failure}", file=sys.stderr)
+    return 1 if failures else 0
+
+
+def passthrough(name: str, args: list[str]) -> int:
+    """Run chezmoi with the given arguments against one secondary source."""
+    if name == "personal":
+        return usage_error("personal is not a secondary source; use chezmoi")
+    if not SOURCE_NAME.fullmatch(name):
+        return usage_error(f"invalid source name: {name}")
+    # A flag value can precede the subcommand, so check every argument.
+    if "purge" in args:
+        return usage_error("refusing purge: it deletes the shared config and every source's state")
+    if "init" in args:
+        return usage_error("refusing init: use dotfiles init, which clones and guards each source")
+    if any(arg == "--init" or arg.startswith("--init=") for arg in args):
+        return usage_error("refusing --init: it renders the source's config template")
+    if "--" in args:
+        # Arguments after -- are not flags, so the source and state flags would not apply.
+        return usage_error("refusing --: dotfiles appends --source and --persistent-state")
+    source = Source.at(repo_root(), name)
+    if not source.is_cloned():
+        return usage_error(f"no checkout at {source.checkout}")
+    if source.shipped_config_template():
+        return 1
+    return run(source.chezmoi(*args))
+
+
+def usage_error(message: str) -> int:
+    """Print an error with the usage text and return the usage exit status."""
+    print(f"dotfiles: {message}\n{USAGE}", file=sys.stderr)
+    return 2
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Dispatch an aggregate verb or a passthrough to one secondary source."""
+    args = sys.argv[1:] if argv is None else argv
+    if not args:
+        return usage_error("missing command")
+    first, rest = args[0], args[1:]
+    if first in ("-h", "--help"):
+        print(f"{USAGE}\n\n{__doc__}")
+        return 0
+    try:
+        if first in AGGREGATE_VERBS:
+            if other := [arg for arg in rest if arg not in AGGREGATE_FLAGS]:
+                return usage_error(
+                    f"{first} accepts only {', '.join(AGGREGATE_FLAGS)};"
+                    f" use dotfiles <source> for other arguments (got {other[0]!r})"
+                )
+            return aggregate(first, rest)
+        return passthrough(first, rest)
+    except FileNotFoundError as error:
+        print(f"dotfiles: {error.filename} was not found on PATH", file=sys.stderr)
+        return 127
+    except subprocess.CalledProcessError as error:
+        print(f"dotfiles: {' '.join(error.cmd)} failed: {error.stderr.strip()}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
