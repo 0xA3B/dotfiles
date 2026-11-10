@@ -569,6 +569,9 @@ mise.*.local.lock
 
 .local/
 
+# Secondary sources are separate repositories checked out here; see docs/adr/0001.
+/managed-*/
+
 # direnv is not used with this repository, and the managed global Git ignore covers .envrc.*
 # variants on machines that apply these dotfiles.
 

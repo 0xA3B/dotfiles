@@ -20,5 +20,8 @@
 	path = ~/.gitconfig-personal
 [includeIf "gitdir:~/.local/share/chezmoi/"]
 	path = ~/.gitconfig-personal
+# A secondary source nested in the dotfiles repo; see docs/adr/0001 there. Later includes win.
+[includeIf "gitdir:~/.local/share/chezmoi/managed-work/"]
+	path = ~/.gitconfig-work
 [includeIf "gitdir:~/Code/work/"]
 	path = ~/.gitconfig-work

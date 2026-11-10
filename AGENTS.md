@@ -26,9 +26,14 @@ chezmoi. Preserve these outcomes:
 - This repository is intended to remain public-safe.
 - Do not add private work endpoints, internal package indexes, credentials, tokens, or
   employer-specific configuration to tracked files.
-- Keep work-only, secret, and machine-local values outside tracked files. Template and ignore logic
-  may control whether public-safe source content is applied, but they do not make tracked private
-  content safe.
+- Keep work-only, secret, and machine-local values outside tracked files; put content private to a
+  **Secondary source** in that source's own repository. Template and ignore logic may control
+  whether public-safe source content is applied, but they do not make tracked private content safe.
+- Write each target from exactly one source. Before adding a `managed/` file, check that no
+  **Secondary source** writes its target; route secondary content into shared tools through drop-in
+  directories, `includeIf`, or environment variables instead.
+- Before changing how `dotfiles` applies secondary sources or the `managed-*` layout, read
+  [ADR 0001](docs/adr/0001-secondary-sources-as-nested-repositories.md).
 - In tracked Markdown and other public-facing repo content, do not use absolute local filesystem
   paths such as `/Users/...`.
 - Use file-relative targets for Markdown links. Use repository-root-relative paths in prose and code
@@ -114,12 +119,22 @@ Use this section for durable domain terms that should guide future work in this 
 update entries when a term becomes stable during adversarial review, architecture review, or
 implementation.
 
-| Term                      | Definition                                                                                                                                                    | Aliases to Avoid           |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| **Managed overlay**       | A repo-owned sidecar file, usually named `*.managed.*`, that authoritatively manages selected keys or settings while preserving unrelated live configuration. | managed file, sidecar      |
-| **Default overlay**       | A repo-owned sidecar file, usually named `*.default.*`, that supplies missing settings or an absent unstructured target without changing existing values.     | default file, fallback     |
-| **Modify script**         | A chezmoi `modify_` script or modify template that transforms existing target-file content instead of replacing the whole file.                               | merge script, transform    |
-| **Modify helper library** | Python helper code under `tools/chezmoi_modify` for use by PEP 723 modify scripts.                                                                            | helper lib, modify helpers |
+- **Managed overlay**: A repo-owned sidecar file, usually named `*.managed.*`, that authoritatively
+  manages selected keys or settings while preserving unrelated live configuration. Aliases to avoid:
+  managed file, sidecar.
+- **Default overlay**: A repo-owned sidecar file, usually named `*.default.*`, that supplies missing
+  settings or an absent unstructured target without changing existing values. Aliases to avoid:
+  default file, fallback.
+- **Modify script**: A chezmoi `modify_` script or modify template that transforms existing
+  target-file content instead of replacing the whole file. Aliases to avoid: merge script,
+  transform.
+- **Modify helper library**: Python helper code under `tools/chezmoi_modify` for use by PEP 723
+  modify scripts. Aliases to avoid: helper lib, modify helpers.
+- **Primary source**: The chezmoi source state in this repository's `managed/` directory, applied by
+  plain `chezmoi`. Aliases to avoid: personal source.
+- **Secondary source**: A separate Git repository checked out at `managed-<name>/` in this
+  repository and applied by the `dotfiles` wrapper. Aliases to avoid: work repo (for the general
+  concept), overlay repo, sub-source.
 
 Relationships:
 
@@ -127,3 +142,6 @@ Relationships:
 - A **Modify script** may apply a **Default overlay** before a **Managed overlay**, so managed
   values win while existing live values win over defaults.
 - A **Modify script** may import the **Modify helper library**.
+- `dotfiles` applies the **Primary source** first, then each **Secondary source** alphabetically,
+  each with its own chezmoi state
+  ([ADR 0001](docs/adr/0001-secondary-sources-as-nested-repositories.md)).
