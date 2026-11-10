@@ -367,8 +367,8 @@ vite.config.ts.timestamp-*
 __MACOSX/
 .AppleDouble
 .LSOverride
-Icon[
-]
+# Matches the name's trailing carriage return; a literal CR does not survive LF normalization.
+Icon[[:cntrl:]]
 
 # Resource forks
 ._*
@@ -389,8 +389,8 @@ Icon[
 .file
 .disk_label*
 lost+found
-.HFS+ Private Directory Data[
-]
+# Matches the name's trailing carriage return; a literal CR does not survive LF normalization.
+.HFS+ Private Directory Data[[:cntrl:]]
 
 # Directories potentially created on remote AFP share
 .AppleDB
