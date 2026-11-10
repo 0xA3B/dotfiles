@@ -5,8 +5,8 @@
 __MACOSX/
 .AppleDouble
 .LSOverride
-Icon[
-]
+# Matches the name's trailing carriage return; a literal CR does not survive LF normalization.
+Icon[[:cntrl:]]
 
 # Thumbnails
 ._*
