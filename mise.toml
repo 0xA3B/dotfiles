@@ -5,6 +5,13 @@ idiomatic_version_file_enable_tools = ["node", "python"]
 lockfile = true
 minimum_release_age = "3d"
 
+# Run tasks in the invocation directory, so a secondary source checked out at managed-<name>/
+# runs the shared tasks over its own files. A task run from a subdirectory of this repository
+# covers only that subtree; CI and hooks run from the repository root. pre-commit tasks pass the
+# shared config with -c because a secondary source has none of its own.
+[task_config]
+dir = "{{cwd}}"
+
 # Track the latest release and let CI catch breaking changes; mise.lock pins the exact release.
 # Pin an exact version only to defer a specific incompatibility; a prefix bound never moves.
 [tools]
@@ -47,15 +54,15 @@ description = "Check all formatting without mutating"
 # filtering, so file discovery lives in the hook filters.
 [tasks."format:fish"]
 description = "Format fish files with fish_indent"
-run = "uv run pre-commit run format-fish --all-files"
+run = "uv run pre-commit run -c {{config_root}}/.pre-commit-config.yaml format-fish --all-files"
 
 [tasks."format:fish:check"]
 description = "Check fish formatting with fish_indent"
-run = "uv run pre-commit run format-fish-check --hook-stage manual --all-files"
+run = "uv run pre-commit run -c {{config_root}}/.pre-commit-config.yaml format-fish-check --hook-stage manual --all-files"
 
 [tasks."format:hygiene"]
 description = "Run pre-commit hygiene hooks across all files; may modify files"
-run = "uv run pre-commit run --all-files --hook-stage manual"
+run = "uv run pre-commit run -c {{config_root}}/.pre-commit-config.yaml --all-files --hook-stage manual"
 
 # .local/ is gitignored and oxfmt's own glob expansion honors .gitignore, so these tasks rely on
 # the shell (sh, via mise) expanding the globs. An unmatched glob stays literal under sh, and
@@ -99,11 +106,11 @@ run = "uv run ruff format --check"
 
 [tasks."format:sh"]
 description = "Format POSIX shell files with shfmt"
-run = "uv run pre-commit run format-sh --all-files"
+run = "uv run pre-commit run -c {{config_root}}/.pre-commit-config.yaml format-sh --all-files"
 
 [tasks."format:sh:check"]
 description = "Check POSIX shell formatting with shfmt"
-run = "uv run pre-commit run format-sh-check --hook-stage manual --all-files"
+run = "uv run pre-commit run -c {{config_root}}/.pre-commit-config.yaml format-sh-check --hook-stage manual --all-files"
 
 [tasks."format:shell"]
 depends = ["format:fish", "format:sh"]
@@ -115,11 +122,11 @@ description = "Check all shell formatting"
 
 [tasks."format:toml"]
 description = "Format TOML files with Tombi"
-run = "tombi format"
+run = "tombi format ."
 
 [tasks."format:toml:check"]
 description = "Check TOML formatting with Tombi"
-run = "tombi format --check"
+run = "tombi format --check ."
 
 [tasks.lint]
 depends = ["lint:python", "lint:shell", "lint:yaml"]
@@ -140,11 +147,11 @@ run = "uv run ruff check --fix"
 
 [tasks."lint:fish"]
 description = "Check fish syntax with fish --no-execute"
-run = "uv run pre-commit run lint-fish --all-files"
+run = "uv run pre-commit run -c {{config_root}}/.pre-commit-config.yaml lint-fish --all-files"
 
 [tasks."lint:sh"]
 description = "Lint sh and bash files with ShellCheck"
-run = "uv run pre-commit run lint-sh --all-files"
+run = "uv run pre-commit run -c {{config_root}}/.pre-commit-config.yaml lint-sh --all-files"
 
 [tasks."lint:shell"]
 depends = ["lint:fish", "lint:sh", "lint:zsh"]
@@ -152,7 +159,7 @@ description = "Lint all shell files"
 
 [tasks."lint:zsh"]
 description = "Check zsh syntax with zsh --no-exec"
-run = "uv run pre-commit run lint-zsh --all-files"
+run = "uv run pre-commit run -c {{config_root}}/.pre-commit-config.yaml lint-zsh --all-files"
 
 # eval + usage: see the format:lua comment.
 [tasks."lint:yaml"]

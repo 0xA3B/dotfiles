@@ -5,6 +5,7 @@ ignore: |
   .cache/
   .local/
   .venv/
+  managed-*/
   node_modules/
   pnpm-lock.yaml
 
