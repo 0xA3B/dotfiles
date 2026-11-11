@@ -31,6 +31,12 @@ established conventions conflict with them, follow the repository.
   tag, am, fetch, pull, push, clone, ls-remote, or submodule command, a `gh pr checkout` or
   `gh repo clone`, or any `op`, `aws`, or `codex` command, set `dangerouslyDisableSandbox: true` on
   the call. For other Git and `gh` commands, leave `dangerouslyDisableSandbox` unset.
+- The sandbox also blocks writes to `.git/config`, and a Git command that writes it can apply part
+  of its change before it fails with `could not lock config file`. When a Bash call creates a branch
+  that tracks a remote branch, such as `git switch -c <branch> origin/main`, or renames, deletes, or
+  sets the upstream of a branch, set `dangerouslyDisableSandbox: true` on the call. If such a
+  command already ran sandboxed, check `git branch --show-current` and `git status` before you
+  continue.
 - If Git fails with `Permission denied (publickey)`, `Host key verification failed`,
   `1Password: Operation not permitted`, or a `sandbox proxy` error, or any tool fails with
   `x509: OSStatus -26276`, the call ran inside the sandbox. Rerun it with
