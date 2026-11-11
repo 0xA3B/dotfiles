@@ -4,16 +4,29 @@
     "commit": "",
     "pr": ""
   },
+  // Bash commands inherit the environment of the process that launched Claude Code, and the shell
+  // snapshot keeps only PATH. The desktop app starts from launchd, outside fish, so mirror the
+  // fish exports that tools in the sandbox need. These values must match dot_config/fish/conf.d.
   "env": {
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "16000",
     "CLAUDE_CODE_NEW_INIT": "1",
     "CLAUDE_CODE_SHELL": "/opt/homebrew/bin/bash",
     "ENABLE_TOOL_SEARCH": "true",
-    "NODE_USE_SYSTEM_CA": "1"
+    "HOMEBREW_NO_ANALYTICS": "1",
+    "HOMEBREW_NO_AUTO_UPDATE": "1",
+    "HOMEBREW_NO_ENV_HINTS": "1",
+    "MISE_CACHE_DIR": "{{ .chezmoi.homeDir }}/.cache/mise",
+    "NODE_USE_SYSTEM_CA": "1",
+    "PNPM_HOME": "{{ .chezmoi.homeDir }}/.local/share/pnpm",
+    "XDG_CACHE_HOME": "{{ .chezmoi.homeDir }}/.cache",
+    "XDG_CONFIG_HOME": "{{ .chezmoi.homeDir }}/.config",
+    "XDG_DATA_HOME": "{{ .chezmoi.homeDir }}/.local/share",
+    "XDG_RUNTIME_DIR": "{{ .chezmoi.homeDir }}/.local/state/run",
+    "XDG_STATE_HOME": "{{ .chezmoi.homeDir }}/.local/state"
   },
   // Claude Code runs CLAUDE_ENV_FILE text before every Bash command, so mise applies the
-  // environment of each command's starting directory. The shell snapshot keeps no exports, so this
-  // cannot live in ~/.bashrc. `-s bash` must match CLAUDE_CODE_SHELL. The hook reruns on
+  // environment of each command's starting directory. The shell snapshot keeps no exports other
+  // than PATH, so this cannot live in ~/.bashrc. `-s bash` must match CLAUDE_CODE_SHELL. The hook reruns on
   // compaction and appends to the same file, so the grep guard keeps the line from repeating.
   "hooks": {
     "SessionStart": [
