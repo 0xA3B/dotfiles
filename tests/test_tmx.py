@@ -5,6 +5,7 @@ import shutil
 import socket
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 from typing import NoReturn
 
@@ -153,17 +154,36 @@ def test_directory_names_are_distinct_and_do_not_expand_tmux_formats(
         assert tmx.main([str(directory)]) == 0
         name = "tmx" + str(tmp_path.resolve()) + "/" + encoded
         assert connections[-1][1][-1] == "=" + name
-        result = tmux_server(
+        target = "=" + name + ":"
+        # tmux reads the pane's directory from its process, which may not have started yet.
+        deadline = time.monotonic() + 5
+        while True:
+            result = tmux_server(
+                "display-message",
+                "-p",
+                "-t",
+                target,
+                "#{pane_current_path}",
+                capture_output=True,
+                text=True,
+            )
+            if result.stdout.strip() == str(directory.resolve()) or time.monotonic() > deadline:
+                break
+            time.sleep(0.05)
+        assert result.returncode == 0, result.stderr
+        diagnostics = tmux_server(
             "display-message",
             "-p",
             "-t",
-            "=" + name + ":",
-            "#{pane_current_path}",
+            target,
+            "start=#{pane_start_path} pid=#{pane_pid} cmd=#{pane_current_command}",
             capture_output=True,
             text=True,
-        )
-        assert result.returncode == 0, result.stderr
-        assert result.stdout.strip() == str(directory.resolve())
+        ).stdout.strip()
+        pid = diagnostics.split("pid=")[1].split()[0]
+        proc = Path(f"/proc/{pid}")
+        proc_cwd = (proc / "cwd").readlink() if proc.exists() else "?"
+        assert result.stdout.strip() == str(directory.resolve()), f"{diagnostics} cwd={proc_cwd}"
     result = tmux_server("list-sessions", "-F", "#{session_name}", capture_output=True, text=True)
     assert len(result.stdout.splitlines()) == 5
 
