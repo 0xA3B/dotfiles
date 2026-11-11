@@ -58,6 +58,68 @@ def test_load_commands_merges_local_over_base(config_home):
     assert commands["chezmoi"]["generator"][0] == "work-chezmoi"
 
 
+def write_drop_in(config_home, filename, commands):
+    drop_ins = config_home / "generate-completions" / "config.d"
+    drop_ins.mkdir(exist_ok=True)
+    path = drop_ins / filename
+    path.write_text(json.dumps({"commands": commands}))
+    return path
+
+
+def test_load_commands_merges_drop_ins_between_base_and_local(config_home):
+    write_config(
+        config_home,
+        "config.json",
+        {"base": {"generator": ["base"]}, "shared": {"generator": ["from-base"]}},
+    )
+    write_drop_in(
+        config_home,
+        "work.json",
+        {
+            "base": None,
+            "shared": {"generator": ["from-drop-in"]},
+            "work-tool": {"generator": ["work-tool"]},
+        },
+    )
+    write_config(config_home, "config.local.json", {"work-tool": {"generator": ["from-local"]}})
+
+    commands = gc.load_commands()
+
+    assert sorted(commands) == ["shared", "work-tool"]
+    assert commands["shared"]["generator"] == ["from-drop-in"]
+    assert commands["work-tool"]["generator"] == ["from-local"]
+
+
+def test_load_commands_applies_drop_ins_in_name_order(config_home):
+    write_config(config_home, "config.json", {})
+    write_drop_in(config_home, "20-later.json", {"tool": {"generator": ["later"]}})
+    write_drop_in(config_home, "10-earlier.json", {"tool": {"generator": ["earlier"]}})
+
+    assert gc.load_commands()["tool"]["generator"] == ["later"]
+
+
+def test_load_commands_ignores_drop_ins_without_json_suffix(config_home):
+    write_config(config_home, "config.json", {})
+    write_drop_in(config_home, "work.json.bak", {"stale": {"generator": ["stale"]}})
+
+    assert gc.load_commands() == {}
+
+
+def test_load_commands_accepts_a_drop_in_without_base_config(config_home):
+    write_drop_in(config_home, "work.json", {"tool": {"generator": ["tool"]}})
+
+    assert sorted(gc.load_commands()) == ["tool"]
+
+
+def test_load_commands_names_a_malformed_drop_in(config_home):
+    write_config(config_home, "config.json", {})
+    drop_in = write_drop_in(config_home, "work.json", {})
+    drop_in.write_text("{not json")
+
+    with pytest.raises(gc.ConfigError, match=r"config\.d/work\.json"):
+        gc.load_commands()
+
+
 @pytest.mark.usefixtures("config_home")
 def test_load_commands_without_any_config_fails():
     with pytest.raises(gc.ConfigError, match="no config found"):

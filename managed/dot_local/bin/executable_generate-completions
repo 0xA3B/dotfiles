@@ -9,9 +9,11 @@ thin wrapper shims stay POSIX sh.
 Configuration lives in ~/.config/generate-completions/:
 
 - config.json: chezmoi-managed base registry.
-- config.local.json: optional machine-local overlay (e.g. work-only tools).
+- config.d/*.json: optional drop-ins, applied in name order, for registries
+  that other sources manage (e.g. a work dotfiles source).
+- config.local.json: optional machine-local overlay, applied last.
 
-Both files share the same shape:
+All files share the same shape:
 
     {
       "commands": {
@@ -25,7 +27,7 @@ Both files share the same shape:
       }
     }
 
-Overlay commands merge over the base by name; a null entry removes the
+Later files' commands merge over earlier ones by name; a null entry removes the
 command. "{shell}" in generator arguments is replaced with the shell being
 generated for. "shells" defaults to fish and zsh, and "targets" overrides the
 conventional per-shell target paths.
@@ -42,7 +44,9 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_SHELLS = ("fish", "zsh")
-CONFIG_FILES = ("config.json", "config.local.json")
+BASE_CONFIG = "config.json"
+DROP_IN_DIR = "config.d"
+LOCAL_CONFIG = "config.local.json"
 
 CommandEntry = dict[str, Any]
 
@@ -61,17 +65,20 @@ def config_dir() -> Path:
     return config_home() / "generate-completions"
 
 
+def config_files() -> list[Path]:
+    """Return the existing config files in merge order: base, drop-ins, local."""
+    directory = config_dir()
+    drop_ins = sorted((directory / DROP_IN_DIR).glob("*.json"))
+    candidates = [directory / BASE_CONFIG, *drop_ins, directory / LOCAL_CONFIG]
+    return [path for path in candidates if path.is_file()]
+
+
 def load_commands() -> dict[str, CommandEntry]:
-    """Merge the base and local config files into a command registry."""
+    """Merge the config files into a command registry."""
     commands: dict[str, CommandEntry] = {}
-    found = False
+    paths = config_files()
 
-    for filename in CONFIG_FILES:
-        path = config_dir() / filename
-        if not path.is_file():
-            continue
-        found = True
-
+    for path in paths:
         try:
             data = json.loads(path.read_text())
         except (OSError, json.JSONDecodeError) as error:
@@ -89,7 +96,7 @@ def load_commands() -> dict[str, CommandEntry]:
             else:
                 raise ConfigError(f"{path}: command {name!r} must be an object or null")
 
-    if not found:
+    if not paths:
         raise ConfigError(
             f"no config found under {config_dir()} (is the chezmoi-managed config.json applied?)"
         )
@@ -178,8 +185,8 @@ def main(argv: list[str] | None = None) -> int:
         description="Regenerate fish and zsh completions for supported commands.",
         epilog=(
             "When no commands are provided, regenerate all supported completions."
-            " Supported commands come from config.json and config.local.json under"
-            " ~/.config/generate-completions/."
+            " Supported commands come from config.json, config.d/*.json, and"
+            " config.local.json under ~/.config/generate-completions/."
         ),
     )
     parser.add_argument("commands", nargs="*", metavar="COMMAND", help="commands to regenerate")
