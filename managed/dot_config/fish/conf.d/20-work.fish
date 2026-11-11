@@ -1,3 +1,10 @@
+# The work dotfiles source applies its executables and shims here. Prepend it so
+# its shims shadow the real binaries; it is absent on personal machines.
+set -l work_bin "$HOME/.local/bin/work"
+if test -d $work_bin
+    fish_add_path --move --prepend --path $work_bin
+end
+
 set -l work_root "$__fish_config_dir/work"
 
 if test -d $work_root
