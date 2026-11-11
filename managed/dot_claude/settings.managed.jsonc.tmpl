@@ -190,8 +190,13 @@
         "release-assets.githubusercontent.com",
         "objects.githubusercontent.com",
         "mise-versions.jdx.dev",
-        "nodejs.org"
-      ]
+        "nodejs.org",
+        "registry.terraform.io",
+        "releases.hashicorp.com"
+      ],
+      // Terraform providers and TFLint plugins handshake over a Unix socket in TMPDIR. Projects
+      // point TMPDIR here for those tools, so the sandbox allows sockets in this one directory.
+      "allowUnixSockets": ["~/.cache/terraform-tmp"]
     }
   }
 }
