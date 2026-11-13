@@ -30,7 +30,7 @@ jobs:
         with:
           # Without a version, the action installs the newest mise release with no three-day
           # cooldown; Renovate updates this input.
-          version: 2026.11.4
+          version: 2026.11.5
 
       - name: Install Node dependencies
         run: pnpm install --frozen-lockfile
@@ -57,7 +57,7 @@ jobs:
         with:
           # Without a version, the action installs the newest mise release with no three-day
           # cooldown; Renovate updates this input.
-          version: 2026.11.4
+          version: 2026.11.5
 
       - name: Install shell tooling
         run: |
