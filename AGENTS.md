@@ -43,8 +43,6 @@ chezmoi. Preserve these outcomes:
 
 - Use Conventional Commits.
 - Use mise for runtime management and project tasks.
-- `package.json#devEngines.runtime` and `.python-version` are the canonical runtime versions;
-  `mise.toml` is the canonical pnpm version.
 - When a command relies on a runtime tool managed by mise, run it with `mise exec --` in
   non-interactive shells.
 - Use the `mise.toml` task surface (`mise run`) for validation and formatting instead of raw tool
@@ -66,70 +64,36 @@ chezmoi. Preserve these outcomes:
 
 ## Dependency policy
 
-- Prefer built-in or standard-library capabilities when they fit the problem; otherwise prefer
-  widely adopted, well-maintained ecosystem-standard packages over custom implementations.
-- Treat `pyproject.toml` and `package.json` as compatibility manifests. Bound each direct dependency
-  below its next major release, such as `<22`, and a 0.x dependency below 1, such as `<1`, except
-  the modify-script runtime dependencies in the next rule.
-- Mirror every PEP 723 dependency of a modify script in `pyproject.toml`'s `[project].dependencies`
-  with the same bound, so CI tests a version from the range that machines resolve. Modify scripts
-  resolve these dependencies on every machine without a lockfile, so bound a 0.x one below its next
-  minor release, such as `<0.16`.
-- Write an upper bound with only the version segments that define its boundary, such as `<1` or
-  `<0.16`, not `<1.0.0`. Renovate keeps a bound's precision when it moves the bound, so `<1.0.0` in
-  `pyproject.toml` becomes `<1.0.1` rather than `<2`.
-- Beyond those bounds, use lower bounds for required features or to exclude vulnerable older
-  releases, tighter upper bounds for intentionally deferred incompatibilities, exclusions for
-  known-bad releases, and exact pins only when no version range is acceptable. Use the least
-  restrictive constraint that expresses the requirement, and remove it when the requirement ends.
-- When a transitive dependency must be constrained, use the owning package manager's constraint or
-  override mechanism. Do not declare it as a direct dependency solely to control its resolved
-  version.
-- Treat `mise.lock`, `uv.lock`, and `pnpm-lock.yaml` as the exact tested resolutions. Let Renovate
-  perform routine lockfile refreshes; regenerate a lockfile locally when a requested dependency
-  change requires a new resolution.
-- Renovate automerges, once CI passes, every update that changes only a lockfile and every GitHub
-  Actions and pre-commit update. A Renovate PR that rewrites a version in `package.json`,
-  `pyproject.toml`, PEP 723 metadata, `mise.toml`, or `managed/dot_config/mise/config.toml` waits
-  for review; read its release notes before merging it.
-- Update Node.js and Python runtime majors manually. Renovate updates in-range runtime versions only
-  through lockfile maintenance.
-- Set `mise.toml` tools to `latest` and let CI catch breaking releases. To take in-range releases
-  before Renovate's lockfile maintenance, run `mise lock --bump`.
-- Write mise-read version ranges as prefixes such as `26`, not caret or comparison ranges such as
-  `^26.12.1` or `>=26.12.1 <27`; mise ignores `mise.lock` for those ranges, and
-  `MISE_LOCKED=1 mise install` fails. For a tool that `mise.lock` locks, Renovate and
-  `mise lock --bump` resolve a prefix only within it, and Renovate never opens a PR to move it, so
-  use a prefix there only for a runtime version. To defer a specific tool incompatibility, pin the
-  tool to an exact version; Renovate holds each PR that moves the pin for review.
-- Keep pnpm out of `package.json`. A `packageManager` or `devEngines.packageManager` field makes
-  pnpm lock its own version in `pnpm-lock.yaml`, which then drifts from `mise.lock`.
-- Pin each external in `managed/.chezmoiexternal.toml` to a release tag and its `checksum.sha256`.
-  Renovate does not track these externals; review and update them manually during routine dependency
-  maintenance, selecting only releases that meet the cooldown.
-- Require a three-day cooldown before selecting releases from public registries and tool sources.
-  Enforce it in every resolver and updater that can select those releases: Renovate, pnpm, mise, and
-  uv.
-- Bypass the cooldown only for an urgent security fix. Keep explicit exceptions package-specific in
-  every applicable resolver or updater, and remove them once the release has aged out.
+Apply `engineering:dependency-policy`, with these additions:
 
-## Terminology
+- Renovate is the updater. Once CI passes, it automerges every update that changes only a lockfile
+  and every GitHub Actions and pre-commit update. It holds for review every update that rewrites a
+  version in `package.json`, `pyproject.toml`, PEP 723 metadata, `mise.toml`, or
+  `managed/dot_config/mise/config.toml`.
+- Update Node.js majors and Python feature releases, such as 3.14 to 3.15, by hand, and keep their
+  Renovate updates disabled in `.github/renovate.jsonc`. Renovate takes their in-range releases only
+  through weekly lockfile maintenance.
+- In `managed/dot_config/mise/config.toml`, the machine-wide mise config, which has no lockfile and
+  which CI never installs, write runtime versions as prefixes such as `go = "1.27"`, which Renovate
+  moves, and other tools as `latest`.
+- Pin each external in `managed/.chezmoiexternal.toml` to a release tag and its `checksum.sha256`;
+  Renovate does not track them.
 
-Use this section for durable domain terms that should guide future work in this repository. Add or
-update entries when a term becomes stable during adversarial review, architecture review, or
-implementation.
+## Ubiquitous language
 
-- **Managed overlay**: A repo-owned sidecar file, usually named `*.managed.*`, that authoritatively
-  manages selected keys or settings while preserving unrelated live configuration. Aliases to avoid:
-  managed file, sidecar.
-- **Default overlay**: A repo-owned sidecar file, usually named `*.default.*`, that supplies missing
+Use these terms, with these meanings, in conversation, code, tests, and documents. When a request,
+or code the task changes, uses an alias to avoid or uses a term with a different meaning, say so
+before you continue. Change this section through `engineering:ubiquitous-language`.
+
+- **Managed overlay**: A repo-owned file, usually named `*.managed.*`, that authoritatively sets
+  selected keys or settings in a live target while preserving unrelated live configuration. Aliases
+  to avoid: managed file, sidecar.
+- **Default overlay**: A repo-owned file, usually named `*.default.*`, that supplies missing
   settings or an absent unstructured target without changing existing values. Aliases to avoid:
-  default file, fallback.
+  default file, fallback, sidecar.
 - **Modify script**: A chezmoi `modify_` script or modify template that transforms existing
   target-file content instead of replacing the whole file. Aliases to avoid: merge script,
   transform.
-- **Modify helper library**: Python helper code under `tools/chezmoi_modify` for use by PEP 723
-  modify scripts. Aliases to avoid: helper lib, modify helpers.
 - **Primary source**: The chezmoi source state in this repository's `managed/` directory, applied by
   plain `chezmoi`. Aliases to avoid: personal source.
 - **Secondary source**: A separate Git repository checked out at `managed-<name>/` in this
@@ -141,7 +105,6 @@ Relationships:
 - A **Modify script** applies one **Managed overlay** to its live target file.
 - A **Modify script** may apply a **Default overlay** before a **Managed overlay**, so managed
   values win while existing live values win over defaults.
-- A **Modify script** may import the **Modify helper library**.
 - `dotfiles` applies the **Primary source** first, then each **Secondary source** alphabetically,
   each with its own chezmoi state
   ([ADR 0001](docs/adr/0001-secondary-sources-as-nested-repositories.md)).
