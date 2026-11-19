@@ -1,0 +1,68 @@
+// Claude Code settings for the personal account on every machine: ~/.claude on personal machines
+// and ~/.claude-personal on work machines.
+{
+  // Model choices. Use flags such as --model for a one-off session; slash commands write to the
+  // live file, and the next apply overwrites it.
+  "model": "opus",
+  "advisorModel": "fable",
+  "effortLevel": "high",
+  "teammateDefaultModel": "opus",
+  "modelSettings": {
+    "claude-fable-5-2": {
+      "effortLevel": "medium",
+      "autoCompactWindow": 500000
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "enableArtifact": true,
+  // The personal account uses the public marketplace that core registers.
+  "enabledPlugins": {
+    "writing@0xa3b-marketplace": true,
+    "meta@0xa3b-marketplace": true,
+    "git@0xa3b-marketplace": true,
+    "engineering@0xa3b-marketplace": true
+  },
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    // Fallback subagent model; a dispatch-time `model` argument or agent frontmatter overrides it.
+    "CLAUDE_CODE_SUBAGENT_MODEL": "opus"
+  },
+  // The ask rule guards switching gh accounts. The deny rules here and the `ntn *` sandbox
+  // exclusion below cover Notion (ntn), a personal service.
+  "permissions": {
+    "ask": ["Bash(gh auth switch*)"],
+    "deny": ["Bash(ntn auth token*)", "Bash(ntn * auth token*)", "Bash(ntn auth * token*)"]
+  },
+  "sandbox": {
+    "excludedCommands": ["ntn *"]
+  },
+  // Review rules for personal scope. On work machines, the work source adds the rules that keep
+  // work content out of this account.
+  "autoMode": {
+    "allow": [
+      "Personal Repo Default-Branch Push (github.com/0xA3B ONLY): Pushing directly to main/master is allowed exclusively on personal github.com/0xA3B repositories — solo personal repos with no pull-request review workflow. Covers normal pushes only; a force-push or history rewrite of main/master remains soft-blocked. Scoped to this account's own repos; does NOT extend to any work scope.",
+      "Topic-Branch History Tidy (github.com/0xA3B ONLY): `git push --force-with-lease=<branch>:<sha>` to a non-default branch of a personal github.com/0xA3B repository is allowed when the session authored the branch's commits and the push only rewrites that branch's own unmerged commits, as the git:tidy-history skill does. This includes the source (head) branch of an open pull request, such as folding fixup commits that address review comments into the commits they correct. A plain `--force`, a lease without an expected SHA, and any force-push to main/master or to a branch that another open pull request uses as its target (base) branch remain soft-blocked.",
+      "Public Reads and Clones: Reading, cloning, and fetching from public sources — public github.com repositories and public package registries (registry.npmjs.org, pypi.org, files.pythonhosted.org) — is routine and in-boundary for this personal account.",
+      "Dependency and Toolchain Changes: when a package-manager or toolchain command (npm, pnpm, uv, mise) reaches this review, whether through a registry connection or an unsandboxed retry, approve it when the command is within the task's scope and the resulting change complies with the loaded repository dependency policy, including version constraints, cooldowns, and lockfile handling.",
+      "Fetch-and-Execute Package Commands: npx, pnpx, pnx, pnpm dlx, npm exec, uvx, uv tool run, uv run --with, and mise x can download and immediately run code. Approve when the named package and its child command are within the task's scope and come from a public registry or mise backend. Require explicit user direction when the package source or the current repository is unverified.",
+      "Notion Operations: Approve routine reads and task-authorized page or database edits in verified personal scope without a second confirmation. Verify each connection's workspace ID and destination against user-authorized scope. Evaluate endpoints, payloads, and actual hosts, including CLI overrides; POST /v1/search is a read. A destination page's sharing and publication state determines its audience."
+    ],
+    "soft_deny": [
+      "Interactive Authentication: Require explicit user direction before starting login, sign-in, enrollment, credential replacement, or credential removal commands, including gh auth login, op signin, and cloud-provider login flows.",
+      "Package Publication: Require explicit user direction naming the package and destination before publishing a package, creating a release, or otherwise writing to an external registry, including forms that permission ask rules do not match.",
+      "Notion Scope: Require explicit user direction for writes outside verified personal scope, publishing, sharing or permission changes, destructive deletion, and Worker deployment or execution. Require the source, destination, and payload to be clear for sensitive transfers."
+    ],
+    "hard_deny": [
+      "Credential Extraction: Reject commands that display or extract authentication tokens, including ntn auth token through wrappers or reordered flags. Use ntn whoami or ntn doctor for authentication checks."
+    ],
+    "environment": [
+      "In-scope (personal) sources and destinations: personal repositories under ~/Code/personal/; the dotfiles/chezmoi repo at ~/.local/share/chezmoi/; the personal GitHub account github.com/0xA3B and its repos (personal git remotes use the `github-personal` SSH host alias); and public package registries (registry.npmjs.org, pypi.org, files.pythonhosted.org).",
+      "Internal package registry: none. Public registries (registry.npmjs.org, pypi.org, files.pythonhosted.org) and public toolchain download hosts are the expected install sources. They are not pre-allowed sandbox domains, so the first connection to one in a session arrives here for review.",
+      "Reference repositories: ~/Code/reference/ is read-only, public, and untrusted. Reading and comparing are routine; executing code, installing dependencies, or publishing local data there needs explicit user direction.",
+      "Secrets management: the 1Password Automation vault is approved for personal project credentials through op run or service-native authentication. Secret values must stay out of command arguments and tool output.",
+      "Notion: Verify personal workspace scope using the connected workspace ID and user authorization, not a display name or saved login alone. CLI and MCP connections may target different workspaces. Apply the same authorization and data-sharing boundaries to both interfaces when they reach review."
+    ]
+  }
+}
