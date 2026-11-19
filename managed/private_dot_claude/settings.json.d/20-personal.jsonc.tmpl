@@ -1,0 +1,5 @@
+{{- /* vim: set filetype=jsonc : */ -}}
+{{- /* On work machines, ~/.claude belongs to the work account, which the work source configures. */ -}}
+{{- if not .work_machine -}}
+{{- template "claude/settings/personal.jsonc" . -}}
+{{- end -}}

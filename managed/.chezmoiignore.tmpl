@@ -19,9 +19,13 @@
 .config/uv/uv.managed.toml
 Library/Application Support/Code/User/settings.managed.jsonc
 
-# Codex and Claude overlays always remain source-only; future modify scripts read them from here.
-.claude/settings.managed.jsonc
-.claude/settings.default.jsonc
+# Overlay directories are modify-script inputs read from every source.
+.claude/settings.json.d
+.claude/settings.json.d/**
+.claude-personal/settings.json.d
+.claude-personal/settings.json.d/**
+
+# Codex overlays always remain source-only; future modify scripts read them from here.
 .codex/AGENTS.default.md
 .codex/config.managed.toml
 .codex/config.default.toml
@@ -30,7 +34,6 @@ Library/Application Support/Code/User/settings.managed.jsonc
 Library/Application Support/Code/User/extensions.managed.txt
 
 # Legacy whole-file agent configs remain source-only if reintroduced.
-.claude/settings.json
 .claude/statusline-command.sh
 .codex/AGENTS.md
 .codex/config.toml

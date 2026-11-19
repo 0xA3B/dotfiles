@@ -15,10 +15,14 @@ More specific `AGENTS.md` files retain implementation details for their director
 - Use templates to select configuration by machine or environment. Use a default overlay when the
   same key may drift after bootstrap; a work-machine check and a default overlay solve different
   problems.
-- For Codex and Claude, keep marketplace sources and machine-independent enforcement settings
-  managed. Keep environment-specific policy text, model choices, shell integration, plugin
-  enablement, and user-selectable UI preferences as defaults. Leave runtime-generated state out of
-  both overlays.
+- For Codex, keep marketplace sources and machine-independent enforcement settings managed. Keep
+  environment-specific policy text, model choices, shell integration, plugin enablement, and
+  user-selectable UI preferences as defaults.
+- For Claude, manage every setting, including model choices, plugin enablement, and UI preferences,
+  so every machine starts each session with the same settings. To change a default, edit its
+  overlay: the next apply reverts what slash commands write to the live file, and the user changes a
+  single session with CLI flags such as `--model`.
+- Leave runtime-generated state, such as `feedbackDrafts`, out of every overlay.
 - Keep modify scripts executable through PEP 723 metadata, and declare any third-party runtime
   dependencies inline.
 - When a modify script uses the helper library, import it from the repository-root `tools`
@@ -30,6 +34,15 @@ More specific `AGENTS.md` files retain implementation details for their director
 - [`private_dot_claude`](private_dot_claude) and [`dot_codex`](dot_codex) contain public-safe agent
   configuration. Their overlays, including `AGENTS.default.md`, remain permanently source-only.
   Future adjacent modify scripts must read those overlays directly from source state.
+- Claude settings come from the `settings.json.d` overlay directories in
+  [`private_dot_claude`](private_dot_claude) and
+  [`private_dot_claude-personal`](private_dot_claude-personal), whose one-line `.tmpl` overlays
+  render [`claude/settings/core.jsonc`](.chezmoitemplates/claude/settings/core.jsonc) for every
+  account and [`claude/settings/personal.jsonc`](.chezmoitemplates/claude/settings/personal.jsonc)
+  for the personal account. Put a setting in `core.jsonc` only when every account on every machine
+  uses the same value, and write the account's own config directory as `{{ .claudeDir }}`. The work
+  source supplies the work account's settings and the personal account's work-machine guard rules in
+  the same overlay directories; keep both out of this repository.
 - Claude user instructions materialize as whole files through `chezmoi apply`.
   [`claude/user.md`](.chezmoitemplates/claude/user.md) renders to `CLAUDE.md` for every Claude
   account, and [`claude/personal-services.md`](.chezmoitemplates/claude/personal-services.md)
@@ -49,10 +62,10 @@ More specific `AGENTS.md` files retain implementation details for their director
 - The two harnesses review package-manager commands differently on purpose. Codex routes them to
   approval through `dot_codex/rules/package-managers.rules`. Claude keeps them sandboxed, where
   server-side auto-mode review covers every sandboxed command. `sandbox.excludedCommands` in
-  `private_dot_claude/settings.managed.jsonc.tmpl` lists only commands that need what the sandbox
-  withholds: commit signing, SSH remotes, or credentials outside it. The package registries and
-  GitHub hosts in its `allowedDomains` rely on that server-side review; where review runs locally,
-  remove them so the per-command host review fires.
+  `claude/settings/core.jsonc` lists only commands that need what the sandbox withholds: commit
+  signing, SSH remotes, or credentials outside it. The package registries and GitHub hosts in its
+  `allowedDomains` rely on that server-side review; where review runs locally, remove them so the
+  per-command host review fires.
 - Codex `.rules` files under `dot_codex/rules/` and
   `private_dot_claude/executable_statusline-command.sh` materialize through `chezmoi apply`. Treat
   edits to those files as active configuration changes; editing an ignored overlay does not change

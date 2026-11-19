@@ -1,8 +1,54 @@
+// Claude Code settings for every account on every machine. Callers set .claudeDir to the
+// account's config directory, such as ~/.claude or ~/.claude-personal.
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "attribution": {
     "commit": "",
     "pr": ""
+  },
+  // Session behavior and UI preferences. Change them here instead of through /config or other
+  // slash commands, which write to the live file that the next apply overwrites.
+  "alwaysThinkingEnabled": true,
+  "askUserQuestionTimeout": "never",
+  "autoCompactEnabled": true,
+  "autoConnectIde": false,
+  "autoMemoryEnabled": false,
+  "autoUpdatesChannel": "latest",
+  "cleanupPeriodDays": 90,
+  "editorMode": "normal",
+  "enableWorkflows": true,
+  "externalEditorContext": true,
+  "feedbackSurveyRate": 0,
+  "idleCompaction": true,
+  "outputStyle": "writing:chat",
+  "promptSuggestionEnabled": false,
+  "respectGitignore": true,
+  "respondToBashCommands": true,
+  "skillListingBudgetFraction": 0.03,
+  "spinnerTipsEnabled": false,
+  "switchModelsOnFlag": false,
+  "teammateMode": "in-process",
+  "theme": "dark",
+  "timeFormat": "24-hour",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "autoCompactWindow": 500000,
+  // Core sets effort only for models whose accounts agree; account overlays set the rest.
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "autoCompactWindow": 500000
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "high",
+      "autoCompactWindow": 500000
+    },
+    "claude-haiku-5-5": {
+      "effortLevel": "high",
+      "autoCompactWindow": 100000
+    }
   },
   // Bash commands inherit the environment of the process that launched Claude Code, and the shell
   // snapshot keeps only PATH. The desktop app starts from launchd, outside fish, so mirror the
@@ -26,8 +72,9 @@
   },
   // Claude Code runs CLAUDE_ENV_FILE text before every Bash command, so mise applies the
   // environment of each command's starting directory. The shell snapshot keeps no exports other
-  // than PATH, so this cannot live in ~/.bashrc. `-s bash` must match CLAUDE_CODE_SHELL. The hook reruns on
-  // compaction and appends to the same file, so the grep guard keeps the line from repeating.
+  // than PATH, so this cannot live in ~/.bashrc. `-s bash` must match CLAUDE_CODE_SHELL. The hook
+  // reruns on compaction and appends to the same file, so the grep guard keeps the line from
+  // repeating.
   "hooks": {
     "SessionStart": [
       {
@@ -47,7 +94,9 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/statusline-command.sh"
+    "command": "bash {{ .claudeDir }}/statusline-command.sh",
+    "refreshInterval": 60,
+    "hideVimModeIndicator": true
   },
   "extraKnownMarketplaces": {
     "0xa3b-marketplace": {
@@ -61,10 +110,10 @@
   "permissions": {
     "defaultMode": "auto",
     "allow": [
-      "Read(~/.claude/settings.json)",
-      "Read(~/.claude/statusline-command.sh)",
-      "Read(~/.claude/skills/**)",
-      "Read(~/.claude/rules/**)",
+      "Read({{ .claudeDir }}/settings.json)",
+      "Read({{ .claudeDir }}/statusline-command.sh)",
+      "Read({{ .claudeDir }}/skills/**)",
+      "Read({{ .claudeDir }}/rules/**)",
       "Bash(gh pr list *)",
       "Bash(gh pr view *)",
       "Bash(gh pr diff *)",
@@ -84,19 +133,15 @@
       "AskUserQuestion",
       "mcp__ccd_turn__wrap_up",
       "Bash(* --show-token*)",
-      "Bash(ntn auth token*)",
-      "Bash(ntn * auth token*)",
-      "Bash(ntn auth * token*)",
       "Bash(codex *--dangerously-bypass-approvals-and-sandbox*)",
       "Bash(codex *--yolo*)",
       "Bash(codex *danger-full-access*)",
       "Bash(claude *--dangerously-skip-permissions*)",
       "Bash(claude *bypassPermissions*)",
-      "Bash(gh auth status --show-token *)",
+      "Bash(gh auth status -t)",
       "Bash(gh auth status -t *)",
-      "Bash(gh auth status * --show-token *)",
-      "Bash(gh auth status * -t *)",
       "Bash(gh auth status * -t)",
+      "Bash(gh auth status * -t *)",
       "Bash(gh auth token*)",
       "Bash(security find-generic-password -g *)",
       "Bash(security find-generic-password * -g)",
@@ -112,15 +157,16 @@
       "Read(~/.aws/credentials)",
       "Read(~/.aws/sso/**)",
       "Read(~/.aws/cli/cache/**)",
-      "Read(~/.claude/.credentials.json)",
+      "Read({{ .claudeDir }}/.credentials.json)",
       "Read(~/.codex/auth.json)",
       "Read(~/.gnupg/**)",
       "Read(~/.netrc)",
       "Read(**/*.key)",
       "Edit(~/.aws/credentials)",
       "Edit(~/.netrc)",
-      "Edit(~/.claude/.credentials.json)",
-      "Edit(~/.codex/auth.json)"
+      "Edit({{ .claudeDir }}/.credentials.json)",
+      "Edit(~/.codex/auth.json)",
+      "Edit(~/.gnupg/**)"
     ],
     // Content-scoped ask rules prompt the user even in auto mode; the classifier cannot clear them.
     "ask": [
@@ -128,8 +174,21 @@
       "Bash(gh auth login *)",
       "Bash(npm publish *)",
       "Bash(pnpm publish *)",
-      "Bash(uv publish *)"
+      "Bash(uv publish *)",
+      "Edit(~/.config/**)"
     ]
+  },
+  // The classifier reviews commands that run outside the sandbox and the first sandboxed connection
+  // to each host in a session. It reads loaded CLAUDE.md content, so a repository dependency policy
+  // applies to dependency commands automatically. Account overlays add their own rules.
+  "autoMode": {
+    "allow": ["$defaults"],
+    "soft_deny": [
+      "$defaults",
+      "Unsandboxed Nested Agents: Nested agent CLIs (codex, claude) are excluded from this session's OS sandbox, so their own sandbox/approval layer is the only containment — do not run them with it disabled or weakened. This covers the flags --yolo, --dangerously-bypass-approvals-and-sandbox, -s/--sandbox danger-full-access, -c/--config sandbox_mode=danger-full-access, --dangerously-skip-permissions, and --permission-mode bypassPermissions, AND indirect routes to the same outcome: selecting a codex profile that sets a permissive sandbox_mode, pointing CODEX_HOME (or claude's CLAUDE_CONFIG_DIR/--settings) at a permissive config, or editing ~/.codex or claude settings so a later plain invocation runs unsandboxed. Block by default; allow only with explicit user direction for that specific invocation."
+    ],
+    "hard_deny": ["$defaults"],
+    "environment": ["$defaults"]
   },
   "sandbox": {
     "enabled": true,
@@ -157,7 +216,6 @@
       "git submodule *",
       "gh pr checkout *",
       "gh repo clone *",
-      "ntn *",
       "op *",
       "codex *",
       "claude *",
@@ -204,6 +262,8 @@
         "objects.githubusercontent.com",
         "mise-versions.jdx.dev",
         "nodejs.org",
+        "www.schemastore.org",
+        "json.schemastore.org",
         "registry.terraform.io",
         "releases.hashicorp.com"
       ],
