@@ -45,7 +45,8 @@ repos:
         name: format-oxfmt
         entry: mise run format:oxfmt
         language: system
-        types_or: [json, markdown, yaml]
+        # identify tags .jsonc files only as text, so types_or alone would skip them.
+        files: \.(jsonc?|md|ya?ml)$
         stages: [pre-commit]
 
       - id: format-toml
