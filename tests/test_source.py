@@ -85,6 +85,8 @@ def test_read_source_template_text_renders_with_chezmoi(
     template = source_dir / "settings.managed.jsonc.tmpl"
     template.write_text('{"home": "{{ .chezmoi.homeDir }}"}\n', encoding="utf-8")
     monkeypatch.setenv("CHEZMOI_SOURCE_DIR", str(source_dir))
+    monkeypatch.delenv("CHEZMOI_EXECUTABLE", raising=False)
+    monkeypatch.delenv("CHEZMOI_CONFIG_FILE", raising=False)
 
     def fake_run(
         args: list[str],
@@ -139,3 +141,38 @@ def test_read_source_template_text_reports_render_errors(
 
     with pytest.raises(ChezmoiModifyError, match="source template could not be rendered"):
         read_source_template_text("settings.managed.jsonc.tmpl")
+
+
+def test_read_source_template_text_uses_the_running_chezmoi_and_its_config(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    template = source_dir / "settings.managed.jsonc.tmpl"
+    template.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setenv("CHEZMOI_SOURCE_DIR", str(source_dir))
+    monkeypatch.setenv("CHEZMOI_EXECUTABLE", "/opt/chezmoi")
+    monkeypatch.setenv("CHEZMOI_CONFIG_FILE", "/home/example/chezmoi.toml")
+    calls: list[list[str]] = []
+
+    def fake_run(args: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+        calls.append(args)
+        return subprocess.CompletedProcess(args, 0, stdout="{}\n")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    read_source_template_text("settings.managed.jsonc.tmpl")
+
+    assert calls == [
+        [
+            "/opt/chezmoi",
+            "--config",
+            "/home/example/chezmoi.toml",
+            "execute-template",
+            "--source",
+            str(source_dir),
+            "--file",
+            str(template),
+        ],
+    ]

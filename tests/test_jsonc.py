@@ -1,9 +1,10 @@
 import json
+import re
 from textwrap import dedent
 
 import pytest
 from chezmoi_modify.exceptions import ChezmoiModifyError
-from chezmoi_modify.jsonc import merge_jsonc_overlay
+from chezmoi_modify.jsonc import compose_jsonc_overlays, merge_jsonc_overlay
 
 
 def test_jsonc_overlay_overwrites_scalars_and_recursively_merges_objects() -> None:
@@ -111,3 +112,110 @@ def test_jsonc_overlay_rejects_invalid_live_jsonc() -> None:
 def test_jsonc_overlay_rejects_non_object_roots() -> None:
     with pytest.raises(ChezmoiModifyError, match="managed JSONC must contain an object"):
         merge_jsonc_overlay("{}", "[]")
+
+
+def test_composed_overlays_override_scalars_merge_objects_and_append_array_entries() -> None:
+    composed = compose_jsonc_overlays(
+        [
+            (
+                "core",
+                """{
+                  // Comments are allowed in each overlay.
+                  "effortLevel": "high",
+                  "env": {"SHELL": "bash", "TRACE": "0"},
+                  "permissions": {"deny": ["Read(~/.ssh/**)", "Bash(sudo *)"]},
+                }""",
+            ),
+            (
+                "work",
+                """{
+                  "effortLevel": "medium",
+                  "env": {"TRACE": "1"},
+                  "permissions": {"deny": ["Bash(sudo *)", "Bash(tool *)"]},
+                }""",
+            ),
+        ],
+    )
+
+    assert json.loads(composed) == {
+        "effortLevel": "medium",
+        "env": {"SHELL": "bash", "TRACE": "1"},
+        "permissions": {"deny": ["Read(~/.ssh/**)", "Bash(sudo *)", "Bash(tool *)"]},
+    }
+
+
+def test_composed_overlays_name_the_overlay_that_fails_to_parse() -> None:
+    with pytest.raises(
+        ChezmoiModifyError, match=re.escape("work:settings.json.d/50-work.jsonc JSONC")
+    ):
+        compose_jsonc_overlays([("work:settings.json.d/50-work.jsonc", "{")])
+
+
+def test_unordered_string_arrays_keep_live_text_when_only_entry_order_differs() -> None:
+    live = '{\n  "deny": ["b", "a"],\n  "ask": ["c"]\n}\n'
+
+    result = merge_jsonc_overlay(
+        live,
+        '{"deny": ["a", "b"], "ask": ["c"]}',
+        unordered_string_arrays=True,
+    )
+
+    assert result.text == live
+
+
+def test_unordered_string_arrays_keep_live_entry_order_when_another_key_changes() -> None:
+    result = merge_jsonc_overlay(
+        '{"deny": ["b", "a"], "theme": "light"}',
+        '{"deny": ["a", "b"], "theme": "dark"}',
+        unordered_string_arrays=True,
+    )
+
+    assert json.loads(result.text) == {"deny": ["b", "a"], "theme": "dark"}
+
+
+def test_unordered_string_arrays_take_managed_entries_when_they_differ() -> None:
+    result = merge_jsonc_overlay(
+        '{"deny": ["b", "a"]}',
+        '{"deny": ["a", "c"]}',
+        unordered_string_arrays=True,
+    )
+
+    assert json.loads(result.text) == {"deny": ["a", "c"]}
+
+
+def test_unordered_string_arrays_still_order_arrays_of_objects() -> None:
+    result = merge_jsonc_overlay(
+        '{"hooks": [{"name": "b"}, {"name": "a"}]}',
+        '{"hooks": [{"name": "a"}, {"name": "b"}]}',
+        unordered_string_arrays=True,
+    )
+
+    assert json.loads(result.text) == {"hooks": [{"name": "a"}, {"name": "b"}]}
+
+
+def test_rewrites_can_keep_non_ascii_characters_literal() -> None:
+    result = merge_jsonc_overlay(
+        '{"rule": "old"}',
+        '{"rule": "work \u2192 personal"}',
+        ensure_ascii=False,
+    )
+
+    assert result.text == '{\n  "rule": "work \u2192 personal"\n}\n'
+
+
+def test_unordered_string_arrays_keep_live_text_for_nested_arrays() -> None:
+    live = '{"permissions": {"deny": ["b", "a"]}}\n'
+
+    result = merge_jsonc_overlay(
+        live,
+        '{"permissions": {"deny": ["a", "b"]}}',
+        unordered_string_arrays=True,
+    )
+
+    assert result.text == live
+
+
+def test_empty_overlay_keeps_non_ascii_characters_literal() -> None:
+    result = merge_jsonc_overlay('{"rule": "a → b"}', "{}", ensure_ascii=False)
+
+    assert result.text == '{\n  "rule": "a → b"\n}\n'
