@@ -6,3 +6,5 @@ change before proposing a different design.
 
 - [0001](0001-secondary-sources-as-nested-repositories.md): Secondary sources are nested
   repositories applied by separate chezmoi invocations
+- [0002](0002-primary-source-composes-overlay-directories.md): The primary source composes overlay
+  directories across sources

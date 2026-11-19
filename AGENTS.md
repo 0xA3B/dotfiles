@@ -31,7 +31,9 @@ chezmoi. Preserve these outcomes:
   whether public-safe source content is applied, but they do not make tracked private content safe.
 - Write each target from exactly one source. Before adding a `managed/` file, check that no
   **Secondary source** writes its target; route secondary content into shared tools through drop-in
-  directories, `includeIf`, or environment variables instead.
+  directories, `includeIf`, or environment variables instead. For a target with none of those
+  routes, use an **Overlay directory**
+  ([ADR 0002](docs/adr/0002-primary-source-composes-overlay-directories.md)).
 - Before changing how `dotfiles` applies secondary sources or the `managed-*` layout, read
   [ADR 0001](docs/adr/0001-secondary-sources-as-nested-repositories.md).
 - In tracked Markdown and other public-facing repo content, do not use absolute local filesystem
@@ -85,9 +87,13 @@ Use these terms, with these meanings, in conversation, code, tests, and document
 or code the task changes, uses an alias to avoid or uses a term with a different meaning, say so
 before you continue. Change this section through `engineering:ubiquitous-language`.
 
-- **Managed overlay**: A repo-owned file, usually named `*.managed.*`, that authoritatively sets
-  selected keys or settings in a live target while preserving unrelated live configuration. Aliases
-  to avoid: managed file, sidecar.
+- **Managed overlay**: A repo-owned file, usually named `*.managed.*` or kept in an **Overlay
+  directory**, that authoritatively sets selected keys or settings in a live target while preserving
+  unrelated live configuration. Aliases to avoid: managed file, sidecar, layer.
+- **Overlay directory**: A source-only directory named after its target with a `.d` suffix, such as
+  `private_dot_claude/settings.json.d/`, that holds **Managed overlays** for one **Modify script**,
+  unlike a drop-in directory, which the target's own tool reads. Aliases to avoid: settings.d, layer
+  directory.
 - **Default overlay**: A repo-owned file, usually named `*.default.*`, that supplies missing
   settings or an absent unstructured target without changing existing values. Aliases to avoid:
   default file, fallback, sidecar.
@@ -102,9 +108,15 @@ before you continue. Change this section through `engineering:ubiquitous-languag
 
 Relationships:
 
-- A **Modify script** applies one **Managed overlay** to its live target file.
+- A **Modify script** applies one **Managed overlay**, or the overlays of one **Overlay directory**,
+  to its live target file.
 - A **Modify script** may apply a **Default overlay** before a **Managed overlay**, so managed
   values win while existing live values win over defaults.
+- A **Modify script** in the **Primary source** composes the **Managed overlays** of its **Overlay
+  directory** from the **Primary source**, then from the same path in each **Secondary source**
+  alphabetically, and within each source in file-name order, so a `10-` or `20-` name prefix sets
+  the order; later overlays override values and add array entries
+  ([ADR 0002](docs/adr/0002-primary-source-composes-overlay-directories.md)).
 - `dotfiles` applies the **Primary source** first, then each **Secondary source** alphabetically,
   each with its own chezmoi state
   ([ADR 0001](docs/adr/0001-secondary-sources-as-nested-repositories.md)).

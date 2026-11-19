@@ -23,8 +23,10 @@ dev = [
 scripts_are_modules = true
 cache_dir = ".cache/mypy"
 python_version = "3.14"
+mypy_path = "tools"
 files = [
     "tools",
+    "managed/.chezmoitemplates/modify_jsonc_overlay_directory.py",
     "managed/dot_local/bin/executable_dotfiles",
     "managed/dot_local/bin/executable_generate-completions",
     "managed/dot_local/bin/executable_tmx",

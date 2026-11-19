@@ -29,7 +29,8 @@ targets land in `$HOME` like the primary source's.
 - Sources must write disjoint targets. A target that two sources write would hold private content at
   a path outside `managed-<name>/`, which a tool denied the checkout may still read. Secondary
   content reaches shared tools through drop-in directories, `includeIf`, and environment variables.
-  Revisit this rule when a setting has none of those routes.
+  Revisit this rule when a setting has none of those routes;
+  [ADR 0002](0002-primary-source-composes-overlay-directories.md) covers targets that have none.
 - A secondary source must not ship a chezmoi config template (`.chezmoi.<format>.tmpl`), which
   `chezmoi init` would render over the shared config. The wrapper refuses to run against one.
 - A secondary source cannot lint or run CI on its own, because its tooling lives in this repository.
