@@ -66,10 +66,9 @@ More specific `AGENTS.md` files retain implementation details for their director
   signing, SSH remotes, or credentials outside it. The package registries and GitHub hosts in its
   `allowedDomains` rely on that server-side review; where review runs locally, remove them so the
   per-command host review fires.
-- Codex `.rules` files under `dot_codex/rules/` and
-  `private_dot_claude/executable_statusline-command.sh` materialize through `chezmoi apply`. Treat
-  edits to those files as active configuration changes; editing an ignored overlay does not change
-  the corresponding live configuration.
+- Codex `.rules` files under `dot_codex/rules/` materialize through `chezmoi apply`. Treat edits to
+  those files as active configuration changes; editing an ignored overlay does not change the
+  corresponding live configuration.
 
 ## Shell Conventions
 

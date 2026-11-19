@@ -26,10 +26,7 @@ indent_size = 4
 [*.{sh,sh.tmpl}]
 shell_variant = posix
 
-[managed/private_dot_claude/executable_statusline-command.sh]
-shell_variant = bash
-
-[managed/dot_local/bin/{executable_claude-commit,executable_codex-commit}]
+[managed/dot_local/bin/{executable_claude-commit,executable_claude-statusline,executable_codex-commit}]
 shell_variant = bash
 
 [*.bash]

@@ -1,2 +1,3 @@
 {{- /* vim: set filetype=jsonc : */ -}}
-{{- template "claude/settings/core.jsonc" (merge (dict "claudeDir" "~/.claude-personal") .) -}}
+{{- /* ~/.claude-personal exists only on work machines, beside the work account's ~/.claude. */ -}}
+{{- template "claude/settings/core.jsonc" (merge (dict "claudeDir" "~/.claude-personal" "statusLineLabel" "personal") .) -}}
