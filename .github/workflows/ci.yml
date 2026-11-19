@@ -64,6 +64,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes fish tmux zsh
 
+      # Tests that drive a real chezmoi skip without one. Install it here instead of in mise.toml, so
+      # local runs keep using the machine's chezmoi; the repository's minimum_release_age applies.
+      - name: Install chezmoi
+        run: mise use --global chezmoi@latest
+
       - name: Install Node dependencies
         run: pnpm install --frozen-lockfile
 
