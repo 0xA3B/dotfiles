@@ -1,10 +1,11 @@
+import re
 from textwrap import dedent
 
 import pytest
 import tomlkit
 from chezmoi_modify.diagnostics import Diagnostic
 from chezmoi_modify.exceptions import ChezmoiModifyError
-from chezmoi_modify.toml import merge_toml_overlay
+from chezmoi_modify.toml import compose_toml_overlays, merge_toml_overlay
 
 
 def test_toml_overlay_overwrites_scalars_and_recursively_merges_tables() -> None:
@@ -235,3 +236,97 @@ def test_toml_overlay_rejects_invalid_live_toml() -> None:
 def test_toml_overlay_rejects_invalid_managed_toml() -> None:
     with pytest.raises(ChezmoiModifyError, match="managed TOML could not be parsed"):
         merge_toml_overlay('live = "ok"\n', "invalid = [")
+
+
+def test_composed_overlays_override_scalars_merge_tables_and_add_array_entries() -> None:
+    composed = compose_toml_overlays(
+        [
+            (
+                "core",
+                dedent(
+                    """\
+                    exclude-newer = "3 days"
+                    no-build = ["a", "b"]
+
+                    [pip]
+                    strict = true
+                    compile-bytecode = false
+
+                    [[index]]
+                    name = "pypi"
+                    url = "https://pypi.example/simple"
+                    explicit = false
+
+                    [[index]]
+                    name = "mirror"
+                    url = "https://mirror.example/simple"
+                    """
+                ),
+            ),
+            (
+                "work",
+                dedent(
+                    """\
+                    exclude-newer = "7 days"
+                    no-build = ["b", "c"]
+
+                    [pip]
+                    compile-bytecode = true
+
+                    [[index]]
+                    name = "pypi"
+                    url = "https://pypi.example/simple"
+                    authenticate = "never"
+
+                    [[index]]
+                    name = "internal"
+                    url = "https://packages.example/simple"
+                    explicit = true
+                    """
+                ),
+            ),
+        ],
+        array_table_identity={"index": ("url",)},
+    )
+
+    assert tomlkit.parse(composed).unwrap() == {
+        "exclude-newer": "7 days",
+        "no-build": ["a", "b", "c"],
+        "pip": {"strict": True, "compile-bytecode": True},
+        "index": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.example/simple",
+                "explicit": False,
+                "authenticate": "never",
+            },
+            {"name": "mirror", "url": "https://mirror.example/simple"},
+            {"name": "internal", "url": "https://packages.example/simple", "explicit": True},
+        ],
+    }
+
+
+def test_composed_overlays_name_the_overlay_that_fails_to_parse() -> None:
+    with pytest.raises(ChezmoiModifyError, match=re.escape("work:uv.toml.d/50-work.toml TOML")):
+        compose_toml_overlays([("work:uv.toml.d/50-work.toml", "[index")])
+
+
+@pytest.mark.parametrize(
+    ("overlay", "message"),
+    [
+        (
+            '[[index]]\nurl = "https://a.example"\n\n[[index]]\nurl = "https://a.example"\n',
+            "duplicate managed identity",
+        ),
+        ('[[index]]\nname = "no-url"\n', "missing identity key: url"),
+        ('[index]\nurl = "https://a.example"\n', "must be an array of tables"),
+    ],
+)
+def test_composed_overlays_reject_invalid_array_table_identities(
+    overlay: str, message: str
+) -> None:
+    with pytest.raises(ChezmoiModifyError, match=message):
+        compose_toml_overlays(
+            [("core", '[[index]]\nurl = "https://b.example"\n'), ("work", overlay)],
+            array_table_identity={"index": ("url",)},
+        )

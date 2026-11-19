@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from copy import deepcopy
 from typing import Any
 
 import tomlkit
-from tomlkit.items import AoT, Table
+from tomlkit.items import AoT, Array, Table
 
 from chezmoi_modify.diagnostics import Diagnostic, MergeResult
 from chezmoi_modify.exceptions import ChezmoiModifyError
@@ -51,6 +51,71 @@ def merge_toml_overlay(
         text=_ensure_one_trailing_newline(tomlkit.dumps(live_doc)),
         diagnostics=tuple(diagnostics),
     )
+
+
+def compose_toml_overlays(
+    overlays: Sequence[tuple[str, str]],
+    *,
+    array_table_identity: _IdentityConfig | None = None,
+) -> str:
+    """Compose ``(label, text)`` TOML overlays, in order, into one TOML overlay.
+
+    Standard tables merge recursively. In an array of tables named in
+    ``array_table_identity``, a later entry merges into the earlier entry with the same
+    identity and other entries append, and inline arrays concatenate without duplicates,
+    so a later overlay adds entries to those without removing any. The later overlay
+    replaces every other value: scalars, inline tables, arrays of tables without an
+    identity, and values whose type differs between overlays. An overlay that does not
+    parse raises an error that names its label.
+    """
+    identity_config = _normalize_identity_config(array_table_identity or {})
+    composed = tomlkit.document()
+    for label, text in overlays:
+        _compose_table(composed, _parse_toml(text, label), path=(), identity_config=identity_config)
+    return tomlkit.dumps(composed)
+
+
+def _compose_table(
+    base: Any,
+    overlay: Any,
+    *,
+    path: tuple[str, ...],
+    identity_config: _IdentityPathConfig,
+) -> None:
+    for key, value in overlay.items():
+        key_path = (*path, str(key))
+        base_value = base.get(key)
+        if key_path in identity_config:
+            if not isinstance(value, AoT):
+                msg = f"managed TOML path {'.'.join(key_path)} must be an array of tables"
+                raise ChezmoiModifyError(msg)
+            identity_fields = identity_config[key_path]
+            _validate_managed_identities(value, identity_fields, key_path)
+            if base_value is None:
+                base[key] = deepcopy(value)
+                continue
+            for entry in value:
+                identity = _entry_identity(entry, identity_fields, key_path)
+                match = next(
+                    (
+                        base_entry
+                        for base_entry in base_value
+                        if _entry_matches_identity(base_entry, identity_fields, identity)
+                    ),
+                    None,
+                )
+                if match is None:
+                    base_value.append(deepcopy(entry))
+                else:
+                    _compose_table(match, entry, path=key_path, identity_config=identity_config)
+        elif _is_mergeable_table(base_value, value):
+            _compose_table(base_value, value, path=key_path, identity_config=identity_config)
+        elif isinstance(base_value, Array) and isinstance(value, Array):
+            for item in value:
+                if item not in base_value:
+                    base_value.append(deepcopy(item))
+        else:
+            base[key] = deepcopy(value)
 
 
 def _parse_toml(text: str, label: str) -> Any:

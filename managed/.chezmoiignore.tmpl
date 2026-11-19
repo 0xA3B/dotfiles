@@ -16,7 +16,6 @@
 
 # Existing modify-script inputs are source-only.
 .npmrc.managed
-.config/uv/uv.managed.toml
 Library/Application Support/Code/User/settings.managed.jsonc
 
 # Overlay directories are modify-script inputs read from every source.
@@ -24,6 +23,8 @@ Library/Application Support/Code/User/settings.managed.jsonc
 .claude/settings.json.d/**
 .claude-personal/settings.json.d
 .claude-personal/settings.json.d/**
+.config/uv/uv.toml.d
+.config/uv/uv.toml.d/**
 
 # Codex overlays always remain source-only; future modify scripts read them from here.
 .codex/AGENTS.default.md

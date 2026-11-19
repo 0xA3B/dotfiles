@@ -11,6 +11,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+import tomlkit
 from chezmoi_modify.exceptions import ChezmoiModifyError
 from chezmoi_modify.source import read_overlay_directory
 
@@ -263,3 +264,37 @@ def test_modify_script_fails_without_writing_when_an_overlay_is_missing(
 
     assert result.returncode != 0
     assert "active source work has no checkout" in result.stderr
+
+
+def test_uv_modify_script_composes_its_overlay_directory_into_the_live_config(
+    tmp_path: Path,
+    repo: Path,
+) -> None:
+    script = repo / "managed/dot_config/uv/modify_uv.toml"
+    script.parent.mkdir(parents=True)
+    shutil.copy(_REPO / "managed/dot_config/uv/modify_uv.toml", script)
+    write(
+        repo / "managed/dot_config/uv/uv.toml.d/10-core.toml",
+        'exclude-newer = "3 days"\n\n[[index]]\nname = "pypi"\nurl = "https://pypi.example/simple"\n',
+    )
+    work = add_checkout(repo, "work")
+    write(
+        work / "dot_config/uv/uv.toml.d/50-work.toml",
+        '[[index]]\nname = "internal"\nurl = "https://packages.example/simple"\nexplicit = true\n',
+    )
+    target = write(
+        tmp_path / "home/.config/uv/uv.toml",
+        'cache-dir = "/kept"\n',
+    )
+
+    result = chezmoi_cat(tmp_path, repo, target)
+
+    assert result.returncode == 0, result.stderr
+    assert tomlkit.parse(result.stdout).unwrap() == {
+        "cache-dir": "/kept",
+        "exclude-newer": "3 days",
+        "index": [
+            {"name": "pypi", "url": "https://pypi.example/simple"},
+            {"name": "internal", "url": "https://packages.example/simple", "explicit": True},
+        ],
+    }
