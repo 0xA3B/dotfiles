@@ -1,2 +1,5 @@
 {{- /* vim: set filetype=jsonc : */ -}}
-{{- template "claude/settings/core.jsonc" (merge (dict "claudeDir" "~/.claude") .) -}}
+{{- /* On work machines, ~/.claude belongs to the work account. */ -}}
+{{- $label := "" -}}
+{{- if .work_machine -}}{{- $label = "work" -}}{{- end -}}
+{{- template "claude/settings/core.jsonc" (merge (dict "claudeDir" "~/.claude" "statusLineLabel" $label) .) -}}

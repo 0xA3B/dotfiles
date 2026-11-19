@@ -1,0 +1,388 @@
+#!/usr/bin/env bash
+# Claude Code status line script (starship style)
+# Usage: claude-statusline [LABEL]
+# Reads status line JSON from stdin and prints up to two lines:
+#   1. Starship-style modules for the account label, project and worktree, git
+#      branch and status, open PR, lines changed this session, and model.
+#   2. Usage meters: the context window, the prompt cache state, the
+#      subscription rate limits (5-hour and 7-day) or the session cost, and a
+#      gateway spend limit, each once reported, then the session ID.
+#
+# LABEL names the account, so sessions of two accounts on one machine look
+# different at a glance; "work" and "personal" get their own icon and color.
+# Without LABEL, the account module is left out.
+#
+# The countdowns only tick when the script re-runs, so the statusLine setting
+# sets refreshInterval to re-run it every minute while the session is idle.
+#
+# Requires a Nerd Font v3+ for the Material Design glyphs. Glyphs are written
+# as literal characters rather than $'\u...' escapes, which bash leaves
+# unexpanded under a non-UTF-8 locale.
+
+# ANSI colors
+ESC=$'\033'
+RESET=$'\033[0m'
+# Low-emphasis text: Catppuccin Mocha Overlay 2 (#9399b2), which stays readable
+# next to the pastel colors, unlike the terminal's faint (SGR 2) rendering
+MUTED=$'\033[38;2;147;153;178m'
+YELLOW=$'\033[33m'
+RED=$'\033[31m'
+BLUE=$'\033[34m'
+ORANGE=$'\033[38;5;208m'
+# Bold ANSI palette colors, matching starship's default module styles, so the
+# modules follow the terminal theme
+BOLD_RED=$'\033[1;31m'
+BOLD_GREEN=$'\033[1;32m'
+BOLD_YELLOW=$'\033[1;33m'
+BOLD_BLUE=$'\033[1;34m'
+BOLD_PURPLE=$'\033[1;35m'
+BOLD_CYAN=$'\033[1;36m'
+BOLD_ORANGE=$'\033[1;38;5;208m'
+
+# Nerd Font glyphs
+ICON_WORK=""       # U+F0B1   fa-briefcase
+ICON_USER=""       # U+F007   fa-user
+ICON_FOLDER=""     # U+F07B   fa-folder
+ICON_WORKTREE="󰙅"   # U+F0645  md-file_tree
+ICON_BRANCH=""     # U+E0A0   powerline branch
+ICON_PR=""         # U+F407   oct-git_pull_request
+ICON_PR_DRAFT=""   # U+F4DD   oct-git_pull_request_draft
+ICON_MR=""         # U+F296   fa-gitlab
+ICON_MODEL="󰙴"      # U+F0674  md-creation (sparkles)
+ICON_SESSION="󰓹"    # U+F04F9  md-tag
+ICON_RESET="󰔟"      # U+F051F  md-timer_sand
+ICON_COST="󰇁"       # U+F01C1  md-currency_usd
+ICON_CACHE_WARM="󰈸" # U+F0238  md-fire
+ICON_CACHE_COLD="󰜗" # U+F0717  md-snowflake
+ICON_CACHE_MISS="󰀨" # U+F0028  md-alert_circle
+# Usage pie, empty then one to eight eighths filled clockwise
+PIE=("󰝦" "󰪞" "󰪟" "󰪠" "󰪡" "󰪢" "󰪣" "󰪤" "󰪥") # U+F0766 md-circle_outline, U+F0A9E-F0AA5 md-circle_slice_1-8
+
+# Read stdin once and extract everything in a single jq call.
+# Emit one field per line and read with mapfile so empty fields don't collapse.
+input=$(cat)
+mapfile -t fields < <(echo "${input}" | jq -r '
+  .workspace.project_dir // "",
+  .workspace.current_dir // .workspace.project_dir // "",
+  .model.id // "",
+  .model.display_name // "",
+  .effort.level // "",
+  .context_window.used_percentage // "",
+  .vim.mode // "",
+  .cost.total_cost_usd // 0,
+  .rate_limits.spend_limit.used_percentage // "",
+  (.rate_limits.spend_limit.resets_at // 0 | floor),
+  .rate_limits.spend_limit.used_usd // "",
+  .rate_limits.spend_limit.limit_usd // "",
+  .rate_limits.spend_limit.period // "",
+  .rate_limits.five_hour.used_percentage // "",
+  (.rate_limits.five_hour.resets_at // 0 | floor),
+  .rate_limits.seven_day.used_percentage // "",
+  (.rate_limits.seven_day.resets_at // 0 | floor),
+  .workspace.git_worktree // .worktree.name // "",
+  .pr.number // "",
+  .pr.url // "",
+  .pr.review_state // "",
+  .pr.kind // "",
+  .cost.total_lines_added // 0,
+  .cost.total_lines_removed // 0,
+  .session_id // "",
+  .prompt_cache.caching_observed // false,
+  .prompt_cache.warm // false,
+  (.prompt_cache.expires_at // 0 | floor),
+  .prompt_cache.recache_tokens_if_cold // "",
+  .prompt_cache.misses // 0
+')
+project_dir=${fields[0]}
+current_dir=${fields[1]}
+model_id=${fields[2]}
+model_display=${fields[3]}
+effort_level=${fields[4]}
+ctx_used=${fields[5]}
+vim_mode=${fields[6]}
+cost_usd=${fields[7]}
+spend_used=${fields[8]}
+spend_resets_at=${fields[9]}
+spend_used_usd=${fields[10]}
+spend_limit_usd=${fields[11]}
+spend_period=${fields[12]}
+five_hour_used=${fields[13]}
+five_hour_resets_at=${fields[14]}
+seven_day_used=${fields[15]}
+seven_day_resets_at=${fields[16]}
+worktree_name=${fields[17]}
+pr_number=${fields[18]}
+pr_url=${fields[19]}
+pr_review_state=${fields[20]}
+pr_kind=${fields[21]}
+lines_added=${fields[22]}
+lines_removed=${fields[23]}
+session_id=${fields[24]}
+cache_observed=${fields[25]}
+cache_warm=${fields[26]}
+cache_expires_at=${fields[27]}
+cache_recache_tokens=${fields[28]}
+cache_misses=${fields[29]}
+
+project_name=$(basename "${project_dir}")
+now=$(date +%s)
+
+# Git info: branch, plus starship's status symbols: "!" for modified, "+" for
+# staged, and "?" for untracked files. Read from the current directory so a
+# worktree session shows the worktree's branch.
+git_branch=""
+git_status=""
+if git -C "${current_dir}" rev-parse --git-dir >/dev/null 2>&1; then
+  git_branch=$(git -C "${current_dir}" symbolic-ref --short HEAD 2>/dev/null || git -C "${current_dir}" rev-parse --short HEAD 2>/dev/null)
+  if [[ -n "${git_branch}" ]]; then
+    porcelain=$(git -C "${current_dir}" status --porcelain 2>/dev/null)
+    modified="" staged="" untracked=""
+    while IFS= read -r line; do
+      [[ -z "${line}" ]] && continue
+      if [[ "${line:0:2}" = "??" ]]; then
+        untracked="?"
+        continue
+      fi
+      [[ "${line:0:1}" != " " ]] && staged="+"
+      [[ "${line:1:1}" != " " ]] && modified="!"
+    done <<<"${porcelain}"
+    git_status="${modified}${staged}${untracked}"
+  fi
+fi
+
+# Model name, without the "Claude " prefix. The effort level is only present
+# when the model supports it.
+model_name="${model_display:-${model_id}}"
+model_alias=${model_name#Claude }
+if [[ -n "${effort_level}" ]]; then
+  model_alias="${model_alias} · ${effort_level}"
+fi
+
+# Starship-style modules: bold colored text joined by plain connector words,
+# using starship's default colors for the username, directory, git branch, and
+# git status modules.
+# Account module, from the LABEL argument
+label=${1:-}
+prompt=""
+case "${label}" in
+  "") ;;
+  work) prompt="${BOLD_ORANGE}${ICON_WORK} work${RESET} in " ;;
+  personal) prompt="${BOLD_YELLOW}${ICON_USER} personal${RESET} in " ;;
+  *) prompt="${BOLD_YELLOW}${label}${RESET} in " ;;
+esac
+# Directory module, plus the worktree name inside a linked git worktree or a
+# worktree session, so two worktrees of one project look different
+directory="${ICON_FOLDER} ${project_name}"
+if [[ -n "${worktree_name}" ]]; then
+  directory+=" ${ICON_WORKTREE} ${worktree_name}"
+fi
+prompt+="${BOLD_CYAN}${directory}${RESET}"
+if [[ -n "${git_branch}" ]]; then
+  prompt+=" on ${BOLD_PURPLE}${ICON_BRANCH} ${git_branch}${RESET}"
+  if [[ -n "${git_status}" ]]; then
+    prompt+=" ${BOLD_RED}[${git_status}]${RESET}"
+  fi
+fi
+
+# Open PR, or GitLab MR, for the branch: colored by review state and linked to
+# its page with an OSC 8 hyperlink
+if [[ -n "${pr_number}" ]]; then
+  pr_icon=${ICON_PR}
+  pr_label="#${pr_number}"
+  if [[ "${pr_kind}" = "mr" ]]; then
+    pr_icon=${ICON_MR}
+    pr_label="!${pr_number}"
+  fi
+  case "${pr_review_state}" in
+    approved) pr_color=${BOLD_GREEN} ;;
+    changes_requested) pr_color=${BOLD_RED} ;;
+    draft)
+      pr_color=${MUTED}
+      [[ "${pr_kind}" != "mr" ]] && pr_icon=${ICON_PR_DRAFT}
+      ;;
+    *) pr_color=${BOLD_YELLOW} ;;
+  esac
+  if [[ -n "${pr_url}" ]]; then
+    pr_label="${ESC}]8;;${pr_url}"$'\a'"${pr_label}${ESC}]8;;"$'\a'
+  fi
+  prompt+=" ${pr_color}${pr_icon} ${pr_label}${RESET}"
+fi
+
+# Lines Claude changed this session, in the style of starship's git_metrics
+# module
+if [[ "${lines_added}" -gt 0 ]]; then
+  prompt+=" ${BOLD_GREEN}+${lines_added}${RESET}"
+fi
+if [[ "${lines_removed}" -gt 0 ]]; then
+  prompt+=" ${BOLD_RED}-${lines_removed}${RESET}"
+fi
+
+prompt+=" via ${BOLD_BLUE}${ICON_MODEL} ${model_alias}${RESET}"
+
+# Usage meter: "<label> <pie> <pct>%<suffix>". The pie fills in eighths, with
+# any nonzero usage showing at least one slice. The pie and the bold
+# percentage take a threshold color.
+meter() {
+  local label=$1 pct=$2 suffix=$3 color slices
+  if [[ "${pct}" -ge 90 ]]; then
+    color="${BOLD_RED}"
+  elif [[ "${pct}" -ge 75 ]]; then
+    color="${BOLD_ORANGE}"
+  elif [[ "${pct}" -ge 50 ]]; then
+    color="${BOLD_YELLOW}"
+  else
+    color="${BOLD_GREEN}"
+  fi
+  slices=$(((pct * 8 + 50) / 100))
+  if [[ "${slices}" -lt 1 ]] && [[ "${pct}" -gt 0 ]]; then slices=1; fi
+  if [[ "${slices}" -gt 8 ]]; then slices=8; fi
+  printf '%s' "${MUTED}${label}${RESET} ${color}${PIE[slices]} ${pct}%${RESET}${suffix}"
+}
+
+# Duration as "1d2h", "2h1m", "42m", or "<1m"
+format_duration() {
+  local secs=$1
+  local d=$((secs / 86400)) h=$(((secs % 86400) / 3600)) m=$(((secs % 3600) / 60))
+  if [[ "${d}" -gt 0 ]]; then
+    printf '%s' "${d}d${h}h"
+  elif [[ "${h}" -gt 0 ]]; then
+    printf '%s' "${h}h${m}m"
+  elif [[ "${m}" -gt 0 ]]; then
+    printf '%s' "${m}m"
+  else
+    printf '%s' "<1m"
+  fi
+}
+
+# Context window usage. used_percentage can be null early in a session.
+context_display=""
+if [[ -n "${ctx_used}" ]]; then
+  context_display=$(meter ctx "$(printf '%.0f' "${ctx_used}")" "")
+fi
+
+# Token count as "850", "72k", or "1.2M"
+format_tokens() {
+  local tokens=$1
+  if [[ "${tokens}" -ge 1000000 ]]; then
+    printf '%d.%dM' $((tokens / 1000000)) $(((tokens % 1000000) / 100000))
+  elif [[ "${tokens}" -ge 1000 ]]; then
+    printf '%dk' $((tokens / 1000))
+  else
+    printf '%d' "${tokens}"
+  fi
+}
+
+# Prompt cache: a fire glyph and the time until the cached prefix goes cold,
+# with the time in yellow under 5 minutes, or a blue snowflake and the tokens
+# the next request re-caches once it is cold. A red marker counts the session's
+# cache misses. Hidden until a response reports cache tokens.
+cache_display=""
+if [[ "${cache_observed}" = "true" ]]; then
+  cache_secs=$((cache_expires_at - now))
+  if [[ "${cache_warm}" = "true" ]] && [[ "${cache_secs}" -gt 0 ]]; then
+    timer_color=${MUTED}
+    [[ "${cache_secs}" -lt 300 ]] && timer_color=${YELLOW}
+    cache_display="${MUTED}cache${RESET} ${ORANGE}${ICON_CACHE_WARM}${RESET} ${timer_color}$(format_duration "${cache_secs}")${RESET}"
+  else
+    cache_display="${MUTED}cache${RESET} ${BLUE}${ICON_CACHE_COLD}${RESET}"
+    # recache_tokens_if_cold is null right after a compaction
+    if [[ -n "${cache_recache_tokens}" ]]; then
+      cache_display+=" ${MUTED}$(format_tokens "${cache_recache_tokens}")${RESET}"
+    fi
+  fi
+  if [[ "${cache_misses}" -gt 0 ]]; then
+    cache_display+=" ${RED}${ICON_CACHE_MISS} ${cache_misses}${RESET}"
+  fi
+fi
+
+# US dollars as "$314.12"
+format_usd() {
+  printf '$%.2f' "$1"
+}
+
+# Subscription rate-limit windows, with an hourglass and the time until reset.
+# rate_limits appears only for Pro/Max after the first API response, and each
+# window can be absent on its own, so an empty percentage hides that window.
+format_limit() {
+  local label=$1 used=$2 resets_at=$3
+  [[ -z "${used}" ]] && return
+  local pct reset=""
+  pct=$(printf '%.0f' "${used}")
+  local secs=$((resets_at - now))
+  if [[ "${resets_at}" -gt 0 ]] && [[ "${secs}" -gt 0 ]]; then
+    reset=" ${MUTED}${ICON_RESET} $(format_duration "${secs}")${RESET}"
+  fi
+  meter "${label}" "${pct}" "${reset}"
+}
+five_hour_display=$(format_limit 5h "${five_hour_used}" "${five_hour_resets_at}")
+seven_day_display=$(format_limit 7d "${seven_day_used}" "${seven_day_resets_at}")
+
+# Session cost: Claude Code's client-side estimate at list price, which resets
+# when /clear starts a new session. Hidden until the first API response, and
+# for a subscription, which reports rate-limit windows instead.
+cost_display=""
+if [[ -z "${five_hour_used}${seven_day_used}" ]] && [[ "$(printf '%.2f' "${cost_usd}")" != "0.00" ]]; then
+  cost_display="${MUTED}cost${RESET} ${ICON_COST} $(printf '%.2f' "${cost_usd}")"
+fi
+
+# Spend limit for the limit's period, with the estimated spend against the
+# limit and an hourglass with the time until the period resets. spend_limit
+# appears only behind a gateway that sets a spend limit, after the first
+# API response. The dollar amounts arrive in a separate request every few
+# minutes, so the meter shows the percentage alone until they do.
+spend_display=""
+if [[ -n "${spend_used}" ]]; then
+  case "${spend_period}" in
+    monthly) spend_label="month" ;;
+    weekly) spend_label="week" ;;
+    daily) spend_label="day" ;;
+    *) spend_label="spend" ;;
+  esac
+  spend_amounts=""
+  if [[ -n "${spend_used_usd}" ]]; then
+    spend_amounts=" $(format_usd "${spend_used_usd}")"
+    if [[ -n "${spend_limit_usd}" ]]; then
+      # Whole-dollar limits read as "$500" rather than "$500.00"
+      spend_limit_display=$(format_usd "${spend_limit_usd}")
+      spend_amounts+="${MUTED}/${spend_limit_display%.00}${RESET}"
+    fi
+  fi
+  spend_reset=""
+  spend_secs=$((spend_resets_at - now))
+  if [[ "${spend_resets_at}" -gt 0 ]] && [[ "${spend_secs}" -gt 0 ]]; then
+    spend_reset=" ${MUTED}${ICON_RESET} $(format_duration "${spend_secs}")${RESET}"
+  fi
+  spend_display=$(meter "${spend_label}" "$(printf '%.0f' "${spend_used}")" "${spend_amounts}${spend_reset}")
+fi
+
+# Vim mode, using starship's character module symbols: "❯" in insert mode and
+# "❮" in the other modes
+vim_display=""
+if [[ -n "${vim_mode}" ]]; then
+  vim_symbol="❮"
+  [[ "${vim_mode}" = "INSERT" ]] && vim_symbol="❯"
+  vim_display=" ${BOLD_GREEN}${vim_symbol} ${vim_mode}${RESET}"
+fi
+
+# Full session ID, so it can be copied to reference this session from another
+# one. The session name is left out because Claude Code already shows it next
+# to the input box.
+session_display=""
+if [[ -n "${session_id}" ]]; then
+  session_display="${MUTED}${ICON_SESSION} ${session_id}${RESET}"
+fi
+
+# Separator between the line 2 meters
+METER_SEPARATOR=" ${MUTED}│${RESET} "
+
+# Line 1: starship-style modules, then the vim mode
+# Line 2: usage meters (ctx  cache  5h  7d  cost  spend), then the session ID
+meters_line=""
+for meter_display in "${context_display}" "${cache_display}" "${five_hour_display}" "${seven_day_display}" "${cost_display}" "${spend_display}" "${session_display}"; do
+  [[ -n "${meter_display}" ]] && meters_line="${meters_line:+${meters_line}${METER_SEPARATOR}}${meter_display}"
+done
+
+printf "%s" "${prompt}${vim_display}"
+if [[ -n "${meters_line}" ]]; then
+  printf "\n%s" "${meters_line}"
+fi

@@ -1,5 +1,6 @@
 // Claude Code settings for every account on every machine. Callers set .claudeDir to the
-// account's config directory, such as ~/.claude or ~/.claude-personal.
+// account's config directory, such as ~/.claude or ~/.claude-personal, and on machines with two
+// accounts set .statusLineLabel to the account's name, which leads its status line.
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "attribution": {
@@ -94,7 +95,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash {{ .claudeDir }}/statusline-command.sh",
+    "command": "bash ~/.local/bin/claude-statusline{{ with .statusLineLabel }} {{ . }}{{ end }}",
     "refreshInterval": 60,
     "hideVimModeIndicator": true
   },
@@ -111,7 +112,7 @@
     "defaultMode": "auto",
     "allow": [
       "Read({{ .claudeDir }}/settings.json)",
-      "Read({{ .claudeDir }}/statusline-command.sh)",
+      "Read(~/.local/bin/claude-statusline)",
       "Read({{ .claudeDir }}/skills/**)",
       "Read({{ .claudeDir }}/rules/**)",
       "Bash(gh pr list *)",
