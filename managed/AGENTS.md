@@ -27,16 +27,16 @@ More specific `AGENTS.md` files retain implementation details for their director
 
 ## Reference Agent Configuration
 
-- [`dot_claude`](dot_claude) and [`dot_codex`](dot_codex) contain public-safe agent configuration.
-  Their overlays, including `AGENTS.default.md`, remain permanently source-only. Future adjacent
-  modify scripts must read those overlays directly from source state.
+- [`private_dot_claude`](private_dot_claude) and [`dot_codex`](dot_codex) contain public-safe agent
+  configuration. Their overlays, including `AGENTS.default.md`, remain permanently source-only.
+  Future adjacent modify scripts must read those overlays directly from source state.
 - Claude user instructions materialize as whole files through `chezmoi apply`.
   [`claude/user.md`](.chezmoitemplates/claude/user.md) renders to `CLAUDE.md` for every Claude
   account, and [`claude/personal-services.md`](.chezmoitemplates/claude/personal-services.md)
   renders to `rules/personal-services.md` for the personal account only. The personal account's
   config directory is `~/.claude-personal` on work machines and `~/.claude` elsewhere;
   `.chezmoiignore.tmpl` selects targets by `work_machine`. Edit the templates; the one-line `.tmpl`
-  targets under `dot_claude` and `dot_claude-personal` only render them.
+  targets under `private_dot_claude` and `private_dot_claude-personal` only render them.
 - Claude keybindings materialize the same way:
   [`claude/keybindings.json`](.chezmoitemplates/claude/keybindings.json) renders to
   `keybindings.json` for every Claude account. Its `meta+enter` binding depends on the `cmd+enter`
@@ -49,13 +49,14 @@ More specific `AGENTS.md` files retain implementation details for their director
 - The two harnesses review package-manager commands differently on purpose. Codex routes them to
   approval through `dot_codex/rules/package-managers.rules`. Claude keeps them sandboxed, where
   server-side auto-mode review covers every sandboxed command. `sandbox.excludedCommands` in
-  `dot_claude/settings.managed.jsonc.tmpl` lists only commands that need what the sandbox withholds:
-  commit signing, SSH remotes, or credentials outside it. The package registries and GitHub hosts in
-  its `allowedDomains` rely on that server-side review; where review runs locally, remove them so
-  the per-command host review fires.
-- Codex `.rules` files under `dot_codex/rules/` and `dot_claude/executable_statusline-command.sh`
-  materialize through `chezmoi apply`. Treat edits to those files as active configuration changes;
-  editing an ignored overlay does not change the corresponding live configuration.
+  `private_dot_claude/settings.managed.jsonc.tmpl` lists only commands that need what the sandbox
+  withholds: commit signing, SSH remotes, or credentials outside it. The package registries and
+  GitHub hosts in its `allowedDomains` rely on that server-side review; where review runs locally,
+  remove them so the per-command host review fires.
+- Codex `.rules` files under `dot_codex/rules/` and
+  `private_dot_claude/executable_statusline-command.sh` materialize through `chezmoi apply`. Treat
+  edits to those files as active configuration changes; editing an ignored overlay does not change
+  the corresponding live configuration.
 
 ## Shell Conventions
 
