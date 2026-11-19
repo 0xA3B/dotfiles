@@ -1,0 +1,9 @@
+#!/bin/sh
+# Upgrade the tools in the global mise config within their configured ranges,
+# then refresh the shims. --global keeps a run from inside a project from
+# upgrading that project's tools and rewriting its mise.lock. mise removes each
+# replaced version after its upgrade.prune_after grace period.
+set -eu
+
+mise upgrade --global
+mise reshim

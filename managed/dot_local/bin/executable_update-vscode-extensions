@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Update VS Code extensions to the newest versions past a 72-hour release-age cooldown.
 
-Lives on PATH so a daily update routine can run it next to brew-update. Python
-(stdlib only) rather than sh because of the Marketplace queries and version
-selection.
+Lives on PATH so update-all can run it next to the other update commands.
+Python (stdlib only) rather than sh because of the Marketplace queries and
+version selection.
 
 Keep extensions.autoUpdate off and run this command instead. VS Code's own
 extensions.autoUpdateDelay setting cannot enforce the cooldown: publishers listed
@@ -25,9 +25,9 @@ matches VS Code's behavior when automatic updates are off.
 
 Usage:
 
-    vscode-extensions-update                       # Install eligible updates.
-    vscode-extensions-update --dry-run             # Report without installing.
-    vscode-extensions-update --skip-cooldown pub.x # Security fix: skip the age check.
+    update-vscode-extensions                       # Install eligible updates.
+    update-vscode-extensions --dry-run             # Report without installing.
+    update-vscode-extensions --skip-cooldown pub.x # Security fix: skip the age check.
 
 An extension whose Marketplace query fails after retries, or whose version data
 cannot be parsed, is skipped. The others still update, and the command exits 1.
@@ -51,7 +51,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any, Protocol
 
-PROG = "vscode-extensions-update"
+PROG = "update-vscode-extensions"
 COOLDOWN = timedelta(hours=72)
 QUERY_URL = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery"
 QUERY_TIMEOUT_SECONDS = 30

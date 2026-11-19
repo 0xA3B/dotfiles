@@ -19,7 +19,7 @@ _SCRIPT = (
     / "managed"
     / "dot_local"
     / "bin"
-    / "executable_vscode-extensions-update"
+    / "executable_update-vscode-extensions"
 )
 _loader = importlib.machinery.SourceFileLoader("vscode_extensions_update", str(_SCRIPT))
 _spec = importlib.util.spec_from_loader("vscode_extensions_update", _loader)

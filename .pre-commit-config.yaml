@@ -105,7 +105,7 @@ repos:
         entry: mise exec -- shfmt -w
         language: system
         files: ^(.*\.(sh|sh\.tmpl|bash|zsh)|(managed/)?dot_(bash|zsh)rc|(managed/)?dot_config/tmux/tmux\.conf\.tmpl|(managed/)?dot_config/zsh/completions/_.*|(managed/)?dot_local/bin/(work/)?executable_.*)$
-        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|vscode-extensions-update)$
+        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|update-vscode-extensions)$
         stages: [pre-commit]
 
       - id: format-sh-check
@@ -113,7 +113,7 @@ repos:
         entry: mise exec -- shfmt -d
         language: system
         files: ^(.*\.(sh|sh\.tmpl|bash|zsh)|(managed/)?dot_(bash|zsh)rc|(managed/)?dot_config/tmux/tmux\.conf\.tmpl|(managed/)?dot_config/zsh/completions/_.*|(managed/)?dot_local/bin/(work/)?executable_.*)$
-        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|vscode-extensions-update)$
+        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|update-vscode-extensions)$
         stages: [manual]
 
       # ShellCheck does not support zsh, so this hook covers only sh and bash files.
@@ -122,7 +122,7 @@ repos:
         entry: mise exec -- shellcheck
         language: system
         files: ^(.*\.(sh|sh\.tmpl|bash)|(managed/)?dot_bashrc|(managed/)?dot_local/bin/(work/)?executable_.*)$
-        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|vscode-extensions-update)$
+        exclude: ^managed/dot_local/bin/executable_(dotfiles|generate-completions|tmx|update-vscode-extensions)$
         stages: [pre-commit]
 
       - id: lint-zsh

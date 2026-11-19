@@ -1,0 +1,37 @@
+#!/bin/sh
+# Run every update command in sequence. A secondary source can add steps
+# through an update-all-work command on PATH, which runs first so its logins
+# precede updates from authenticated package indexes. Every step runs: a step
+# whose tool is missing is skipped with a note, and the exit status is 1 when
+# any step fails, after a summary of the failed steps.
+set -u
+
+failed=
+
+# step <label> <tool> <command> [<argument>...]
+step() {
+  label=$1
+  tool=$2
+  shift 2
+  printf '\n==> %s\n' "${label}"
+  if ! command -v "${tool}" >/dev/null 2>&1; then
+    printf '%s not found; skipping\n' "${tool}" >&2
+    return
+  fi
+  "$@" || failed="${failed}  ${label}
+"
+}
+
+if command -v update-all-work >/dev/null 2>&1; then
+  step "Work steps" update-all-work update-all-work
+fi
+step Homebrew brew update-brew
+step "mise tools" mise update-mise
+step "uv tools" uv uv tool upgrade --all
+step "VS Code extensions" code update-vscode-extensions
+step "Claude Code" claude claude update
+
+if [ -n "${failed}" ]; then
+  printf '\nFailed steps:\n%s' "${failed}" >&2
+  exit 1
+fi
