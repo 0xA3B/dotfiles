@@ -4,3 +4,5 @@
 .config/zsh/functions/brew-update.zsh
 .config/zsh/functions/generate-completions.zsh
 .config/zsh/functions/__generate_completions_base_registry.zsh
+.local/bin/brew-update
+.local/bin/vscode-extensions-update

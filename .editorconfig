@@ -58,5 +58,5 @@ shell_variant = bash
 [managed/dot_zshrc]
 shell_variant = zsh
 
-[managed/dot_local/bin/{executable_dotfiles,executable_tmx,executable_vscode-extensions-update}]
+[managed/dot_local/bin/{executable_dotfiles,executable_tmx,executable_update-vscode-extensions}]
 indent_size = 4

@@ -30,7 +30,7 @@ files = [
     "managed/dot_local/bin/executable_dotfiles",
     "managed/dot_local/bin/executable_generate-completions",
     "managed/dot_local/bin/executable_tmx",
-    "managed/dot_local/bin/executable_vscode-extensions-update"
+    "managed/dot_local/bin/executable_update-vscode-extensions"
 ]
 strict = false
 
@@ -67,7 +67,7 @@ extend-include = [
     "managed/dot_local/bin/executable_dotfiles",
     "managed/dot_local/bin/executable_generate-completions",
     "managed/dot_local/bin/executable_tmx",
-    "managed/dot_local/bin/executable_vscode-extensions-update"
+    "managed/dot_local/bin/executable_update-vscode-extensions"
 ]
 
 [tool.ruff.lint]
