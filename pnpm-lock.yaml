@@ -257,8 +257,8 @@ packages:
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
 
-  argue-cli@3.2.0:
-    resolution: {integrity: sha512-VipTB0gXgGIFO2Rg9yEVN5wLt2AurJcZqDbgmYSwPwsykhLrQhs240/bfceev4w68lI8JshoOJIk9uW7tFzROw==}
+  argue-cli@3.2.1:
+    resolution: {integrity: sha512-h8QG03KSAympQnbZe0k5h/mnQCCkoKO9rVQ0L+F99+NNTV4vm18Lq70WwIKE0aLN3mM1EUf42l960bl6Dd0jOw==}
     engines: {node: '>=22'}
 
   callsites@3.1.0:
@@ -648,7 +648,7 @@ snapshots:
 
   argparse@2.0.1: {}
 
-  argue-cli@3.2.0: {}
+  argue-cli@3.2.1: {}
 
   callsites@3.1.0: {}
 
@@ -669,7 +669,7 @@ snapshots:
   conventional-commits-parser@7.1.4:
     dependencies:
       '@simple-libs/stream-utils': 2.0.0
-      argue-cli: 3.2.0
+      argue-cli: 3.2.1
 
   cosmiconfig@9.0.2:
     dependencies:
