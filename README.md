@@ -3,6 +3,33 @@
 This is my set of personal dotfiles managed with [chezmoi](https://www.chezmoi.io/). Feel free to
 explore them for inspiration.
 
+## Set Up a New Mac
+
+On a new Apple silicon Mac, run the bootstrap script in Terminal:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/0xA3B/dotfiles/main/bootstrap.sh)"
+```
+
+Pass the script to `bash` as an argument, as shown. Do not pipe it into a shell. The Homebrew
+installer, `sudo`, and `chezmoi init` read their prompts from standard input, and a pipe replaces
+standard input with the script.
+
+[`bootstrap.sh`](bootstrap.sh) installs Homebrew, chezmoi, and mise. Then it runs
+`chezmoi init --apply` with mise's Python and uv on `PATH`, because the modify scripts need uv
+before the apply installs it. The apply also installs the packages in the [Brewfile](#homebrew) and
+the tools in the mise config.
+
+Each step skips work that is already done, so you can rerun the script. If the source directory is
+already cloned, the script pulls and applies it instead of cloning it.
+
+The script clones the repository over HTTPS, because a new Mac has no SSH keys for GitHub yet. After
+you set up SSH access, switch the remote:
+
+```sh
+chezmoi git -- remote set-url origin git@github.com:0xA3B/dotfiles.git
+```
+
 ## Install chezmoi
 
 chezmoi is a standalone tool written in Go. On macOS, the simplest install is:
@@ -17,8 +44,10 @@ Other package-manager and binary install options are available in the official d
 
 ## Bootstrap This Repo
 
-The repository's modify scripts run through [uv](https://docs.astral.sh/uv/) during `chezmoi apply`,
-so install uv first, for example with `brew install uv`.
+To set up a machine without the bootstrap script, install chezmoi as described in
+[Install chezmoi](#install-chezmoi), then follow these steps. The repository's modify scripts run
+through [uv](https://docs.astral.sh/uv/) during `chezmoi apply`, so install uv first, for example
+with `brew install uv`.
 
 Initialize the default chezmoi source directory from GitHub:
 
