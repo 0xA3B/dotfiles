@@ -3,6 +3,33 @@
 This is my set of personal dotfiles managed with [chezmoi](https://www.chezmoi.io/). Feel free to
 explore them for inspiration.
 
+## Set Up a New Mac
+
+On a new Apple silicon Mac, run the bootstrap script in Terminal:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/0xA3B/dotfiles/main/bootstrap.sh)"
+```
+
+Pass the script to `bash` as an argument, as shown. Do not pipe it into a shell. The Homebrew
+installer, `sudo`, and `chezmoi init` read their prompts from standard input, and a pipe replaces
+standard input with the script.
+
+[`bootstrap.sh`](bootstrap.sh) installs Homebrew, chezmoi, and mise. Then it runs
+`chezmoi init --apply` with mise's Python and uv on `PATH`, because the modify scripts need uv
+before the apply installs it. The apply also installs the packages in the [Brewfile](#homebrew) and
+the tools in the mise config.
+
+Each step skips work that is already done, so you can rerun the script. If the source directory is
+already cloned, the script pulls and applies it instead of cloning it.
+
+The script clones the repository over HTTPS, because a new Mac has no SSH keys for GitHub yet. After
+you set up SSH access, switch the remote:
+
+```sh
+chezmoi git -- remote set-url origin git@github.com:0xA3B/dotfiles.git
+```
+
 ## Install chezmoi
 
 chezmoi is a standalone tool written in Go. On macOS, the simplest install is:
@@ -17,8 +44,10 @@ Other package-manager and binary install options are available in the official d
 
 ## Bootstrap This Repo
 
-The repository's modify scripts run through [uv](https://docs.astral.sh/uv/) during `chezmoi apply`,
-so install uv first, for example with `brew install uv`.
+To set up a machine without the bootstrap script, install chezmoi as described in
+[Install chezmoi](#install-chezmoi), then follow these steps. The repository's modify scripts run
+through [uv](https://docs.astral.sh/uv/) during `chezmoi apply`, so install uv first, for example
+with `brew install uv`.
 
 Initialize the default chezmoi source directory from GitHub:
 
@@ -106,19 +135,27 @@ check only that checkout. The `:::` separates the two mise tasks.
 mise run format:check ::: lint
 ```
 
-## Bootstrap Homebrew
+## Homebrew
 
 The repo manages a curated global Brewfile at
-[`managed/dot_config/homebrew/Brewfile`](managed/dot_config/homebrew/Brewfile).
+[`managed/dot_config/homebrew/Brewfile.tmpl`](managed/dot_config/homebrew/Brewfile.tmpl). The apps
+in its personal block install only when `work_machine` is false. The Brewfile applies only on macOS,
+and its install needs Homebrew at `/opt/homebrew/bin/brew`.
 
-Install the fresh-machine Homebrew (requires `chezmoi apply`):
-
-```sh
-brew bundle install --global
-```
+When the rendered Brewfile changes, `chezmoi apply` runs `brew bundle install --no-upgrade` through
+[`run_onchange_after_10-brew-bundle.sh.tmpl`](managed/run_onchange_after_10-brew-bundle.sh.tmpl).
+The install does not run `brew upgrade` on packages that are already installed, although installing
+a new package can upgrade a dependency that it needs. chezmoi writes every file before it runs the
+install, so a failed install leaves the dotfiles applied, and the next apply retries the install. If
+you remove an entry from the Brewfile, the package stays installed until you run `brew uninstall`
+for it.
 
 The Brewfile is intentionally limited to machine bootstrap tools, shell/editor utilities, desktop
 apps, and fonts. Developer runtimes are managed by mise.
+
+To upgrade packages, run `update-brew`, a command that `chezmoi apply` installs in `~/.local/bin`.
+It runs `brew update`, `brew upgrade`, and `brew cleanup`. `brew upgrade` skips casks that Homebrew
+marks `auto_updates`, because those apps update themselves.
 
 ## License
 

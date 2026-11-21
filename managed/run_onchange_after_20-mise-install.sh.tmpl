@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+# Install the tools in the machine-wide mise config whenever it changes. Its name sorts it after
+# the Brewfile install, which provides mise, and before the scripts that use mise tools.
+# config.toml hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+
+if ! command -v mise >/dev/null 2>&1; then
+  echo "mise not found; skipping mise install" >&2
+  exit 0
+fi
+
+mise install
