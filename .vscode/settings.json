@@ -44,6 +44,7 @@
     "**/dot_vimrc": "Vimscript",
     "**/dot_zshrc": "shellscript",
     "**/run_onchange_after_10-brew-bundle.sh.tmpl": "shellscript",
+    "**/run_onchange_after_20-mise-install.sh.tmpl": "shellscript",
     "**/run_onchange_after_30-generate-completions.sh.tmpl": "shellscript",
     "**/run_onchange_after_40-install-vscode-extensions.sh.tmpl": "shellscript",
     ".shellcheckrc": "properties",
