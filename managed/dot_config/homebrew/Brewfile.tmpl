@@ -1,8 +1,12 @@
-# Curated Homebrew bundle for fresh-machine bootstrap.
+{{- /* vim: set filetype=ruby : */ -}}
+# Curated Homebrew bundle. chezmoi apply installs it through the
+# run_onchange_after_10-brew-bundle.sh script whenever this file changes.
 #
 # Keep developer runtimes in mise or project-local config instead of Homebrew.
 # This includes Node, Python, uv, pnpm, Go, and Bun unless a package has a
 # specific bootstrap reason to live in Homebrew.
+#
+# Casks marked auto_updates update themselves; update-brew upgrades the rest.
 
 # Bootstrap and source control
 brew "chezmoi"
@@ -41,10 +45,27 @@ brew "neovim"
 # Other command-line tools
 brew "nmap"
 
-# Desktop apps
+# Command-line tools distributed as casks
 cask "1password-cli"
+cask "claude-code@latest"
 cask "codex"
+
+# Desktop apps
+cask "1password"
+cask "chatgpt"
+cask "claude"
 cask "ghostty"
+{{- if not .work_machine }}
+
+# Desktop apps that IT installs and updates on work machines
+cask "google-chrome"
+cask "visual-studio-code"
+
+# Personal desktop apps
+cask "fastmail"
+cask "grok-bot"
+cask "notion"
+{{- end }}
 
 # Fonts
 cask "font-fira-code-nerd-font"
