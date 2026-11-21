@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+
+# Install the managed Brewfile whenever its rendered content changes.
+#
+# This runs as an after script, so a failed install still leaves every file applied. chezmoi
+# records no hash for a failed script, so the next apply retries the install. Its name sorts it
+# before the other after scripts, which use tools that the Brewfile installs.
+
+if [ "$(uname -s)" != Darwin ]; then
+  exit 0
+fi
+
+brew=/opt/homebrew/bin/brew
+if [ ! -x "${brew}" ]; then
+  echo "Homebrew not found at ${brew}; install it with the dotfiles bootstrap.sh" >&2
+  exit 1
+fi
+
+# Install only what is missing; update-brew owns upgrades. The shell configs set
+# HOMEBREW_NO_AUTO_UPDATE, so Homebrew's package metadata can be older than a new Brewfile entry.
+if ! "${brew}" bundle install --no-upgrade --file=- <<'BREWFILE'
+{{ includeTemplate "dot_config/homebrew/Brewfile.tmpl" . -}}
+BREWFILE
+then
+  echo "brew bundle failed; if Homebrew could not find a package, run update-brew and apply again" >&2
+  exit 1
+fi

@@ -43,8 +43,9 @@
     "**/dot_bashrc": "shellscript",
     "**/dot_vimrc": "Vimscript",
     "**/dot_zshrc": "shellscript",
-    "**/run_onchange_generate-completions.sh.tmpl": "shellscript",
-    "**/run_onchange_install-vscode-extensions.sh.tmpl": "shellscript",
+    "**/run_onchange_after_10-brew-bundle.sh.tmpl": "shellscript",
+    "**/run_onchange_after_30-generate-completions.sh.tmpl": "shellscript",
+    "**/run_onchange_after_40-install-vscode-extensions.sh.tmpl": "shellscript",
     ".shellcheckrc": "properties",
     "mise.lock": "toml",
     "uv.lock": "toml"

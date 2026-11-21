@@ -106,19 +106,27 @@ check only that checkout. The `:::` separates the two mise tasks.
 mise run format:check ::: lint
 ```
 
-## Bootstrap Homebrew
+## Homebrew
 
 The repo manages a curated global Brewfile at
-[`managed/dot_config/homebrew/Brewfile`](managed/dot_config/homebrew/Brewfile).
+[`managed/dot_config/homebrew/Brewfile.tmpl`](managed/dot_config/homebrew/Brewfile.tmpl). The apps
+in its personal block install only when `work_machine` is false. The Brewfile applies only on macOS,
+and its install needs Homebrew at `/opt/homebrew/bin/brew`.
 
-Install the fresh-machine Homebrew (requires `chezmoi apply`):
-
-```sh
-brew bundle install --global
-```
+When the rendered Brewfile changes, `chezmoi apply` runs `brew bundle install --no-upgrade` through
+[`run_onchange_after_10-brew-bundle.sh.tmpl`](managed/run_onchange_after_10-brew-bundle.sh.tmpl).
+The install does not run `brew upgrade` on packages that are already installed, although installing
+a new package can upgrade a dependency that it needs. chezmoi writes every file before it runs the
+install, so a failed install leaves the dotfiles applied, and the next apply retries the install. If
+you remove an entry from the Brewfile, the package stays installed until you run `brew uninstall`
+for it.
 
 The Brewfile is intentionally limited to machine bootstrap tools, shell/editor utilities, desktop
 apps, and fonts. Developer runtimes are managed by mise.
+
+To upgrade packages, run `update-brew`, a command that `chezmoi apply` installs in `~/.local/bin`.
+It runs `brew update`, `brew upgrade`, and `brew cleanup`. `brew upgrade` skips casks that Homebrew
+marks `auto_updates`, because those apps update themselves.
 
 ## License
 
