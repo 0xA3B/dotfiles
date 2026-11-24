@@ -8,7 +8,7 @@ import pytest
 
 _BIN_DIR = Path(__file__).resolve().parent.parent / "managed" / "dot_local" / "bin"
 _SHIMS = ("update-all", "update-brew", "update-mise")
-_TOOLS = ("brew", "mise", "uv", "code", "claude", "update-vscode-extensions")
+_TOOLS = ("brew", "mise", "uv", "code", "update-vscode-extensions")
 
 
 @pytest.fixture
@@ -75,7 +75,6 @@ def test_update_all_runs_the_work_hook_before_every_update(bin_dir: Path, tmp_pa
         "mise reshim",
         "uv tool upgrade --all",
         "update-vscode-extensions",
-        "claude update",
     ]
 
 
@@ -86,7 +85,6 @@ def test_update_all_runs_the_work_hook_before_every_update(bin_dir: Path, tmp_pa
         ("mise", "mise upgrade --global"),
         ("uv", "uv tool upgrade --all"),
         ("code", "update-vscode-extensions"),
-        ("claude", "claude update"),
     ],
 )
 def test_update_all_skips_a_step_whose_tool_is_missing(
@@ -116,7 +114,6 @@ def test_update_all_finishes_every_step_and_reports_the_failed_ones(
     stub(bin_dir, "mise", fail_on="upgrade")
     stub(bin_dir, "uv", fail_on="tool")
     stub(bin_dir, "update-vscode-extensions", fail_on="")
-    stub(bin_dir, "claude", fail_on="update")
 
     result, calls = run_update_all(bin_dir, tmp_path)
 
@@ -127,14 +124,7 @@ def test_update_all_finishes_every_step_and_reports_the_failed_ones(
         "mise upgrade --global",
         "uv tool upgrade --all",
         "update-vscode-extensions",
-        "claude update",
     ]
     assert result.stderr.endswith(
-        "Failed steps:\n"
-        "  Work steps\n"
-        "  Homebrew\n"
-        "  mise tools\n"
-        "  uv tools\n"
-        "  VS Code extensions\n"
-        "  Claude Code\n"
+        "Failed steps:\n  Work steps\n  Homebrew\n  mise tools\n  uv tools\n  VS Code extensions\n"
     )
