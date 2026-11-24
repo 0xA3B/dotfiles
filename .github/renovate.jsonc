@@ -45,8 +45,8 @@
     // Manager behavior.
     {
       "description": "Preserve mise ranges with npm versioning",
-      // Default coerced semver would replace global config prefixes such as `go = "1.27"` with
-      // exact versions.
+      // Default coerced semver would replace a prefix such as `python = "3.14"` with an exact
+      // version.
       "matchManagers": ["mise"],
       "versioning": "npm"
     },
@@ -70,7 +70,7 @@
     {
       "description": "Review updates that rewrite a manifest version",
       // An in-range update changes only a lockfile and keeps the manifest value. An update that
-      // moves a bound, an exact pin, or a global mise config prefix, or that replaces a package,
+      // moves a bound, an exact pin, or a mise prefix, or that replaces a package,
       // waits for review and is the release-note review for that release. GitHub Actions and
       // pre-commit pin exact versions that every update rewrites, so this rule leaves them out and
       // they stay automerged. Clear the group so a reviewed PR cannot hold back the automerged
@@ -86,15 +86,6 @@
       "matchPackageNames": ["@commitlint/**"],
       "matchUpdateTypes": ["major"],
       "groupName": "commitlint"
-    },
-    {
-      "description": "Group global mise tools",
-      // The chezmoi-managed global mise config has no lockfile, so every update rewrites a prefix
-      // and waits for review under the rule above. That review matters because CI never installs
-      // this config.
-      "matchManagers": ["mise"],
-      "matchFileNames": ["managed/**"],
-      "groupName": "global mise tools"
     },
     // Lockfile maintenance.
     {

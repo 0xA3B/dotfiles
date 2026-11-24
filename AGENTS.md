@@ -70,14 +70,14 @@ Apply `engineering:dependency-policy`, with these additions:
 
 - Renovate is the updater. Once CI passes, it automerges every update that changes only a lockfile
   and every GitHub Actions and pre-commit update. It holds for review every update that rewrites a
-  version in `package.json`, `pyproject.toml`, PEP 723 metadata, `mise.toml`, or
-  `managed/dot_config/mise/config.toml`.
+  version in `package.json`, `pyproject.toml`, PEP 723 metadata, or `mise.toml`.
 - Update Node.js majors and Python feature releases, such as 3.14 to 3.15, by hand, and keep their
   Renovate updates disabled in `.github/renovate.jsonc`. Renovate takes their in-range releases only
   through weekly lockfile maintenance.
 - In `managed/dot_config/mise/config.toml`, the machine-wide mise config, which has no lockfile and
-  which CI never installs, write runtime versions as prefixes such as `go = "1.27"`, which Renovate
-  moves, and other tools as `latest`.
+  which CI never installs, write Python as a feature-release prefix such as `python = "3.14"`,
+  Node.js as `lts`, and every other tool, including other runtimes, as `latest`. Projects pin their
+  own runtime versions, so the machine-wide versions serve only directories without a pin.
 - Pin each external in `managed/.chezmoiexternal.toml` to a release tag and its `checksum.sha256`;
   Renovate does not track them.
 
