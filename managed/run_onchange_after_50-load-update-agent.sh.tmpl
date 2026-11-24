@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+# Load the update-all launchd agent, and reload it whenever its plist changes. .chezmoiignore.tmpl
+# skips this script, the agent, and update-all-unattended on work machines and outside macOS.
+# Plist hash: {{ includeTemplate "private_Library/LaunchAgents/io.github.0xa3b.update-all.plist.tmpl" . | sha256sum }}
+
+label=io.github.0xa3b.update-all
+plist="${HOME}/Library/LaunchAgents/${label}.plist"
+domain="gui/$(id -u)"
+
+# An apply without a login session, such as over SSH, has no GUI domain to load into. launchd loads
+# the agent from ~/Library/LaunchAgents at the next login instead.
+if ! launchctl print "${domain}" >/dev/null 2>&1; then
+  echo "No GUI session; the update-all agent loads at the next login" >&2
+  exit 0
+fi
+
+# Bootstrapping a loaded agent fails, so unload any earlier version first. launchd can still be
+# tearing that version down when bootout returns, so retry the bootstrap once.
+launchctl bootout "${domain}/${label}" 2>/dev/null || true
+if ! launchctl bootstrap "${domain}" "${plist}"; then
+  sleep 2
+  launchctl bootstrap "${domain}" "${plist}"
+fi

@@ -49,6 +49,14 @@ Library/Application Support/Code/User/extensions.managed.txt
 .config/fish/conf.d/disabled/**
 .config/zsh/conf.d/disabled/**
 
+# The unattended update agent runs only on personal Macs. Work tools usually need the VPN.
+{{- if or .work_machine (ne .chezmoi.os "darwin") }}
+.local/bin/update-all-unattended
+Library/LaunchAgents
+Library/LaunchAgents/**
+50-load-update-agent.sh
+{{- end }}
+
 # OS specific ignores
 {{- if ne .chezmoi.os "darwin" }}
 Library/Application Support/Code/User/settings.json

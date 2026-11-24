@@ -30,6 +30,7 @@
     "**/dot_local/bin/executable_op": "shellscript",
     "**/dot_local/bin/executable_tmx": "python",
     "**/dot_local/bin/executable_update-all": "shellscript",
+    "**/dot_local/bin/executable_update-all-unattended": "shellscript",
     "**/dot_local/bin/executable_update-brew": "shellscript",
     "**/dot_local/bin/executable_update-mise": "shellscript",
     "**/dot_local/bin/executable_update-vscode-extensions": "python",
@@ -47,6 +48,8 @@
     "**/run_onchange_after_20-mise-install.sh.tmpl": "shellscript",
     "**/run_onchange_after_30-generate-completions.sh.tmpl": "shellscript",
     "**/run_onchange_after_40-install-vscode-extensions.sh.tmpl": "shellscript",
+    "**/run_onchange_after_50-load-update-agent.sh.tmpl": "shellscript",
+    "**/LaunchAgents/*.plist.tmpl": "xml",
     ".shellcheckrc": "properties",
     "mise.lock": "toml",
     "uv.lock": "toml"
