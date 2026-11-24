@@ -1,0 +1,51 @@
+#!/bin/sh
+# Run update-all without a terminal, for the launchd agent that chezmoi installs on personal Macs.
+#
+# launchd starts jobs with a minimal PATH and without shell configuration, so this sets up PATH and
+# the Homebrew and mise environment the way the shells do. The output replaces the previous run's log, and a failed run posts a macOS
+# notification that names the failed steps. The exit status is update-all's.
+set -u
+
+log_dir="${HOME}/Library/Logs"
+log="${log_dir}/update-all.log"
+
+export PATH="${HOME}/.local/bin:${HOME}/.local/share/mise/shims:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:${PATH}"
+# Match the Homebrew and mise settings in the shells' 00-homebrew and 24-mise configs.
+export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_ENV_HINTS=1
+export MISE_CACHE_DIR="${XDG_CACHE_HOME:-${HOME}/.cache}/mise"
+
+mkdir -p "${log_dir}"
+exec >"${log}" 2>&1
+
+printf '==> update-all-unattended started %s\n' "$(date)"
+
+# A run that launchd starts at wake can begin before the network is back. Wait up to a minute for a
+# default route, then run anyway; steps that need the network fail and are reported.
+attempts=0
+until route -n get default >/dev/null 2>&1 || [ "${attempts}" -ge 12 ]; do
+  attempts=$((attempts + 1))
+  sleep 5
+done
+
+update-all
+status=$?
+
+printf '\n==> update-all-unattended finished %s with exit status %s\n' "$(date)" "${status}"
+
+if [ "${status}" -ne 0 ]; then
+  # update-all ends a failed run with "Failed steps:" and one indented step name per line.
+  steps=$(sed -n '/^Failed steps:$/,/^==>/{s/^  //p;}' "${log}" | paste -sd, - | sed 's/,/, /g')
+  if [ -n "${steps}" ]; then
+    message="Failed: ${steps}"
+  else
+    message="update-all exited with status ${status}"
+  fi
+  osascript \
+    -e 'on run argv' \
+    -e 'display notification (item 1 of argv) with title "update-all" subtitle (item 2 of argv)' \
+    -e 'end run' \
+    "${message}" "See ~/Library/Logs/update-all.log" || true
+fi
+
+exit "${status}"

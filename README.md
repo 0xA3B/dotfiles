@@ -157,6 +157,30 @@ To upgrade packages, run `update-brew`, a command that `chezmoi apply` installs 
 It runs `brew update`, `brew upgrade`, and `brew cleanup`. `brew upgrade` skips casks that Homebrew
 marks `auto_updates`, because those apps update themselves.
 
+## Unattended Updates
+
+On personal Macs, `chezmoi apply` installs a launchd agent that runs `update-all` every day at noon.
+If the Mac is asleep then, launchd runs it once when the Mac wakes. `update-all` upgrades Homebrew
+packages, mise tools, uv tools, and VS Code extensions. It runs every step even when one fails.
+
+The agent runs `update-all-unattended`, which sets up `PATH` and the Homebrew and mise environment,
+writes the run's output to `~/Library/Logs/update-all.log`, replacing the previous run's log. If a
+run fails, it posts a notification that names the failed steps. The first notification may need you
+to allow notifications from Script Editor in System Settings.
+[`run_onchange_after_50-load-update-agent.sh.tmpl`](managed/run_onchange_after_50-load-update-agent.sh.tmpl)
+loads the agent and reloads it when its plist changes. Work machines skip the agent,
+`update-all-unattended`, and the loader script, because work tools usually need the VPN.
+
+To run an update now, run `launchctl kickstart`. To unload the agent until you next log in or an
+apply changes its plist, run `launchctl bootout`.
+
+```sh
+# Run update-all now
+launchctl kickstart "gui/$(id -u)/io.github.0xa3b.update-all"
+# Unload the agent
+launchctl bootout "gui/$(id -u)/io.github.0xa3b.update-all"
+```
+
 ## License
 
 This repository is available under the [MIT License](LICENSE).

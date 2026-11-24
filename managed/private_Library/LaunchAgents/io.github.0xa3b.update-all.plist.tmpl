@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Runs update-all-unattended every day at 12:00 on personal Macs. If the Mac is asleep at that time,
+  launchd runs the job once when it wakes. run_onchange_after_50-load-update-agent.sh.tmpl reloads
+  this agent whenever the rendered file changes.
+-->
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>io.github.0xa3b.update-all</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>{{ .chezmoi.homeDir }}/.local/bin/update-all-unattended</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+      <key>Hour</key>
+      <integer>12</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+    <key>ProcessType</key>
+    <string>Background</string>
+  </dict>
+</plist>
