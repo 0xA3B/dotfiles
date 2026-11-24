@@ -29,7 +29,6 @@ step Homebrew brew update-brew
 step "mise tools" mise update-mise
 step "uv tools" uv uv tool upgrade --all
 step "VS Code extensions" code update-vscode-extensions
-step "Claude Code" claude claude update
 
 if [ -n "${failed}" ]; then
   printf '\nFailed steps:\n%s' "${failed}" >&2
