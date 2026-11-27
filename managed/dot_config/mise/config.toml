@@ -12,6 +12,19 @@ NODE_USE_SYSTEM_CA = "1"
 GOPATH = "{{ env.XDG_DATA_HOME | default(value=env.HOME ~ '/.local/share') }}/go"
 GOBIN = "{{ env.XDG_DATA_HOME | default(value=env.HOME ~ '/.local/share') }}/go/bin"
 
+[hooks]
+# virtualenv caches interpreter details keyed by path and modification time.
+# python-build-standalone ships every binary with the same modification time, so
+# when mise moves a prefix such as python/3.14 to a new patch release, virtualenv
+# reuses the old entry and pre-commit's health check fails. Clear the cache
+# after any Python install. A global hook runs for every project's installs and
+# for mise upgrade.
+postinstall = '''
+case "$MISE_INSTALLED_TOOLS" in
+  *'"name":"python"'*) rm -rf "${XDG_CACHE_HOME:-$HOME/.cache}/virtualenv/py_info" ;;
+esac
+'''
+
 [tools]
 uv = "latest"
 pnpm = "latest"
