@@ -13,6 +13,7 @@ export PATH="${HOME}/.local/bin:${HOME}/.local/share/mise/shims:/opt/homebrew/bi
 # Match the Homebrew and mise settings in the shells' 00-homebrew and 24-mise configs.
 export HOMEBREW_NO_ANALYTICS=1
 export HOMEBREW_NO_ENV_HINTS=1
+export HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1
 export MISE_CACHE_DIR="${XDG_CACHE_HOME:-${HOME}/.cache}/mise"
 
 mkdir -p "${log_dir}"

@@ -8,6 +8,10 @@ if [[ -f $brewbin ]]; then
   export HOMEBREW_NO_AUTO_UPDATE=1
   export HOMEBREW_NO_ANALYTICS=1
   export HOMEBREW_NO_ENV_HINTS=1
+  # Leave casks marked auto_updates, which covers every desktop app here, to update themselves.
+  # Homebrew otherwise upgrades them when they fall behind, quitting the running app and sometimes
+  # asking for sudo.
+  export HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1
 
   gnubin="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin"
   if [[ -d $gnubin ]]; then

@@ -155,7 +155,11 @@ apps, and fonts. Developer runtimes are managed by mise.
 
 To upgrade packages, run `update-brew`, a command that `chezmoi apply` installs in `~/.local/bin`.
 It runs `brew update`, `brew upgrade`, and `brew cleanup`. `brew upgrade` skips casks that Homebrew
-marks `auto_updates`, because those apps update themselves.
+marks `auto_updates`, which include every desktop app in the Brewfile, because those apps update
+themselves. Homebrew would otherwise upgrade such an app when it falls behind, quitting it and
+sometimes asking for `sudo`. The shell configs and `update-all-unattended` set
+`HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS` to turn that off; run `brew upgrade --greedy` to upgrade
+them anyway.
 
 ## Unattended Updates
 
