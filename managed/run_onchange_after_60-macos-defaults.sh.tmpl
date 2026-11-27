@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+# Write the managed macOS user defaults whenever this script changes. An app reads its defaults when
+# it starts, so restart a running app to pick up a change.
+
+if [ "$(uname -s)" != Darwin ]; then
+  exit 0
+fi
+
+# Repeat a held key in VS Code instead of showing the accent picker, so held Vim motions repeat.
+defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
