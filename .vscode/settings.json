@@ -49,6 +49,7 @@
     "**/run_onchange_after_30-generate-completions.sh.tmpl": "shellscript",
     "**/run_onchange_after_40-install-vscode-extensions.sh.tmpl": "shellscript",
     "**/run_onchange_after_50-load-update-agent.sh.tmpl": "shellscript",
+    "**/run_onchange_after_60-macos-defaults.sh.tmpl": "shellscript",
     "**/LaunchAgents/*.plist.tmpl": "xml",
     ".shellcheckrc": "properties",
     "mise.lock": "toml",
