@@ -49,6 +49,14 @@ Library/Application Support/Code/User/extensions.managed.txt
 .config/fish/conf.d/disabled/**
 .config/zsh/conf.d/disabled/**
 
+# Contribution checkouts live in ~/Code/contrib on personal machines, and work repositories in
+# ~/Code/work on work machines.
+{{- if .work_machine }}
+Code/contrib
+{{- else }}
+Code/work
+{{- end }}
+
 # The unattended update agent runs only on personal Macs. Work tools usually need the VPN.
 {{- if or .work_machine (ne .chezmoi.os "darwin") }}
 .local/bin/update-all-unattended
