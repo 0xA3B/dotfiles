@@ -7,7 +7,8 @@
   live `settings.json` by the adjacent `modify_private_settings.json` script. It manages only the
   keys it contains and preserves unrelated live settings.
 - `extensions.managed.txt` lists extensions installed by
-  `managed/run_onchange_after_40-install-vscode-extensions.sh.tmpl`.
+  `managed/run_onchange_after_40-install-vscode-extensions.sh.tmpl`, which passes them to
+  `update-vscode-extensions --install` so each new extension also waits out the cooldown.
 - `managed/dot_local/bin/executable_update-vscode-extensions` updates every installed extension
   under a 72-hour release-age cooldown. Its docstring explains why `extensions.autoUpdate` stays
   `off` instead of relying on `extensions.autoUpdateDelay`.
