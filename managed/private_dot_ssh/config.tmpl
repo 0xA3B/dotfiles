@@ -1,0 +1,18 @@
+{{- /* vim: set filetype=sshconfig : */ -}}
+# Secondary sources and machine-local settings go in ~/.ssh/config.d. ssh keeps the first value it
+# reads for each setting, so those files override the settings below.
+Include config.d/*
+{{- if and (eq .chezmoi.os "darwin") (not .work_machine) }}
+
+# Authenticate to GitHub with the personal key in the 1Password SSH agent.
+Host github.com
+    User git
+    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    IdentityFile "~/.ssh/keys/github-personal.pub"
+    IdentitiesOnly yes
+{{- end }}
+
+# Check GitHub's host keys against the managed copy, so the first connection needs no prompt. ssh
+# records new keys for other hosts in known_hosts, the first file.
+Host *
+    UserKnownHostsFile ~/.ssh/known_hosts ~/.ssh/github_known_hosts

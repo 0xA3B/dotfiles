@@ -46,6 +46,13 @@ indent_style = tab
 indent_size = tab
 tab_width = 8
 
+[managed/private_dot_ssh/config.tmpl]
+indent_size = 4
+
+# Each host key is one line, which the known_hosts format can't wrap.
+[managed/private_dot_ssh/github_known_hosts]
+max_line_length = off
+
 [managed/dot_config/tmux/tmux.conf.tmpl]
 shell_variant = bash
 

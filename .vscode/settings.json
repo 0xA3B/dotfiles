@@ -50,6 +50,8 @@
     "**/run_onchange_after_40-install-vscode-extensions.sh.tmpl": "shellscript",
     "**/run_onchange_after_50-load-update-agent.sh.tmpl": "shellscript",
     "**/run_onchange_after_60-macos-defaults.sh.tmpl": "shellscript",
+    "**/private_dot_ssh/config.tmpl": "ssh_config",
+    "**/private_dot_ssh/github_known_hosts": "plaintext",
     "**/.keep": "plaintext",
     "**/LaunchAgents/*.plist.tmpl": "xml",
     ".shellcheckrc": "properties",
