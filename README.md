@@ -18,17 +18,34 @@ standard input with the script.
 [`bootstrap.sh`](bootstrap.sh) installs Homebrew, chezmoi, and mise. Then it runs
 `chezmoi init --apply` with mise's Python and uv on `PATH`, because the modify scripts need uv
 before the apply installs it. The apply also installs the packages in the [Brewfile](#homebrew) and
-the tools in the mise config.
+the tools in the mise config, creates the `~/Code` directories, writes `~/.ssh/config`, and sets the
+managed macOS user defaults.
 
-Each step skips work that is already done, so you can rerun the script. If the source directory is
-already cloned, the script pulls and applies it instead of cloning it.
+After the apply, the script:
 
-The script clones the repository over HTTPS, because a new Mac has no SSH keys for GitHub yet. After
-you set up SSH access, switch the remote:
+- Adds Homebrew's fish and zsh to `/etc/shells` and makes fish the login shell.
+- Removes GarageBand, iMovie, and Keynote. macOS can block the removal if Terminal lacks App
+  Management access in System Settings > Privacy & Security.
+- Trusts the repository's mise config, then installs its tools, dependencies, and Git hooks with
+  `mise run setup`.
+- Sets the repository to push over SSH, as described below.
+- On personal Macs, posts a test notification, so macOS asks now whether to allow notifications from
+  Script Editor, which the [update agent](#unattended-updates) uses to report failures.
 
-```sh
-chezmoi git -- remote set-url origin git@github.com:0xA3B/dotfiles.git
-```
+These steps prompt for your password through `sudo` and `chsh`.
+
+Each step skips work that is already done, except the test notification, so you can rerun the
+script. If the source directory is already cloned, the script pulls and applies it instead of
+cloning it.
+
+The script clones and pulls the public repository over HTTPS, which needs no credentials, so a rerun
+works before the 1Password SSH agent is set up. It sets the push URL to SSH:
+`git@github.com:0xA3B/dotfiles.git` on personal Macs, and `git@github-personal:0xA3B/dotfiles.git`
+on work machines. On personal Macs, `~/.ssh/config` points `github.com` at the personal key in the
+1Password SSH agent. On work machines, the work source defines the `github-personal` host alias in
+`~/.ssh/config.d/`. On every machine, ssh also checks GitHub against the host keys that GitHub
+publishes, kept in `~/.ssh/github_known_hosts`, so the first connection asks no questions. Turn on
+the 1Password SSH agent before you push.
 
 ## Install chezmoi
 
