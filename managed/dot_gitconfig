@@ -15,7 +15,7 @@
 [pull]
 	rebase = true
 [include]
-	path = ~/.gitconfig-machine
+	path = ~/.gitconfig-local
 [includeIf "gitdir:~/Code/personal/"]
 	path = ~/.gitconfig-personal
 # Contribution checkouts, which exist only on personal machines, use the personal identity.
