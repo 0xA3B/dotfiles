@@ -663,3 +663,156 @@ def test_fails_when_code_version_output_is_incomplete(monkeypatch, capsys, versi
 
     assert status == 1
     assert "cannot read the VS Code installation" in capsys.readouterr().err
+
+
+def test_install_installs_a_missing_extension_at_the_newest_version_past_the_cooldown(capsys):
+    status, installed = run(
+        ["--install", "Pub.New"],
+        installed={"pub.ext": "1.0.0"},
+        marketplace={
+            "pub.new": [
+                release("2.1.0", age_hours=10),
+                release("2.0.0", age_hours=80),
+                release("1.9.0", age_hours=900),
+            ],
+            "pub.ext": [release("1.1.0", age_hours=80)],
+        },
+    )
+
+    out = capsys.readouterr().out
+    assert status == 0
+    assert installed == {"pub.ext": "1.0.0", "pub.new": "2.0.0"}
+    assert "Installed pub.new 2.0.0" in out
+    assert "Held pub.new 2.1.0 until" in out
+    assert "Reload" in out
+
+
+def test_install_leaves_installed_extensions_alone(capsys):
+    status, installed = run(
+        ["--install", "pub.ext"],
+        installed={"pub.ext": "1.0.0"},
+        marketplace={"pub.ext": [release("1.1.0", age_hours=80)]},
+    )
+
+    assert status == 0
+    assert installed == {"pub.ext": "1.0.0"}
+    assert capsys.readouterr().out == ""
+
+
+def test_install_skips_pre_release_and_incompatible_versions():
+    status, installed = run(
+        ["--install", "pub.new"],
+        installed={},
+        marketplace={
+            "pub.new": [
+                release("1.3.0", age_hours=80, prerelease=True),
+                release("1.2.0", age_hours=80, engine="^1.200.0"),
+                release("1.1.0", age_hours=80, platform="linux-x64"),
+                release("1.0.0", age_hours=80),
+            ]
+        },
+    )
+
+    assert status == 0
+    assert installed == {"pub.new": "1.0.0"}
+
+
+def test_install_skips_an_extension_with_no_version_past_the_cooldown(capsys):
+    status, installed = run(
+        ["--install", "pub.new"],
+        installed={},
+        marketplace={"pub.new": [release("1.0.0", age_hours=10)]},
+    )
+
+    out = capsys.readouterr().out
+    assert status == 0
+    assert installed == {}
+    assert "Skipped pub.new: every compatible version is inside the cooldown" in out
+    assert "--skip-cooldown pub.new" in out
+    assert "Held pub.new 1.0.0 until" in out
+
+
+def test_install_with_skip_cooldown_installs_the_newest_compatible_version_now():
+    status, installed = run(
+        ["--install", "pub.new", "--skip-cooldown", "pub.new"],
+        installed={},
+        marketplace={
+            "pub.new": [
+                release("1.2.0", age_hours=1, prerelease=True),
+                release("1.1.0", age_hours=1),
+                release("1.0.0", age_hours=900),
+            ]
+        },
+    )
+
+    assert status == 0
+    assert installed == {"pub.new": "1.1.0"}
+
+
+def test_install_rejects_skip_cooldown_for_an_extension_it_does_not_name(capsys):
+    with pytest.raises(SystemExit) as exit_info:
+        run(
+            ["--install", "pub.new", "--skip-cooldown", "pub.ext"],
+            installed={"pub.ext": "1.0.0"},
+            marketplace={},
+        )
+
+    assert exit_info.value.code == 2
+    assert "--skip-cooldown: pub.ext is not named by --install" in capsys.readouterr().err
+
+
+def test_install_dry_run_reports_without_installing(capsys):
+    status, installed = run(
+        ["--install", "pub.new", "--dry-run"],
+        installed={},
+        marketplace={"pub.new": [release("1.0.0", age_hours=80)]},
+    )
+
+    out = capsys.readouterr().out
+    assert status == 0
+    assert installed == {}
+    assert "Would install pub.new 1.0.0" in out
+    assert "Reload" not in out
+
+
+def test_install_fails_for_an_extension_with_no_compatible_version(capsys):
+    status, installed = run(
+        ["--install", "pub.new"],
+        installed={},
+        marketplace={"pub.new": [release("1.0.0", age_hours=80, engine="^1.200.0")]},
+    )
+
+    assert status == 1
+    assert installed == {}
+    assert (
+        "pub.new: no stable version for darwin-arm64 supports VS Code 1.144.0; skipped"
+        in capsys.readouterr().err
+    )
+
+
+def test_install_fails_for_an_extension_missing_from_the_marketplace(capsys):
+    status, installed = run(["--install", "pub.gone"], installed={}, marketplace={})
+
+    assert status == 1
+    assert installed == {}
+    assert "pub.gone: not found on the Marketplace; skipped" in capsys.readouterr().err
+
+
+def test_install_reports_failures_and_installs_the_rest(capsys):
+    status, installed = run(
+        ["--install", "pub.down", "--install", "pub.broken", "--install", "pub.new"],
+        installed={},
+        marketplace={
+            "pub.down": [release("1.0.0", age_hours=80)],
+            "pub.broken": [release("1.0.0", age_hours=80)],
+            "pub.new": [release("1.0.0", age_hours=80)],
+        },
+        failures={"pub.down": [http_error(503)] * 3},
+        broken={"pub.broken"},
+    )
+
+    err = capsys.readouterr().err
+    assert status == 1
+    assert installed == {"pub.new": "1.0.0"}
+    assert "pub.down: Marketplace query failed after 3 attempts" in err
+    assert "pub.broken: installing 1.0.0 failed" in err

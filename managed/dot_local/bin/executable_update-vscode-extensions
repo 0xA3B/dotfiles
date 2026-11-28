@@ -23,14 +23,24 @@ It never downgrades. A version installed by hand inside the cooldown stays
 installed. Installing with publisher.name@version also pins the extension, which
 matches VS Code's behavior when automatic updates are off.
 
+With --install, it instead installs each named extension that is not installed
+yet, at the newest version that meets the same rules, and leaves every other
+extension alone. The chezmoi onchange script uses it for the managed extension
+list, so a newly managed extension also waits out the cooldown. An extension
+with no version past the cooldown is skipped with a note; add --skip-cooldown
+for it to install the newest compatible version now.
+
 Usage:
 
     update-vscode-extensions                       # Install eligible updates.
     update-vscode-extensions --dry-run             # Report without installing.
     update-vscode-extensions --skip-cooldown pub.x # Security fix: skip the age check.
+    update-vscode-extensions --install pub.x       # Install pub.x if it is missing.
 
 An extension whose Marketplace query fails after retries, or whose version data
 cannot be parsed, is skipped. The others still update, and the command exits 1.
+An extension named by --install that is not on the Marketplace, or that has no
+stable version for this platform and VS Code, also makes the command exit 1.
 """
 
 import argparse
@@ -333,17 +343,20 @@ class Plan:
 
 def plan(
     releases: list[Release],
-    current: VersionKey,
+    current: VersionKey | None,
     engine: VersionKey,
     now: datetime,
     *,
     skip_cooldown: bool,
 ) -> Plan:
-    """Choose the update for one extension without ever downgrading it."""
+    """Choose the update for one extension without ever downgrading it.
+
+    A current version of None plans a first install, for which every release is newer.
+    """
     newer = [
         release
         for release in releases
-        if release.key > current
+        if (current is None or release.key > current)
         and not release.prerelease
         and (release.min_engine is None or release.min_engine <= engine)
     ]
@@ -359,6 +372,11 @@ def plan(
         None,
     )
     return Plan(update=update, held=newest if newest is not update else None, kept=kept)
+
+
+def format_version(key: VersionKey) -> str:
+    """Format a version key as major.minor.patch."""
+    return ".".join(str(part) for part in key)
 
 
 def local_time(moment: datetime) -> str:
@@ -387,6 +405,13 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="PUBLISHER.NAME",
         help="skip the age check for one extension, such as for a security fix; repeatable",
     )
+    parser.add_argument(
+        "--install",
+        action="append",
+        default=[],
+        metavar="PUBLISHER.NAME",
+        help="install one extension if it is missing, and update nothing else; repeatable",
+    )
     return parser
 
 
@@ -414,25 +439,38 @@ def main(
         return 1
 
     skip_cooldown = {ext_id.lower() for ext_id in args.skip_cooldown}
-    missing = sorted(skip_cooldown - installed.keys())
-    if missing:
-        parser.error(f"--skip-cooldown: {', '.join(missing)} is not installed")
+    requested = {ext_id.lower() for ext_id in args.install}
+    if requested:
+        unknown = sorted(skip_cooldown - requested)
+        if unknown:
+            parser.error(f"--skip-cooldown: {', '.join(unknown)} is not named by --install")
+        # Each target maps to its installed version; None marks a first install.
+        targets: dict[str, str | None] = {
+            ext_id: None for ext_id in requested if ext_id not in installed
+        }
+    else:
+        missing = sorted(skip_cooldown - installed.keys())
+        if missing:
+            parser.error(f"--skip-cooldown: {', '.join(missing)} is not installed")
+        targets = dict(installed)
 
     with ThreadPoolExecutor(max_workers=MAX_CONCURRENT_QUERIES) as pool:
-        futures = {
-            ext_id: pool.submit(query_versions, opener, ext_id, sleep) for ext_id in installed
-        }
+        futures = {ext_id: pool.submit(query_versions, opener, ext_id, sleep) for ext_id in targets}
 
     status = 0
-    updated = False
-    for ext_id, current in sorted(installed.items()):
+    changed = False
+    for ext_id, current in sorted(targets.items()):
         try:
             entries = futures[ext_id].result()
             if entries is None:
-                print(f"Skipped {ext_id}: not found on the Marketplace")
+                if current is None:
+                    error(f"{ext_id}: not found on the Marketplace; skipped")
+                    status = 1
+                else:
+                    print(f"Skipped {ext_id}: not found on the Marketplace")
                 continue
-            current_key = parse_version(current)
-            releases = parse_releases(entries, platform_name, current_key)
+            current_key = None if current is None else parse_version(current)
+            releases = parse_releases(entries, platform_name, current_key or (0, 0, 0))
         except (MarketplaceError, ValueError, LookupError, TypeError) as exc:
             error(f"{ext_id}: {exc}; skipped")
             status = 1
@@ -440,14 +478,31 @@ def main(
 
         result = plan(releases, current_key, engine, now, skip_cooldown=ext_id in skip_cooldown)
         if result.update is not None:
+            version = result.update.version
+            change = (
+                f"{ext_id} {version}" if current is None else f"{ext_id} {current} -> {version}"
+            )
+            verb, done = ("install", "Installed") if current is None else ("update", "Updated")
             if args.dry_run:
-                print(f"Would update {ext_id} {current} -> {result.update.version}")
-            elif code.install(ext_id, result.update.version):
-                print(f"Updated {ext_id} {current} -> {result.update.version}")
-                updated = True
+                print(f"Would {verb} {change}")
+            elif code.install(ext_id, version):
+                print(f"{done} {change}")
+                changed = True
             else:
-                error(f"{ext_id}: installing {result.update.version} failed")
+                error(f"{ext_id}: installing {version} failed")
                 status = 1
+        elif current is None and result.held is None:
+            error(
+                f"{ext_id}: no stable version for {platform_name} supports"
+                f" VS Code {format_version(engine)}; skipped"
+            )
+            status = 1
+        elif current is None:
+            print(
+                f"Skipped {ext_id}: every compatible version is inside the cooldown. Run"
+                f" `{PROG} --install {ext_id}` once one has aged, or add"
+                f" `--skip-cooldown {ext_id}` to install it now."
+            )
         if result.held is not None:
             held = result.held
             print(f"Held {ext_id} {held.version} until {local_time(held.eligible_at)}")
@@ -457,8 +512,8 @@ def main(
                 f" {local_time(result.kept.eligible_at)}"
             )
 
-    if updated:
-        print("Reload VS Code windows to load the updated extensions.")
+    if changed:
+        print("Reload VS Code windows to load the installed extensions.")
     return status
 
 

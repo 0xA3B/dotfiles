@@ -1,4 +1,6 @@
 #!/bin/sh
+# Install each managed VS Code extension that is not installed yet, at the newest version past
+# update-vscode-extensions' release-age cooldown. That command updates installed extensions.
 set -eu
 
 if ! command -v code >/dev/null 2>&1; then
@@ -6,13 +8,29 @@ if ! command -v code >/dev/null 2>&1; then
   exit 0
 fi
 
+# Run the command from its target: on a new machine's first apply, ~/.local/bin is not on PATH yet.
+update="${HOME}/.local/bin/update-vscode-extensions"
+
+if [ ! -x "${update}" ]; then
+  echo "update-vscode-extensions not found; skipping VS Code extension install" >&2
+  exit 0
+fi
+
+set --
 while IFS= read -r extension; do
   extension=${extension%%#*}
   extension=$(printf '%s' "${extension}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
   if [ -z "${extension}" ]; then
     continue
   fi
-  code --install-extension "${extension}"
+  set -- "$@" --install "${extension}"
 done <<'EXTENSIONS'
 {{ include "private_Library/private_Application Support/private_Code/User/extensions.managed.txt" -}}
 EXTENSIONS
+
+# A Marketplace or install failure must not abort the apply. The command names each extension it
+# skipped; this script reruns only when the extension list changes.
+if [ "$#" -gt 0 ] && ! "${update}" "$@"; then
+  echo "Some VS Code extensions were not installed; see the errors above." >&2
+  echo "Install each one later with: update-vscode-extensions --install <publisher.name>" >&2
+fi
