@@ -25,6 +25,7 @@ vitest.explorer
 # Project and infrastructure tooling
 ms-azuretools.vscode-containers
 ms-azuretools.vscode-docker
+ms-vscode-remote.remote-ssh-edit
 ms-vscode.makefile-tools
 
 # AI assistants
